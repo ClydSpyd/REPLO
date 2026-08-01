@@ -81,7 +81,7 @@ export default function Modal({
         {overlay}
 
         {/* Header */}
-        <div className="relative border-b border-[var(--contrast-one)] px-8 py-6 min-h-25">
+        <div className="relative lg:border-b border-[var(--contrast-one)] px-8 lg:py-6 lg:min-h-25">
           <button
             type="button"
             aria-label="Close"
@@ -92,10 +92,10 @@ export default function Modal({
           </button>
 
           {/* A div, not a p — subHeading may carry markup (tags, chips). */}
-          <div className="space-mono pr-12 text-xs uppercase tracking-wide text-[var(--accent-primary)]">
+          <div className="hidden lg:block space-mono pr-12 text-xs uppercase tracking-wide text-[var(--accent-primary)]">
             {subHeading}
           </div>
-          <h2 className="mt-1 heading-three pr-12">{mainHeading}</h2>
+          <h2 className="hidden lg:block mt-1 heading-three pr-12">{mainHeading}</h2>
           {description && (
             <p className="mt-2 body-text text-sm! text-[var(--contrast-three)]">
               {description}

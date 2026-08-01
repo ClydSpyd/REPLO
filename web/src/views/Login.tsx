@@ -24,7 +24,7 @@ export default function Login() {
   };
 
   return (
-    <div className="w-full">
+    <div className="w-full bg-[var(--dark-two)] rounded-2xl p-6">
       <p className="mb-1 text-sm text-[var(--accent-primary)] space-mono">
         WELCOME BACK
       </p>

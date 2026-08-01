@@ -46,7 +46,7 @@ const AuthLayout = () => {
       </section>
 
       {/* Right: fixed-width, route-specific */}
-      <section className="flex w-full shrink-0 flex-col justify-center border-l border-[var(--contrast-one)] bg-[var(--dark-two)] p-10 lg:w-[440px]">
+      <section className="flex w-full shrink-0 flex-col justify-center border-l border-[var(--contrast-one)] app-bg--mobile-only bg-[var(--dark-two)] p-4 lg:p-10 lg:w-[440px]">
         <Outlet />
       </section>
     </div>

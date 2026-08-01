@@ -256,7 +256,7 @@ export default function RoutineBuilderModal({
       onClose={isPending ? undefined : onClose}
       footer={
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-          <p className="body-text text-sm!">
+          <p className="hidden lg:block body-text text-sm!">
             {isEditing
               ? 'Update the name, tag, exercises or set counts, then save your changes.'
               : 'Name your routine and add at least one exercise to save it to your library.'}
@@ -266,7 +266,7 @@ export default function RoutineBuilderModal({
               type="button"
               onClick={onClose}
               disabled={isPending}
-              className="manrope rounded-lg border border-[var(--contrast-one)] px-5 py-3 text-sm font-bold text-white transition-colors hover:border-[var(--contrast-two)] disabled:opacity-50"
+              className="manrope rounded-lg border border-(--contrast-one) px-5 py-3 text-sm font-bold text-white transition-colors hover:border-(--contrast-two) disabled:opacity-50"
             >
               Cancel
             </button>
@@ -274,7 +274,7 @@ export default function RoutineBuilderModal({
               type="button"
               onClick={handleSave}
               disabled={!canSave}
-              className="anton rounded-lg px-6 py-3 text-lg font-extrabold uppercase tracking-wide transition-colors disabled:cursor-not-allowed disabled:bg-[var(--contrast-one)] disabled:text-[var(--contrast-two)] enabled:bg-[var(--accent-primary)] enabled:text-black enabled:hover:brightness-95"
+              className="anton rounded-lg px-6 py-3 text-lg font-extrabold uppercase tracking-wide transition-colors disabled:cursor-not-allowed disabled:bg-(--contrast-one) disabled:text-(--contrast-two) enabled:bg-(--accent-primary) enabled:text-black enabled:hover:brightness-95"
             >
               {isPending
                 ? 'Saving…'
@@ -287,7 +287,7 @@ export default function RoutineBuilderModal({
       }
     >
       {/* Name + tag live above the two columns */}
-      <div className="-mt-2 mb-5">
+      <div className="my-3 lg:mt-2 lg:mb-5">
         <input
           type="text"
           value={name}
@@ -297,27 +297,29 @@ export default function RoutineBuilderModal({
           className="heading-three w-full border-none bg-transparent p-0 text-white placeholder:text-[var(--contrast-two)] focus:outline-none"
         />
 
-        <div className="mt-4 flex flex-wrap items-center gap-2">
+        <div className="mt-6 lg:mt-4 flex items-center gap-1">
           <span className="space-mono mr-1 text-xs uppercase tracking-wide text-[var(--contrast-three)]">
             Tag
           </span>
-          {routineTags.map((option) => (
-            <button
-              key={option}
-              type="button"
-              onClick={() => {
-                setTagTouched(true);
-                setTag(option === effectiveTag ? null : option);
-              }}
-              className={`space-mono shrink-0 whitespace-nowrap rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-wide transition-colors ${
-                effectiveTag === option
-                  ? 'bg-[var(--accent-primary)] text-black!'
-                  : 'border border-[var(--contrast-one)] text-[var(--contrast-three)]! hover:text-white!'
-              }`}
-            >
-              {formatLabel(option)}
-            </button>
-          ))}
+          <div className="scrollbar-none flex gap-2 overflow-x-auto pb-1 lg:contents lg:overflow-visible lg:pb-0">
+            {routineTags.map((option) => (
+              <button
+                key={option}
+                type="button"
+                onClick={() => {
+                  setTagTouched(true);
+                  setTag(option === effectiveTag ? null : option);
+                }}
+                className={`space-mono shrink-0 whitespace-nowrap rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-wide transition-colors ${
+                  effectiveTag === option
+                    ? 'bg-[var(--accent-primary)] text-black!'
+                    : 'border border-[var(--contrast-one)] text-[var(--contrast-three)]! hover:text-white!'
+                }`}
+              >
+                {formatLabel(option)}
+              </button>
+            ))}
+          </div>
           {!tagTouched && derivedTag && (
             <span className="space-mono text-xs uppercase tracking-wide text-[var(--contrast-two)]">
               · Auto

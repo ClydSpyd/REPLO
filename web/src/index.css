@@ -219,6 +219,28 @@ button {
     var(--grid-size) var(--grid-size),
     var(--grid-size) var(--grid-size);
 }
+.app-bg--mobile-only {
+  @media
+    (max-width: 760px)
+  {
+    --grid-size: 43px;
+      --grid-line: rgba(255, 255, 255, 0.057);
+    
+      background-color: black;
+      background-image:
+        radial-gradient(120% 90% at 100% 0%,
+          rgba(255, 128, 0, 0.156),
+          rgba(255, 128, 0, 0.117) 30%,
+          transparent 100%),
+        linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+        linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+      background-size:
+        100% 100%,
+        var(--grid-size) var(--grid-size),
+        var(--grid-size) var(--grid-size);
+
+  }
+}
 
 /* Scrollable strip without a visible scrollbar (mobile filter chips, etc.) */
 .scrollbar-none {
