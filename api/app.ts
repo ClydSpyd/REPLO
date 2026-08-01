@@ -1,5 +1,4 @@
 import express from "express";
-import cors from "cors";
 import fs from "fs";
 import path from "path";
 import workoutRoutes from "./modules/workout/workout.routes";
@@ -29,12 +28,6 @@ const API_PUBLIC_DIR = fs.existsSync(path.join(__dirname, "public", "docs.html")
 
 export function createServer() {
   const app = express();
-
-  app.use(
-    cors({
-      origin: "*",
-    }),
-  );
   app.use(express.json());
 
   app.use(express.static(CLIENT_DIR));

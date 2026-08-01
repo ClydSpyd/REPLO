@@ -6,7 +6,7 @@ import { loginUserSchema, RegisterUserSchema } from "./user.schema";
 import z, { ZodIssue } from "zod";
 
 const service = new UserService();
-const JWT_SECRET = process.env.JWT_SECRET || "hello_world_123_2026";
+const JWT_SECRET = process.env.JWT_SECRET || "baloo_2026";
 const REFRESH_SECRET = process.env.REFRESH_SECRET || "hello_world_123_2026";
 
 /**
