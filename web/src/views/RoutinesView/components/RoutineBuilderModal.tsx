@@ -6,6 +6,7 @@ import {
   FiPlus,
   FiX,
 } from 'react-icons/fi';
+import { LuDumbbell } from 'react-icons/lu';
 import Modal from '../../../components/ui/Modal';
 import ExerciseDatasetList from '../../../components/exercise-dataset-list';
 import ExerciseFiltersBar from '../../../components/exercise-filters-bar';
@@ -88,6 +89,11 @@ export default function RoutineBuilderModal({
   );
   const [equipment, setEquipment] = useState<EquipmentFilter | null>(null);
   const [resultCount, setResultCount] = useState<number>();
+
+  // Below lg the two columns collapse into one toggleable view, and the
+  // muscle/equipment filters collapse behind a toggle. Desktop ignores both.
+  const [mobileView, setMobileView] = useState<'add' | 'routine'>('add');
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
   const { success, error: toastError } = useToast();
   const { mutate: createRoutine, isPending: isCreating } = useCreateRoutine();
@@ -255,18 +261,29 @@ export default function RoutineBuilderModal({
       mainHeading={isEditing ? 'Edit Routine' : 'New Routine'}
       onClose={isPending ? undefined : onClose}
       footer={
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex items-center justify-between gap-3">
           <p className="hidden lg:block body-text text-sm!">
             {isEditing
               ? 'Update the name, tag, exercises or set counts, then save your changes.'
               : 'Name your routine and add at least one exercise to save it to your library.'}
           </p>
+
+          {/* Mobile totals — desktop shows these in the draft panel. */}
+          <div className="flex items-center gap-4 lg:hidden">
+            <Stat value={draft.length} label="Ex" />
+            <Stat value={setCount} label="Sets" />
+            <Stat
+              value={`~${draft.length === 0 ? 0 : estimatedMinutes}`}
+              label="min"
+            />
+          </div>
+
           <div className="flex items-center gap-3">
             <button
               type="button"
               onClick={onClose}
               disabled={isPending}
-              className="manrope rounded-lg border border-(--contrast-one) px-5 py-3 text-sm font-bold text-white transition-colors hover:border-(--contrast-two) disabled:opacity-50"
+              className="manrope hidden rounded-lg border border-(--contrast-one) px-5 py-3 text-sm font-bold text-white transition-colors hover:border-(--contrast-two) disabled:opacity-50 lg:block"
             >
               Cancel
             </button>
@@ -276,11 +293,16 @@ export default function RoutineBuilderModal({
               disabled={!canSave}
               className="anton rounded-lg px-6 py-3 text-lg font-extrabold uppercase tracking-wide transition-colors disabled:cursor-not-allowed disabled:bg-(--contrast-one) disabled:text-(--contrast-two) enabled:bg-(--accent-primary) enabled:text-black enabled:hover:brightness-95"
             >
-              {isPending
-                ? 'Saving…'
-                : isEditing
-                  ? 'Save Changes'
-                  : 'Save Routine'}
+              {isPending ? (
+                'Saving…'
+              ) : (
+                <>
+                  <span className="lg:hidden">Save</span>
+                  <span className="hidden lg:inline">
+                    {isEditing ? 'Save Changes' : 'Save Routine'}
+                  </span>
+                </>
+              )}
             </button>
           </div>
         </div>
@@ -328,9 +350,26 @@ export default function RoutineBuilderModal({
         </div>
       </div>
 
+      {/* Mobile view toggle — swap between the library and the draft. */}
+      <div className="mb-4 flex rounded-xl border border-[var(--contrast-one)] bg-[var(--dark-one)] p-1 lg:hidden">
+        <ViewTab
+          label="Add Exercises"
+          active={mobileView === 'add'}
+          onClick={() => setMobileView('add')}
+        />
+        <ViewTab
+          label="Routine"
+          count={draft.length}
+          active={mobileView === 'routine'}
+          onClick={() => setMobileView('routine')}
+        />
+      </div>
+
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* Library */}
-        <div className="min-w-0">
+        <div
+          className={`min-w-0 lg:block ${mobileView === 'add' ? 'block' : 'hidden'}`}
+        >
           <ExerciseFiltersBar
             search={search}
             onSearchChange={setSearch}
@@ -339,10 +378,27 @@ export default function RoutineBuilderModal({
             equipment={equipment}
             onEquipmentChange={setEquipment}
             resultCount={resultCount}
+            collapsibleFilters
+            filtersOpen={filtersOpen}
+            onToggleFilters={() => setFiltersOpen((open) => !open)}
             searchPlaceholder="Search by exercise or muscle — 'chest', 'row', 'glutes'…"
           />
 
-          <div className="mt-5 max-h-[45vh] overflow-y-auto pr-1">
+          {/* Mobile result count — desktop shows it inside the search field. */}
+          <div className="mt-4 flex items-center justify-between lg:hidden">
+            <p className="space-mono text-xs uppercase tracking-wide text-[var(--contrast-three)]">
+              All Exercises
+            </p>
+            {resultCount !== undefined && (
+              <p className="space-mono text-xs text-[var(--contrast-two)]">
+                {resultCount} exercise{resultCount === 1 ? '' : 's'}
+              </p>
+            )}
+          </div>
+
+          {/* Inner scroll on desktop only; on mobile the list flows into the
+              modal's own scroll rather than nesting a second scroll area. */}
+          <div className="mt-4 lg:mt-5 lg:max-h-[45vh] lg:overflow-y-auto lg:pr-1">
             <ExerciseDatasetList
               filterInput={filterInput}
               onSelect={toggleExercise}
@@ -353,9 +409,14 @@ export default function RoutineBuilderModal({
           </div>
         </div>
 
-        {/* Draft routine */}
-        <div className="flex min-w-0 flex-col rounded-2xl border border-[var(--contrast-one)] bg-[var(--dark-one)] p-5">
-          <div className="flex items-center justify-between gap-3">
+        {/* Draft routine. Full-bleed on mobile; a bordered card from lg. */}
+        <div
+          className={`min-w-0 flex-col lg:flex lg:rounded-2xl lg:border lg:border-[var(--contrast-one)] lg:bg-[var(--dark-one)] lg:p-5 ${
+            mobileView === 'routine' ? 'flex' : 'hidden'
+          }`}
+        >
+          {/* Desktop header — on mobile the view toggle carries the label + count. */}
+          <div className="hidden items-center justify-between gap-3 lg:flex">
             <p className="space-mono text-xs uppercase tracking-wide text-[var(--contrast-three)]">
               Your Routine
             </p>
@@ -366,14 +427,14 @@ export default function RoutineBuilderModal({
             </p>
           </div>
 
-          {/* Muscle coverage */}
-          <div className="mt-4 flex flex-wrap gap-2">
+          {/* Muscle coverage — swipeable row on mobile, wraps from lg. */}
+          <div className="scrollbar-none mt-1 flex gap-2 overflow-x-auto pb-1 lg:mt-4 lg:flex-wrap lg:overflow-visible lg:pb-0">
             {coverageGroups.map((group) => {
               const active = activeCoverage.has(group.label);
               return (
                 <span
                   key={group.label}
-                  className={`space-mono rounded-full border px-3 py-1 text-[10px] uppercase tracking-wide transition-colors ${
+                  className={`space-mono shrink-0 rounded-full border px-3 py-1 text-[10px] uppercase tracking-wide transition-colors ${
                     active
                       ? 'border-[var(--accent-primary)] bg-[var(--hint-primary-dark)] text-[var(--accent-primary)]'
                       : 'border-[var(--contrast-one)] text-[var(--contrast-two)]'
@@ -388,10 +449,30 @@ export default function RoutineBuilderModal({
           {/* Picked exercises */}
           <div className="mt-4 min-h-[220px] flex-1">
             {draft.length === 0 ? (
-              <div className="flex h-full min-h-[220px] items-center justify-center rounded-xl border border-dashed border-[var(--contrast-one)] p-6 text-center">
-                <p className="anotation text-[var(--contrast-two)]! text-xs!">
+              <div className="flex h-full min-h-[220px] flex-col items-center justify-center gap-4 rounded-xl border border-dashed border-[var(--contrast-one)] p-6 text-center">
+                <p className="anotation hidden text-[var(--contrast-two)]! text-xs! lg:block">
                   Add exercises from the library
                 </p>
+
+                {/* Richer mobile empty state that jumps back to the library. */}
+                <div className="flex flex-col items-center gap-3 lg:hidden">
+                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-[var(--accent-primary)] bg-[var(--hint-primary-dark)]">
+                    <LuDumbbell className="text-xl text-[var(--accent-primary)]" />
+                  </div>
+                  <div>
+                    <h4 className="heading-four text-white">No exercises yet</h4>
+                    <p className="body-text mt-1 text-sm! text-[var(--contrast-three)]">
+                      Switch to Add Exercises and tap + to build your routine.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setMobileView('add')}
+                    className="anton mt-1 rounded-lg bg-[var(--accent-primary)] px-6 py-3 text-sm font-extrabold uppercase tracking-wide text-black transition-colors hover:brightness-95"
+                  >
+                    Add Exercises
+                  </button>
+                </div>
               </div>
             ) : (
               <ul className="flex flex-col gap-2">
@@ -469,8 +550,8 @@ export default function RoutineBuilderModal({
             )}
           </div>
 
-          {/* Totals */}
-          <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 border-t border-[var(--contrast-one)] pt-4">
+          {/* Totals — desktop only; mobile shows these in the footer. */}
+          <div className="mt-4 hidden flex-wrap gap-x-6 gap-y-2 border-t border-[var(--contrast-one)] pt-4 lg:flex">
             <Stat value={draft.length} label="Exercises" />
             <Stat value={setCount} label="Sets" />
             <Stat
@@ -481,6 +562,45 @@ export default function RoutineBuilderModal({
         </div>
       </div>
     </Modal>
+  );
+}
+
+/** Mobile segmented-control tab: switches between the library and the draft. */
+function ViewTab({
+  label,
+  active,
+  onClick,
+  count,
+}: {
+  label: string;
+  active: boolean;
+  onClick: () => void;
+  count?: number;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={active}
+      className={`anton flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-extrabold uppercase tracking-wide transition-colors ${
+        active
+          ? 'bg-[var(--accent-primary)] text-black'
+          : 'text-[var(--contrast-three)]'
+      }`}
+    >
+      {label}
+      {count !== undefined && (
+        <span
+          className={`flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-[10px] ${
+            active
+              ? 'bg-black/25 text-black'
+              : 'bg-[var(--accent-primary)] text-black'
+          }`}
+        >
+          {count}
+        </span>
+      )}
+    </button>
   );
 }
 

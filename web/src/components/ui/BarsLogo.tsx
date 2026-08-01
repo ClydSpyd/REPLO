@@ -8,6 +8,7 @@ interface BarsLogoProps {
    * value (e.g. 3) for a more angular mark that pairs with angular wordmarks.
    */
   cornerRadius?: number;
+  className?: string;
 }
 
 // Bar geometry within a 100x100 viewBox. Each bar is bottom-aligned and grows
@@ -26,6 +27,7 @@ export default function BarsLogo({
   size,
   barColors,
   cornerRadius = 8,
+  className
 }: BarsLogoProps) {
   return (
     <svg
@@ -33,6 +35,7 @@ export default function BarsLogo({
       height={size}
       viewBox="0 0 100 100"
       xmlns="http://www.w3.org/2000/svg"
+      className={className ?? ''}
     >
       <g transform="rotate(-20 50 50)">
         {BARS.map((bar, i) => (

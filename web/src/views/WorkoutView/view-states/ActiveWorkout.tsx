@@ -37,7 +37,7 @@ export default function ActiveWorkout() {
   return (
     <div className="w-full px-6 lg:px-2">
       <WorkoutSummary session={workout} />
-      <div className="h-full overflow-hidden w-full grow grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_400px] gap-4">
+      <div className="h-full w-full grow grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_400px] gap-4">
         <div className="flex flex-col gap-4 min-w-0">
           <ExerciseList exercises={workout.exercises} />
           <button

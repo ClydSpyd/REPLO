@@ -1,5 +1,6 @@
-import { FiSearch } from 'react-icons/fi';
+import { FiFilter, FiSearch } from 'react-icons/fi';
 import {
+  equipmentFilters,
   primaryMuscleGroups,
   type EquipmentFilter,
   type PrimaryMuscleGroup,
@@ -18,12 +19,20 @@ interface ExerciseFiltersBarProps {
   searchPlaceholder?: string;
   /** Shown inside the search field, e.g. "45 exercises". */
   resultCount?: number;
-  /**
-   * Equipment filtering. The row is currently commented out below, so these
-   * are accepted but unused — re-enable the block to bring them back.
-   */
+  /** Currently selected equipment bucket, or null for "All". */
   equipment?: EquipmentFilter | null;
+  /** Called when an equipment pill is selected (null for "All"). */
   onEquipmentChange?: (value: EquipmentFilter | null) => void;
+  /**
+   * Opt in to the compact mobile treatment: below `lg` the muscle/equipment
+   * pills collapse behind a filter toggle in the search field. Desktop is
+   * unaffected. Consumers that omit this keep the always-visible pill row.
+   */
+  collapsibleFilters?: boolean;
+  /** Whether the collapsed mobile filter panel is expanded. */
+  filtersOpen?: boolean;
+  /** Toggle the mobile filter panel. */
+  onToggleFilters?: () => void;
 }
 
 /**
@@ -38,6 +47,11 @@ export default function ExerciseFiltersBar({
   onMuscleGroupChange,
   searchPlaceholder = 'Search the full exercise library...',
   resultCount,
+  equipment,
+  onEquipmentChange,
+  collapsibleFilters = false,
+  filtersOpen = false,
+  onToggleFilters,
 }: ExerciseFiltersBarProps) {
   return (
     <div className="exercise-filters-bar">
@@ -50,32 +64,58 @@ export default function ExerciseFiltersBar({
           onChange={(e) => onSearchChange(e.target.value)}
           placeholder={searchPlaceholder}
           className={`w-full rounded-lg border border-[var(--contrast-one)] bg-transparent py-3.5 pl-12 text-white placeholder:text-[var(--contrast-two)] ${
-            resultCount === undefined ? 'pr-4' : 'pr-32'
+            collapsibleFilters
+              ? 'pr-14 lg:pr-32'
+              : resultCount === undefined
+                ? 'pr-4'
+                : 'pr-32'
           }`}
         />
+
         {resultCount !== undefined && (
-          <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-sm text-[var(--contrast-three)]">
+          <span
+            className={`pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-sm text-[var(--contrast-three)] ${
+              collapsibleFilters ? 'hidden lg:block' : ''
+            }`}
+          >
             {resultCount} exercise{resultCount === 1 ? '' : 's'}
           </span>
         )}
+
+        {/* Mobile filter toggle — desktop shows the pills inline instead. */}
+        {collapsibleFilters && onToggleFilters && (
+          <button
+            type="button"
+            aria-label="Toggle filters"
+            aria-expanded={filtersOpen}
+            onClick={onToggleFilters}
+            className={`absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-lg border transition-colors lg:hidden ${
+              filtersOpen
+                ? 'border-[var(--accent-primary)] text-[var(--accent-primary)]'
+                : 'border-[var(--contrast-one)] text-[var(--contrast-two)]'
+            }`}
+          >
+            <FiFilter />
+          </button>
+        )}
       </div>
 
-      {/* Muscle group filter. On small screens the pills become a single
-          swipeable row so they don't consume half the modal; from lg they wrap
-          inline next to the label as before. */}
-      <div className="mt-4 lg:mt-5 flex flex-col lg:flex-row lg:flex-wrap lg:items-center gap-x-2 gap-y-[2px]">
-        {/* <span className="space-mono lg:mr-2 text-[10px] uppercase tracking-wide text-[var(--contrast-three)]">
-          Muscle Group
-        </span> */}
-
+      {/* Muscle group pills. Below lg the pills become a single swipeable row;
+          from lg they wrap inline. When collapsible, the mobile row is hidden
+          (the panel below replaces it) but the desktop row is unchanged. */}
+      <div
+        className={`mt-4 lg:mt-5 flex-col lg:flex-row lg:flex-wrap lg:items-center gap-x-2 gap-y-[2px] ${
+          collapsibleFilters ? 'hidden lg:flex' : 'flex'
+        }`}
+      >
         <div className="scrollbar-none flex gap-2 overflow-x-auto pb-1 lg:contents lg:overflow-visible lg:pb-0">
-          <MuscleGroupPill
+          <FilterPill
             label="All"
             active={muscleGroup === null}
             onClick={() => onMuscleGroupChange(null)}
           />
           {primaryMuscleGroups.map((group) => (
-            <MuscleGroupPill
+            <FilterPill
               key={group}
               label={formatLabel(group)}
               active={muscleGroup === group}
@@ -85,35 +125,60 @@ export default function ExerciseFiltersBar({
         </div>
       </div>
 
-      {/* Equipment filter — only rendered when the parent opts in. */}
-      {/* {onEquipmentChange && (
-        <div className="mt-3 flex flex-col lg:flex-row lg:flex-wrap lg:items-center gap-2">
-          <span className="space-mono lg:mr-2 text-xs uppercase tracking-wide text-[var(--contrast-three)]">
-            Equipment
-          </span>
-
-          <div className="scrollbar-none flex gap-2 overflow-x-auto pb-1 lg:contents lg:overflow-visible lg:pb-0">
-            <MuscleGroupPill
-              label="All"
-              active={!equipment}
-              onClick={() => onEquipmentChange(null)}
-            />
-            {equipmentFilters.map((option) => (
-              <MuscleGroupPill
-                key={option.label}
-                label={option.label}
-                active={equipment === option.label}
-                onClick={() => onEquipmentChange(option.label)}
+      {/* Collapsible mobile panel: muscle + equipment. Never rendered on
+          desktop, so it can't change the desktop layout. */}
+      {collapsibleFilters && filtersOpen && (
+        <div className="mt-3 flex flex-col gap-4 rounded-xl border border-[var(--contrast-one)] p-4 lg:hidden">
+          <div>
+            <p className="space-mono mb-2 text-[10px] uppercase tracking-wide text-[var(--contrast-three)]">
+              Muscle Group
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <FilterPill
+                label="All"
+                active={muscleGroup === null}
+                onClick={() => onMuscleGroupChange(null)}
               />
-            ))}
+              {primaryMuscleGroups.map((group) => (
+                <FilterPill
+                  key={group}
+                  label={formatLabel(group)}
+                  active={muscleGroup === group}
+                  onClick={() => onMuscleGroupChange(group)}
+                />
+              ))}
+            </div>
           </div>
+
+          {onEquipmentChange && (
+            <div>
+              <p className="space-mono mb-2 text-[10px] uppercase tracking-wide text-[var(--contrast-three)]">
+                Equipment
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <FilterPill
+                  label="All"
+                  active={!equipment}
+                  onClick={() => onEquipmentChange(null)}
+                />
+                {equipmentFilters.map((option) => (
+                  <FilterPill
+                    key={option.label}
+                    label={option.label}
+                    active={equipment === option.label}
+                    onClick={() => onEquipmentChange(option.label)}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
         </div>
-      )} */}
+      )}
     </div>
   );
 }
 
-function MuscleGroupPill({
+function FilterPill({
   label,
   active,
   onClick,

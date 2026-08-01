@@ -9,6 +9,7 @@
   ],
   "scripts": {
     "dev": "concurrently -n api,web -c cyan,magenta \"npm run dev -w @replo/api\" \"npm run dev -w @replo/web\"",
+    "dev:host": "concurrently -n api,web -c cyan,magenta \"npm run dev -w @replo/api\" \"npm run dev -w @replo/web -- --host\"",
     "dev:api": "npm run dev -w @replo/api",
     "dev:web": "npm run dev -w @replo/web",
     "build": "npm run build -w @replo/api && npm run build -w @replo/web",

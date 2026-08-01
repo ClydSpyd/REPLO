@@ -16,7 +16,7 @@ export default function WorkoutSummary({
     useWorkoutSessionData(session ?? null);
   const [confirmingEnd, setConfirmingEnd] = useState(false);
   return (
-    <div className="w-full flex flex-col lg:flex-row justify-between gap-4 h-full min-h-0 mb-4">
+    <div className="w-full flex flex-col lg:flex-row justify-between gap-4 min-h-0 mb-4">
       <div className="flex flex-col gap-1">
         <div className="flex items-center gap-2">
           <span

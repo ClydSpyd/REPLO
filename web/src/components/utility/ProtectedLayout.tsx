@@ -8,7 +8,7 @@ import ViewHeader from '../ui/ViewHeader';
  */
 const ProtectedLayout = () => {
   return (
-    <div className="app-bg w-screen min-h-screen flex flex-col">
+    <div className="app-bg w-screen h-dvh flex flex-col">
       <ViewHeader />
       <main className="container grow min-w-screen flex flex-1 overflow-hidden">
         <Outlet />
