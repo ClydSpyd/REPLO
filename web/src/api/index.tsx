@@ -4,7 +4,12 @@ import exerciseMethods from './exercises';
 import { routineMethods } from './routine';
 
 export const baseClient = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
+  /**
+   * Same-origin by default: in dev the Vite proxy forwards /api to Express,
+   * and in production Express serves this bundle itself. Only set
+   * VITE_API_BASE_URL when the API lives on a different host.
+   */
+  baseURL: import.meta.env.VITE_API_BASE_URL ?? '/api',
   // withCredentials: true,
 });
 

@@ -4,12 +4,15 @@ import { Link, NavLink, useNavigate } from 'react-router-dom';
 import BarsLogo from './BarsLogo';
 import MobileNavSheet from './MobileNavSheet';
 import { navItems } from '../../config/nav';
+import { useQueryClient } from '@tanstack/react-query';
 
 export default function ViewHeader() {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const queryClient = useQueryClient();
+
 
   // Close the popover on outside click or Escape.
   useEffect(() => {
@@ -38,6 +41,7 @@ export default function ViewHeader() {
     setMenuOpen(false);
     setSheetOpen(false);
     navigate('/login', { replace: true });
+    queryClient.clear();
   };
 
   return (

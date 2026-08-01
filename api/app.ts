@@ -1,10 +1,31 @@
 import express from "express";
 import cors from "cors";
+import fs from "fs";
+import path from "path";
 import workoutRoutes from "./modules/workout/workout.routes";
 import routineRoutes from "./modules/routine/routine.routes";
 import userRoutes from "./modules/user/user.routes";
 import exerciseRoutes from "./modules/exercise/exercise.routes";
 import { errorHandler } from "./middleware/error.middleware";
+
+/**
+ * Static assets served alongside the API. Resolved from this file rather than
+ * the working directory, so it holds in both modes:
+ *   - dev  (ts-node from api/)      → api/public       (docs + landing page)
+ *   - prod (node from api/dist/)    → api/dist/public  (the built web client)
+ * The web build writes into the latter, so a deployment serves the SPA and the
+ * API from a single origin — no CORS, no API base URL to configure.
+ */
+const CLIENT_DIR = path.join(__dirname, "public");
+
+/**
+ * The API's own static assets (docs page, landing page) always live in
+ * api/public — they aren't compiled, so in production they sit one level up
+ * from the running code rather than beside it.
+ */
+const API_PUBLIC_DIR = fs.existsSync(path.join(__dirname, "public", "docs.html"))
+  ? path.join(__dirname, "public") // dev: api/public
+  : path.join(__dirname, "..", "public"); // prod: api/dist → api/public
 
 export function createServer() {
   const app = express();
@@ -12,13 +33,11 @@ export function createServer() {
   app.use(
     cors({
       origin: "*",
-      credentials: true,
     }),
   );
   app.use(express.json());
 
-  // Serve static files
-  app.use(express.static("public"));
+  app.use(express.static(CLIENT_DIR));
 
   // API routes
   app.use("/api/workout", workoutRoutes);
@@ -28,7 +47,19 @@ export function createServer() {
 
   // API documentation route
   app.get("/api/docs", (req, res) => {
-    res.sendFile("docs.html", { root: "public" });
+    res.sendFile(path.join(API_PUBLIC_DIR, "docs.html"));
+  });
+
+  /**
+   * SPA fallback: hand any non-API GET to index.html so client-side routes
+   * survive a refresh or a deep link (e.g. /workout/:id). The negative
+   * lookahead keeps unmatched /api paths falling through to a real 404 rather
+   * than silently returning HTML.
+   */
+  app.get(/^(?!\/api(\/|$)).*/, (req, res, next) => {
+    const indexFile = path.join(CLIENT_DIR, "index.html");
+    if (!fs.existsSync(indexFile)) return next();
+    res.sendFile(indexFile);
   });
 
   // Global error handler
