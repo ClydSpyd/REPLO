@@ -90,9 +90,6 @@ REFRESH_SECRET=…
 PORT=6969          # optional, defaults to 6969
 ```
 
-The client needs no env file — it defaults to a relative `/api`. Set
-`web/.env` `VITE_API_BASE_URL` only if you point it at a different host.
-
 ```bash
 npm run dev        # API + client together
 npm run dev:api    # API only  → :6969

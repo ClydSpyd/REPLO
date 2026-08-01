@@ -7,9 +7,8 @@ export const baseClient = axios.create({
   /**
    * Same-origin by default: in dev the Vite proxy forwards /api to Express,
    * and in production Express serves this bundle itself. Only set
-   * VITE_API_BASE_URL when the API lives on a different host.
    */
-  baseURL: import.meta.env.VITE_API_BASE_URL ?? '/api',
+  baseURL: '/api',
   // withCredentials: true,
 });
 
