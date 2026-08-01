@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Workout Tracker API</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Workout Tracker API</h1>
+    <p>This API powers a workout tracking app with user authentication, workout logging, routines, and metrics tracking.</p>
+    <h2>Available Routes</h2>
+    <ul>
+      <li><strong>User Module</strong>
+        <ul>
+          <li><span class="method">POST</span> <span class="slug">/api/user/register</span> - Register a new user</li>
+          <li><span class="method">POST</span> <span class="slug">/api/user/login</span> - Login and receive JWT</li>
+          <li><span class="method">GET</span> <span class="slug">/api/user/me</span> - Get current user info</li>
+        </ul>
+      </li>
+      <li><strong>Workout Module</strong>
+        <ul>
+          <li><span class="method">POST</span> <span class="slug">/api/workout</span> - Create a workout session (can be partial, e.g. routineId only)</li>
+          <li><span class="method">PATCH</span> <span class="slug">/api/workout/:id</span> - Update a workout session (add exercises, notes, metrics)</li>
+          <li><span class="method">POST</span> <span class="slug">/api/workout/:id/set</span> - Add or update an exercise/set in a workout</li>
+          <li><span class="method">GET</span> <span class="slug">/api/workout/:id</span> - Get the current state of a workout session</li>
+          <li><span class="method">GET</span> <span class="slug">/api/workout/mine</span> - Get all workouts for the authenticated user</li>
+        </ul>
+      </li>
+      <li><strong>Routine Module</strong>
+        <ul>
+          <li><span class="method">POST</span> <span class="slug">/api/routine</span> - Create a routine</li>
+          <li><span class="method">PATCH</span> <span class="slug">/api/routine/:id</span> - Update a routine</li>
+          <li><span class="method">GET</span> <span class="slug">/api/routine/:id</span> - Get a routine by ID</li>
+          <li><span class="method">GET</span> <span class="slug">/api/routine</span> - List all routines</li>
+          <li><span class="method">GET</span> <span class="slug">/api/routine/mine</span> - List all routines created by the authenticated user</li>
+        </ul>
+      </li>
+      <li><strong>UserMetrics Module</strong>
+        <ul>
+          <li><span class="method">POST</span> <span class="slug">/api/userMetrics</span> - Create a metrics record</li>
+          <li><span class="method">GET</span> <span class="slug">/api/userMetrics/latest</span> - Get latest metrics</li>
+          <li><span class="method">GET</span> <span class="slug">/api/userMetrics/history</span> - Get metrics history</li>
+          <li><span class="method">PATCH</span> <span class="slug">/api/userMetrics/:id</span> - Update metrics</li>
+        </ul>
+      </li>
+    </ul>
+    <h2>Functionalities</h2>
+    <ul>
+      <li>User registration and authentication (JWT)</li>
+      <li>Workout logging and history</li>
+      <li>Routine creation and reference</li>
+      <li>Metrics tracking (weight, BMI, body fat, personal bests)</li>
+      <li>Protected routes with auth middleware</li>
+      <li>Error handling for robust API responses</li>
+    </ul>
+    <footer>
+      <p>See <a href="/api/docs">API documentation</a> for more details.</p>
+    </footer>
+  </div>
+</body>
+</html>
