@@ -76,17 +76,17 @@ export default function Modal({
     >
       <div
         ref={panelRef}
-        className={`animate-modal-panel relative flex max-h-[90vh] w-full flex-col ${size === 'wide' ? 'max-w-6xl' : 'max-w-3xl'} overflow-hidden rounded-2xl border border-[var(--contrast-one)] bg-[var(--dark-two)] text-white shadow-2xl`}
+        className={`animate-modal-panel relative flex h-[calc(100dvh-20px)] lg:h-fit lg:max-h-[90vh] w-full flex-col ${size === 'wide' ? 'max-w-6xl' : 'max-w-3xl'} overflow-hidden rounded-2xl border border-[var(--contrast-one)] bg-[var(--dark-two)] text-white shadow-2xl`}
       >
         {overlay}
 
         {/* Header */}
-        <div className="relative lg:border-b border-[var(--contrast-one)] px-8 lg:py-6 lg:min-h-25">
+        <div className="relative lg:border-b border-[var(--contrast-one)] px-8 lg:py-6 h-fit">
           <button
             type="button"
             aria-label="Close"
             onClick={handleClose}
-            className="absolute right-6 top-6 flex h-10 w-10 items-center justify-center rounded-lg border border-[var(--contrast-one)] text-[var(--contrast-three)] transition-colors hover:border-[var(--accent-primary)] hover:text-white"
+            className="absolute z-10 right-6 top-6 flex h-10 w-10 items-center justify-center rounded-lg border border-[var(--contrast-one)] text-[var(--contrast-three)] transition-colors hover:border-[var(--accent-primary)] hover:text-white bg-[var(--dark-two)]"
           >
             <FiX className="text-xl" />
           </button>
@@ -95,9 +95,9 @@ export default function Modal({
           <div className="hidden lg:block space-mono pr-12 text-xs uppercase tracking-wide text-[var(--accent-primary)]">
             {subHeading}
           </div>
-          <h2 className="hidden lg:block mt-1 heading-three pr-12">{mainHeading}</h2>
+          <h2 className="hidden lg:block mt-3 heading-three pr-12">{mainHeading}</h2>
           {description && (
-            <p className="mt-2 body-text text-sm! text-[var(--contrast-three)]">
+            <p className="hidden lg:block mt-2 body-text text-sm! text-[var(--contrast-three)]">
               {description}
             </p>
           )}

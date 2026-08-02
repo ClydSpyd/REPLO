@@ -460,7 +460,9 @@ export default function RoutineBuilderModal({
                     <LuDumbbell className="text-xl text-[var(--accent-primary)]" />
                   </div>
                   <div>
-                    <h4 className="heading-four text-white">No exercises yet</h4>
+                    <h4 className="heading-four text-white">
+                      No exercises yet
+                    </h4>
                     <p className="body-text mt-1 text-sm! text-[var(--contrast-three)]">
                       Switch to Add Exercises and tap + to build your routine.
                     </p>
@@ -481,68 +483,74 @@ export default function RoutineBuilderModal({
                     key={entry.exerciseId}
                     className="flex flex-wrap items-center gap-3 rounded-xl border border-[var(--contrast-one)] bg-[var(--dark-two)] p-3"
                   >
-                    <span className="anton text-sm text-[var(--contrast-two)]">
-                      {String(index + 1).padStart(2, '0')}
-                    </span>
-
-                    <div className="min-w-0 flex-1">
-                      <p className="heading-four truncate text-white">
-                        {entry.name}
-                      </p>
-                      <p className="mt-0.5 truncate text-xs text-[var(--contrast-three)]">
-                        {entry.muscleGroups.map(formatLabel).join(' · ')}
-                      </p>
-                    </div>
-
-                    {/* Set count */}
-                    <div className="flex items-center gap-2">
-                      <IconButton
-                        label={`Fewer sets for ${entry.name}`}
-                        onClick={() => adjustSets(entry.exerciseId, -1)}
-                        disabled={entry.setCount <= 1}
-                      >
-                        <FiMinus />
-                      </IconButton>
-                      <span className="space-mono w-14 text-center text-xs text-white">
-                        {entry.setCount} set{entry.setCount === 1 ? '' : 's'}
+                    {/* top row */}
+                    <div className="w-full flex gap-2">
+                      <span className="anton text-sm text-[var(--contrast-two)]">
+                        {String(index + 1).padStart(2, '0')}
                       </span>
-                      <IconButton
-                        label={`More sets for ${entry.name}`}
-                        onClick={() => adjustSets(entry.exerciseId, 1)}
-                        disabled={entry.setCount >= MAX_SET_COUNT}
-                      >
-                        <FiPlus />
-                      </IconButton>
+
+                      <div className="bordermin-w-0 flex-1">
+                        <p className="heading-four truncate text-white">
+                          {entry.name}
+                        </p>
+                        <p className="mt-0.5 truncate text-xs text-[var(--contrast-three)]">
+                          {entry.muscleGroups.map(formatLabel).join(' · ')}
+                        </p>
+                      </div>
                     </div>
 
-                    {/* Reorder + remove */}
-                    <div className="flex items-center gap-1">
-                      <IconButton
-                        label={`Move ${entry.name} up`}
-                        onClick={() => move(index, -1)}
-                        disabled={index === 0}
-                      >
-                        <FiChevronUp />
-                      </IconButton>
-                      <IconButton
-                        label={`Move ${entry.name} down`}
-                        onClick={() => move(index, 1)}
-                        disabled={index === draft.length - 1}
-                      >
-                        <FiChevronDown />
-                      </IconButton>
-                      <IconButton
-                        label={`Remove ${entry.name}`}
-                        onClick={() =>
-                          setDraft((current) =>
-                            current.filter(
-                              (item) => item.exerciseId !== entry.exerciseId,
-                            ),
-                          )
-                        }
-                      >
-                        <FiX />
-                      </IconButton>
+                    {/* bottom row */}
+                    <div className='w-full flex items-center justify-between'>
+                      {/* Set count */}
+                      <div className="flex items-center gap-2">
+                        <IconButton
+                          label={`Fewer sets for ${entry.name}`}
+                          onClick={() => adjustSets(entry.exerciseId, -1)}
+                          disabled={entry.setCount <= 1}
+                        >
+                          <FiMinus />
+                        </IconButton>
+                        <span className="space-mono w-16 text-center text-xs text-white whitespace-nowrap">
+                          {entry.setCount} set{entry.setCount === 1 ? '' : 's'}
+                        </span>
+                        <IconButton
+                          label={`More sets for ${entry.name}`}
+                          onClick={() => adjustSets(entry.exerciseId, 1)}
+                          disabled={entry.setCount >= MAX_SET_COUNT}
+                        >
+                          <FiPlus />
+                        </IconButton>
+                      </div>
+
+                      {/* Reorder + remove */}
+                      <div className="flex items-center gap-1">
+                        <IconButton
+                          label={`Move ${entry.name} up`}
+                          onClick={() => move(index, -1)}
+                          disabled={index === 0}
+                        >
+                          <FiChevronUp />
+                        </IconButton>
+                        <IconButton
+                          label={`Move ${entry.name} down`}
+                          onClick={() => move(index, 1)}
+                          disabled={index === draft.length - 1}
+                        >
+                          <FiChevronDown />
+                        </IconButton>
+                        <IconButton
+                          label={`Remove ${entry.name}`}
+                          onClick={() =>
+                            setDraft((current) =>
+                              current.filter(
+                                (item) => item.exerciseId !== entry.exerciseId,
+                              ),
+                            )
+                          }
+                        >
+                          <FiX />
+                        </IconButton>
+                      </div>
                     </div>
                   </li>
                 ))}

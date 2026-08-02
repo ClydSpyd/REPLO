@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { FaPlay } from 'react-icons/fa';
-import { FiTrash2 } from 'react-icons/fi';
+import { FiChevronDown, FiChevronUp, FiTrash2 } from 'react-icons/fi';
 import Modal from '../../../components/ui/Modal';
 import { useDeleteRoutine } from '../../../mutations/routines';
 import {
@@ -22,6 +22,7 @@ export default function RoutineDetailModal({
   onClose: () => void;
 }) {
   const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [showDetails, setShowDetails] = useState(false);
   const {
     mutate: deleteRoutine,
     isPending: isDeleting,
@@ -37,23 +38,19 @@ export default function RoutineDetailModal({
   const handleDelete = () =>
     deleteRoutine(routine._id, { onSuccess: () => onClose() });
 
+  // Tag pill only — the muscle summary now lives in the collapsible details.
+  // Rendered by the shared Modal header on lg, and by the in-content mobile
+  // header below lg (where that header is hidden).
+  const eyebrow = primaryTag ? (
+    <span className="inline-flex rounded-full border border-[var(--accent-primary)] bg-[var(--hint-primary-dark)] px-3 py-1 text-[10px] font-bold text-[var(--accent-primary)]">
+      {primaryTag}
+    </span>
+  ) : null;
+
   return (
     <Modal
       mainHeading={routine.name}
-      subHeading={
-        <span className="flex flex-wrap items-center gap-x-3 gap-y-2">
-          {primaryTag && (
-            <span className="rounded-full border border-[var(--accent-primary)] bg-[var(--hint-primary-dark)] px-3 py-1 text-[10px] font-bold text-[var(--accent-primary)]">
-              {primaryTag}
-            </span>
-          )}
-          {muscles.length > 0 && (
-            <span className="text-[var(--contrast-three)]">
-              {muscles.map(formatLabel).join(' · ')}
-            </span>
-          )}
-        </span>
-      }
+      subHeading={eyebrow}
       onClose={confirmingDelete ? undefined : onClose}
       overlay={
         confirmingDelete && (
@@ -67,39 +64,81 @@ export default function RoutineDetailModal({
         )
       }
       footer={
-        <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
           <button
             type="button"
             onClick={() => setConfirmingDelete(true)}
-            className="manrope text-sm font-bold text-red-400 transition-opacity hover:opacity-80"
+            aria-label="Delete routine"
+            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border border-red-400/50 text-red-400 transition-colors hover:border-red-400 hover:bg-red-400/10"
           >
-            Delete
+            <FiTrash2 className="text-lg" />
           </button>
 
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              className="space-mono rounded-lg border border-[var(--contrast-one)] px-5 py-3 text-xs font-bold uppercase tracking-wide text-white transition-colors hover:border-[var(--accent-primary)] hover:text-[var(--accent-primary)]"
-            >
-              Schedule
-            </button>
-            <button
-              type="button"
-              className="anton flex items-center gap-2 rounded-lg bg-[var(--accent-primary)] px-6 py-3 text-sm font-extrabold uppercase tracking-wide text-black transition-colors hover:brightness-95"
-            >
-              <FaPlay className="text-xs" />
-              Start Workout
-            </button>
-          </div>
+          <button
+            type="button"
+            className="space-mono flex-1 rounded-lg border border-[var(--contrast-one)] px-5 py-3.5 text-xs font-bold uppercase tracking-wide text-white transition-colors hover:border-[var(--accent-primary)] hover:text-[var(--accent-primary)]"
+          >
+            Schedule
+          </button>
+          <button
+            type="button"
+            className="anton flex flex-[1.6] items-center justify-center gap-2 rounded-lg bg-[var(--accent-primary)] px-6 py-3.5 text-sm font-extrabold uppercase tracking-wide text-black transition-colors hover:brightness-95"
+          >
+            <FaPlay className="text-xs" />
+            Start
+          </button>
         </div>
       }
     >
-      {/* Summary figures */}
-      <div className="-mt-1 mb-6 flex flex-wrap gap-x-8 gap-y-3 border-b border-[var(--contrast-one)] pb-6">
-        <Stat value={exerciseCount} label="Exercises" />
-        <Stat value={setCount} label="Sets" />
-        <Stat value={totalVolume.toLocaleString()} label="kg Volume" />
-        <Stat value={estimatedMinutes} label="Est. min" />
+      {/* Mobile header — the shared Modal hides its own header below lg. */}
+      <div className="mb-6 pr-12 lg:hidden">
+        <div className="space-mono text-xs uppercase tracking-wide text-[var(--accent-primary)]">
+          {eyebrow}
+        </div>
+        <h2 className="heading-three mt-3">{routine.name}</h2>
+      </div>
+
+      {/* Summary line + collapsible detail figures */}
+      <div className="-mt-1 mb-6 border-b border-[var(--contrast-one)] pb-6">
+        <div className="flex items-center justify-between gap-3">
+          <p className="space-mono text-sm text-[var(--contrast-three)]">
+            <span className="font-bold text-white">{exerciseCount}</span> ex
+            {' · '}
+            <span className="font-bold text-white">~{estimatedMinutes}</span> min
+          </p>
+
+          <button
+            type="button"
+            onClick={() => setShowDetails((open) => !open)}
+            aria-expanded={showDetails}
+            className="space-mono flex shrink-0 items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-[var(--contrast-three)] transition-colors hover:text-white"
+          >
+            {showDetails ? 'Hide' : 'Details'}
+            {showDetails ? <FiChevronUp /> : <FiChevronDown />}
+          </button>
+        </div>
+
+        {showDetails && (
+          <div className="mt-5">
+            <div className="grid grid-cols-2 gap-3">
+              <StatCard value={exerciseCount} label="Exercises" />
+              <StatCard value={setCount} label="Sets" />
+              <StatCard value={totalVolume.toLocaleString()} label="kg Volume" />
+              <StatCard value={estimatedMinutes} label="Est. min" />
+            </div>
+
+            {muscles.length > 0 && (
+              <div className="mt-4">
+                <p className="space-mono mb-2 text-[10px] uppercase tracking-wide text-[var(--contrast-three)]!">
+                  Targets
+                </p>
+                <p className="space-mono text-xs uppercase tracking-wide text-white">
+                  {muscles.map(formatLabel).join(' · ')}
+                </p>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Exercises */}
@@ -129,7 +168,7 @@ export default function RoutineDetailModal({
                   </div>
                 </div>
 
-                <span className="space-mono shrink-0 text-xs uppercase tracking-wide text-[var(--contrast-three)]">
+                <span className="space-mono shrink-0 text-xs font-bold uppercase tracking-wide text-[var(--accent-primary)]">
                   {exercise.sets.length} × sets
                 </span>
               </div>
@@ -208,13 +247,13 @@ function DeleteConfirmOverlay({
   );
 }
 
-function Stat({ value, label }: { value: string | number; label: string }) {
+function StatCard({ value, label }: { value: string | number; label: string }) {
   return (
-    <div className="flex items-baseline gap-2">
-      <span className="anton text-2xl text-white">{value}</span>
-      <span className="space-mono text-xs uppercase tracking-wide text-[var(--contrast-three)]!">
+    <div className="rounded-xl border border-[var(--contrast-one)] bg-[var(--dark-one)] px-5 py-4">
+      <div className="anton text-3xl leading-none text-white">{value}</div>
+      <div className="space-mono mt-2 text-xs uppercase tracking-wide text-[var(--contrast-three)]!">
         {label}
-      </span>
+      </div>
     </div>
   );
 }
