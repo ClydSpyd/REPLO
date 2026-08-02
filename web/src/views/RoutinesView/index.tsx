@@ -38,6 +38,7 @@ export default function RoutinesView() {
   // Keep saved routines ordered by creation time (newest first). Ghost cards
   // represent in-flight creations, so place them first in submit order.
   const entries = useMemo<GridEntry[]>(() => {
+    console.log({ routines });
     const saved: GridEntry[] = (routines ?? [])
       .map((routine) => ({
         kind: 'routine' as const,
@@ -99,7 +100,7 @@ export default function RoutinesView() {
             )}
 
             {!isLoading && !error && entries.length === 0 && (
-              <Placeholder text="No routines saved yet — finish a session and tick 'save to my routines'" />
+              <Placeholder text="No routines saved yet — Create one here or finish a session and tick 'save to my routines'" />
             )}
 
             {entries.length > 0 && (

@@ -3,7 +3,7 @@ import { UserService } from "./user.service";
 import { createTokenPair } from "./user.utils";
 import { AuthenticatedRequest } from "../../types/auth";
 import { loginUserSchema, RegisterUserSchema } from "./user.schema";
-import z, { ZodIssue } from "zod";
+import z from "zod";
 
 const service = new UserService();
 const JWT_SECRET = process.env.JWT_SECRET || "baloo_2026";

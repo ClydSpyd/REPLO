@@ -1,28 +1,57 @@
 import React, { useState } from 'react';
-import { loginUser } from '../utility/auth';
 import { Link, useNavigate } from 'react-router-dom';
+import {
+  loginSchema,
+  validate,
+  type FieldErrors,
+  type LoginInput,
+} from '@replo/shared';
+import { loginUser } from '../utility/auth';
 import BarsLogo from '../components/ui/BarsLogo';
 
+const EMPTY_FORM: LoginInput = { email: '', password: '' };
+
+const inputBase =
+  'w-full rounded-md border bg-[var(--dark-one)] p-3 text-white placeholder:text-[var(--contrast-two)]';
+
 export default function Login() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [form, setForm] = useState<LoginInput>(EMPTY_FORM);
+  const [errors, setErrors] = useState<FieldErrors>({});
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [submitError, setSubmitError] = useState('');
   const navigate = useNavigate();
+
+  const update =
+    (field: keyof LoginInput) => (e: React.ChangeEvent<HTMLInputElement>) => {
+      const { value } = e.target;
+      setForm((prev) => ({ ...prev, [field]: value }));
+      setErrors((prev) => (prev[field] ? { ...prev, [field]: '' } : prev));
+    };
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setSubmitError('');
+
+    const result = validate(loginSchema, form);
+    if (!result.success) {
+      setErrors(result.errors);
+      return;
+    }
+    setErrors({});
+
     setLoading(true);
-    setError('');
     try {
-      await loginUser(email, password);
-      setLoading(false);
+      await loginUser(result.data);
       navigate('/'); // Redirect to main view after login
     } catch (err) {
-      setError('Login failed');
+      setSubmitError((err as { message: string }).message || 'Login failed');
+    } finally {
       setLoading(false);
     }
   };
+
+  const borderClass = (field: keyof LoginInput) =>
+    errors[field] ? 'border-red-500' : 'border-[var(--contrast-one)]';
 
   return (
     <>
@@ -42,21 +71,31 @@ export default function Login() {
         </p>
         <h3 className="mb-6 text-5xl heading-three">SIGN IN</h3>
 
-        <form className="flex flex-col gap-3" onSubmit={handleLogin}>
-          <input
-            type="text"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full rounded-md border border-[var(--contrast-one)] bg-[var(--dark-one)] p-3 text-white placeholder:text-[var(--contrast-two)]"
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full rounded-md border border-[var(--contrast-one)] bg-[var(--dark-one)] p-3 text-white placeholder:text-[var(--contrast-two)]"
-          />
+        <form className="flex flex-col gap-3" onSubmit={handleLogin} noValidate>
+          <div>
+            <input
+              type="email"
+              placeholder="Email"
+              value={form.email}
+              onChange={update('email')}
+              className={`${inputBase} ${borderClass('email')}`}
+            />
+            {errors.email && (
+              <p className="mt-1 text-xs text-red-500">{errors.email}</p>
+            )}
+          </div>
+          <div>
+            <input
+              type="password"
+              placeholder="Password"
+              value={form.password}
+              onChange={update('password')}
+              className={`${inputBase} ${borderClass('password')}`}
+            />
+            {errors.password && (
+              <p className="mt-1 text-xs text-red-500">{errors.password}</p>
+            )}
+          </div>
           <button
             type="submit"
             className="mt-2 w-full rounded-md bg-[var(--accent-primary)] p-3 font-semibold text-black disabled:opacity-60"
@@ -64,7 +103,9 @@ export default function Login() {
           >
             {loading ? 'Logging in...' : 'Log in'}
           </button>
-          {error && <div className="text-sm text-red-500">{error}</div>}
+          {submitError && (
+            <div className="text-sm text-red-500">{submitError}</div>
+          )}
         </form>
 
         <p className="mt-6 text-sm text-[var(--contrast-three)]">

@@ -11,7 +11,7 @@ export default function ErrorBoundaryModal({
   return (
     <ErrorBoundary
       fallbackRender={({ error }) => (
-        <div className="m-auto rounded-lg border border-dashed border-[var(--contrast-one)] bg-[color-mix(in_srgb,var(--dark-one)_60%,transparent)] p-10 px-20 flex flex-col items-center justify-center gap-2 text-center">
+        <div className="m-auto rounded-lg border border-dashed border-[var(--contrast-one)] bg-[color-mix(in_srgb,var(--dark-one)_60%,transparent)] p-10 lg:px-20 flex flex-col items-center justify-center gap-2 text-center">
           <div className="w-fit border border-[var(--accent-primary)] bg-[var(--hint-primary-dark)] rounded-xl p-3 mb-2">
             <IoIosWarning className="text-[var(--accent-primary)] text-3xl" />
           </div>

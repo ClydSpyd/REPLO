@@ -6,14 +6,16 @@ import RecordsBlock from './components/RecordsBlock';
 import { formatDate } from '../../utility/dates';
 import ReploLoader from '../../components/ui/loaders/ReploLoader';
 import ErrorBoundaryModal from '../../components/utility/ErrorBoundaryModal.tsx';
+import { useMyProfileData } from '../../queries/user.ts';
 
 export default function Homescreen() {
+  const { data: myProfile } = useMyProfileData()
   return (
     <ErrorBoundaryModal pageType="Homescreen">
       <div className="h-full grow p-4 flex flex-col gap-3 w-full page-wrapper">
         <div className="flex flex-col gap-0 my-6">
           <p className="anotation">{formatDate(new Date())}</p>
-          <h2 className="heading-two">welcome back, baloo</h2>
+          <h2 className="heading-two">welcome back, {myProfile?.username}</h2>
         </div>
         <Suspense
           fallback={

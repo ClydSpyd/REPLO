@@ -1,18 +1,9 @@
-import { z } from "zod";
-
-export const RegisterUserSchema = z
-  .object({
-    email: z.email(),
-    password: z.string().min(6),
-    repeatPassword: z.string(),
-    username: z.string().min(3),
-  })
-  .refine((data) => data.password === data.repeatPassword, {
-    message: "Passwords do not match",
-    path: ["repeatPassword"],
-  });
-
-  export const loginUserSchema = z.object({
-    email: z.email(),
-    password: z.string().min(6),
-  });
+/**
+ * Auth validation lives in @replo/shared so the web client and this API
+ * validate register/login against the same rules. Re-exported here under
+ * the names the controllers already use.
+ */
+export {
+  registerSchema as RegisterUserSchema,
+  loginSchema as loginUserSchema,
+} from "@replo/shared";

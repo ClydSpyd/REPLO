@@ -2,8 +2,9 @@
   "name": "replo",
   "version": "0.0.0",
   "private": true,
-  "description": "REPLO workout tracker — API and web client.",
+  "description": "REPLO workout tracker \u2014 API and web client.",
   "workspaces": [
+    "packages/*",
     "api",
     "web"
   ],
@@ -12,12 +13,14 @@
     "dev:host": "concurrently -n api,web -c cyan,magenta \"npm run dev -w @replo/api\" \"npm run dev -w @replo/web -- --host\"",
     "dev:api": "npm run dev -w @replo/api",
     "dev:web": "npm run dev -w @replo/web",
-    "build": "npm run build -w @replo/api && npm run build -w @replo/web",
+    "build": "npm run build -w @replo/shared && npm run build -w @replo/api && npm run build -w @replo/web",
     "lint": "npm run lint -w @replo/web",
-    "typecheck": "npm run build -w @replo/api && npm run build -w @replo/web"
+    "typecheck": "npm run build -w @replo/shared && npm run build -w @replo/api && npm run build -w @replo/web"
   },
   "devDependencies": {
     "concurrently": "^9.1.2"
   },
-  "engines": { "node": "20.x" }
+  "engines": {
+    "node": "20.x"
+  }
 }

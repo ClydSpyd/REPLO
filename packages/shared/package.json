@@ -1,0 +1,18 @@
+{
+  "name": "@replo/shared",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Validation schemas and types shared by the API and web client.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "prepare": "tsc"
+  },
+  "dependencies": {
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
+}
