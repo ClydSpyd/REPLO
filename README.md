@@ -81,14 +81,21 @@ Requires **Node 20.x** and a MongoDB connection string.
 npm install
 ```
 
-Create `api/.env`:
+Create `api/.env` (see [`api/.env.example`](api/.env.example)):
 
 ```
 MONGO_URI=mongodb+srv://…
 JWT_SECRET=…
 REFRESH_SECRET=…
 PORT=6969          # optional, defaults to 6969
+
+# Owner signup notifications (optional — omit both to disable)
+RESEND_API_KEY=re_…
+OWNER_EMAIL=you@gmail.com
+NOTIFY_FROM_EMAIL=Replo <onboarding@resend.dev>   # optional, this is the default
 ```
+
+See [Owner notifications](#owner-notifications) for how to obtain these.
 
 ```bash
 npm run dev        # API + client together
@@ -118,10 +125,40 @@ Deploys to Render as a **single Web Service**:
 |---|---|
 | Build Command | `npm ci --include=dev && npm run build` |
 | Start Command | `npm start -w @replo/api` |
-| Environment | `MONGO_URI`, `JWT_SECRET`, `REFRESH_SECRET` |
+| Environment | `MONGO_URI`, `JWT_SECRET`, `REFRESH_SECRET` (+ `RESEND_API_KEY`, `OWNER_EMAIL` for notifications) |
 
 `--include=dev` matters: `tsc` and `vite` are devDependencies and the build
 fails without them. Don't set `PORT` — the platform injects it.
+
+---
+
+## Owner notifications
+
+When a new user registers, the app can email the owner. It's built on
+[Resend](https://resend.com) and hooked into the register flow in
+[`api/lib/notify.ts`](api/lib/notify.ts) — sent **fire-and-forget**, so a mail
+outage can never block or fail a signup.
+
+The feature is **off until configured**: if `RESEND_API_KEY` or `OWNER_EMAIL` is
+unset, `notifyOwner` no-ops silently (which is why local dev stays quiet).
+
+**To enable it:**
+
+1. Sign up at [resend.com](https://resend.com) using the inbox you want alerts
+   at, and create an API key.
+2. Set the env vars — locally in `api/.env`, and in the Render service's
+   Environment:
+   ```
+   RESEND_API_KEY=re_…
+   OWNER_EMAIL=you@gmail.com
+   ```
+3. Restart the API. A new signup now emails `OWNER_EMAIL`.
+
+`NOTIFY_FROM_EMAIL` defaults to Resend's shared sender
+(`onboarding@resend.dev`), which in test mode **only delivers to the email you
+registered with Resend** — fine for owner alerts. To send from your own address
+(or email other recipients later), [verify a domain](https://resend.com/domains)
+in Resend and set `NOTIFY_FROM_EMAIL` to an address on it.
 
 ---
 

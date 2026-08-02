@@ -3,6 +3,7 @@ import { UserService } from "./user.service";
 import { createTokenPair } from "./user.utils";
 import { AuthenticatedRequest } from "../../types/auth";
 import { loginUserSchema, RegisterUserSchema } from "./user.schema";
+import { notifyOwner } from "../../lib/notify";
 import z from "zod";
 
 const service = new UserService();
@@ -35,6 +36,13 @@ export async function register(
     if (!user) {
       return res.status(500).json({ error: "Failed to create user" });
     }
+
+    // Fire-and-forget: a notifier outage must never break signup.
+    notifyOwner({
+      type: "signup",
+      email: user.email,
+      username: user.username,
+    }).catch((err) => console.error("notifyOwner failed:", err));
 
     const tokenPair = createTokenPair(user, JWT_SECRET, REFRESH_SECRET);
 
