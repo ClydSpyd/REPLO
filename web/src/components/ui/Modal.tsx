@@ -15,6 +15,12 @@ interface ModalProps {
   /** `wide` suits two-column content such as the routine builder. */
   size?: 'default' | 'wide';
   /**
+   * Below `lg`, render edge-to-edge full-viewport (no backdrop gutter, no
+   * panel border/radius) instead of the default near-full rounded card.
+   * Desktop is unaffected. Suits dense, form-heavy modals like the builder.
+   */
+  mobileFullScreen?: boolean;
+  /**
    * Optional layer covering the whole panel (confirmation steps, etc.).
    * Lives inside the panel so it doesn't trip the outside-click dismissal a
    * separately-portaled modal would.
@@ -39,6 +45,7 @@ export default function Modal({
   footer,
   overlay,
   size = 'default',
+  mobileFullScreen = false,
   onOpen,
   onClose,
   children,
@@ -67,17 +74,28 @@ export default function Modal({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const backdropClassName = `animate-modal-backdrop fixed inset-0 z-50 flex justify-center bg-black/70 backdrop-blur-sm ${
+    mobileFullScreen
+      ? 'items-stretch lg:items-center lg:p-4'
+      : 'items-center p-4'
+  }`;
+
+  const panelClassName = `animate-modal-panel relative flex w-full flex-col overflow-hidden bg-[var(--dark-two)] text-white shadow-2xl lg:h-fit lg:max-h-[90vh] ${
+    size === 'wide' ? 'max-w-6xl' : 'max-w-3xl'
+  } ${
+    mobileFullScreen
+      ? 'h-[100dvh] rounded-none border-0 lg:rounded-2xl lg:border lg:border-[var(--contrast-one)]'
+      : 'h-[calc(100dvh-20px)] rounded-2xl border border-[var(--contrast-one)]'
+  }`;
+
   return createPortal(
     <div
-      className="animate-modal-backdrop fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
+      className={backdropClassName}
       role="dialog"
       aria-modal="true"
       aria-label={mainHeading}
     >
-      <div
-        ref={panelRef}
-        className={`animate-modal-panel relative flex h-[calc(100dvh-20px)] lg:h-fit lg:max-h-[90vh] w-full flex-col ${size === 'wide' ? 'max-w-6xl' : 'max-w-3xl'} overflow-hidden rounded-2xl border border-[var(--contrast-one)] bg-[var(--dark-two)] text-white shadow-2xl`}
-      >
+      <div ref={panelRef} className={panelClassName}>
         {overlay}
 
         {/* Header */}

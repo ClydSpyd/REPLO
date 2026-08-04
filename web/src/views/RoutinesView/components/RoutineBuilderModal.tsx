@@ -257,6 +257,7 @@ export default function RoutineBuilderModal({
   return (
     <Modal
       size="wide"
+      mobileFullScreen
       subHeading={isEditing ? 'Edit' : 'Create'}
       mainHeading={isEditing ? 'Edit Routine' : 'New Routine'}
       onClose={isPending ? undefined : onClose}

@@ -29,7 +29,7 @@ export default function RoutineDetailModal({
     error: deleteError,
   } = useDeleteRoutine();
 
-  const { exerciseCount, setCount, totalVolume, estimatedMinutes } =
+  const { exerciseCount, setCount, estimatedMinutes } =
     getRoutineStats(routine);
 
   const muscles = topMuscleGroups(routine.exercises);
