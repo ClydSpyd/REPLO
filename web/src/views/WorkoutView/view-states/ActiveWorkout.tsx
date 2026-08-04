@@ -8,7 +8,6 @@ import WorkoutSummary from '../components/WorkoutSummary';
 import WorkoutProgress from '../components/WorkoutProgress';
 import AddExerciseModal from '../components/AddExerciseModal';
 import ExerciseList from '../components/ExerciseList';
-import RestTimer from '../../../components/ui/RestTimer';
 
 export default function ActiveWorkout() {
   const { data: workout } = useMyCurrentWorkout();
@@ -58,7 +57,6 @@ export default function ActiveWorkout() {
             notes={workout.notes}
             onSave={(notes) => updateWorkout({ notes })}
           />
-          <RestTimer display />
         </div>
       </div>
 

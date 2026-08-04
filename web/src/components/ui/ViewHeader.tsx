@@ -3,6 +3,7 @@ import { FiUser, FiLogOut, FiMenu } from 'react-icons/fi';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import BarsLogo from './BarsLogo';
 import MobileNavSheet from './MobileNavSheet';
+import HeaderRestTimerButton from './HeaderRestTimerButton';
 import { navItems } from '../../config/nav';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -80,7 +81,10 @@ export default function ViewHeader() {
         </div>
       </nav>
 
-      <div className="w-30 flex justify-end">
+      <div className="w-30 flex justify-end items-center gap-2">
+        {/* Rest timer: on /workout with an active session, below lg */}
+        <HeaderRestTimerButton />
+
         {/* Mobile: hamburger opens the full-screen nav sheet */}
         <button
           type="button"

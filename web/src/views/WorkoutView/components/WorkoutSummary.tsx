@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { FaRegCalendar, FaRegClock, FaStop } from 'react-icons/fa';
+import { FaRegCalendar, FaRegClock, FaStop, FaStopwatch } from 'react-icons/fa';
 import { format } from 'date-fns';
 import WorkoutTitleBlock from './WorkoutTitleBlock';
 import Button from '../../../components/ui/Button';
 import ElapsedTimer from '../../../components/ui/ElapsedTimer';
 import EndWorkoutModal from './EndWorkoutModal';
 import { useWorkoutSessionData } from '../../../hooks/useWorkoutSessionData';
+import { useRestTimer } from '../../../hooks/useRestTimer';
 
 export default function WorkoutSummary({
   session,
@@ -15,6 +16,7 @@ export default function WorkoutSummary({
   const { exerciseCount, setCount, estimatedDurationSec } =
     useWorkoutSessionData(session ?? null);
   const [confirmingEnd, setConfirmingEnd] = useState(false);
+  const { open: openRestTimer } = useRestTimer();
   return (
     <div className="w-full flex flex-col lg:flex-row justify-between gap-4 min-h-0 mb-4">
       <div className="flex flex-col gap-1">
@@ -54,18 +56,28 @@ export default function WorkoutSummary({
           </div>
         </div>
       </div>
-      <div className="h-full justify-center hidden lg:flex flex-col items-end w-40">
+      <div className="h-full justify-center hidden lg:flex flex-col items-end gap-2">
         <ElapsedTimer
           from={session?.started ?? session?.createdAt}
           until={session?.ended}
         />
-        <Button
-          icon={<FaStop />}
-          text="End Workout"
-          size="xl"
-          onClick={() => setConfirmingEnd(true)}
-          disabled={!session}
-        />
+        <div className="flex items-stretch gap-2">
+          <button
+            type="button"
+            aria-label="Open rest timer"
+            onClick={openRestTimer}
+            className="flex w-[80px] shrink-0 items-center justify-center rounded-lg border border-[var(--contrast-one)] bg-[var(--dark-one)] text-[var(--accent-primary)] transition-colors hover:border-[var(--accent-primary)]"
+          >
+            <FaStopwatch className="text-2xl" />
+          </button>
+          <Button
+            icon={<FaStop />}
+            text="End Workout"
+            size="xl"
+            onClick={() => setConfirmingEnd(true)}
+            disabled={!session}
+          />
+        </div>
       </div>
 
       {confirmingEnd && session && (
