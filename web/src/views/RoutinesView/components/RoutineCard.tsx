@@ -12,6 +12,7 @@ import RoutineDetailModal from './RoutineDetailModal';
 import RoutineBuilderModal from './RoutineBuilderModal';
 import { useToast } from '../../../hooks/useToast';
 import { useCreateRoutine, useDeleteRoutine } from '../../../mutations/routines';
+import { useToggleFavorite } from '../../../mutations/favorites';
 import { useStartWorkoutFromRoutine } from '../../../mutations/workouts';
 import {
   formatLabel,
@@ -25,7 +26,13 @@ import {
  * One saved routine in the library: identity, what it hits, how big it is, and
  * when it was last performed.
  */
-export default function RoutineCard({ routine }: { routine: Routine }) {
+export default function RoutineCard({
+  routine,
+  isFavorite = false,
+}: {
+  routine: Routine;
+  isFavorite?: boolean;
+}) {
   const [detailOpen, setDetailOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -38,6 +45,8 @@ export default function RoutineCard({ routine }: { routine: Routine }) {
     error: deleteError,
   } = useDeleteRoutine();
   const { mutate: createRoutine, isPending: isDuplicating } = useCreateRoutine();
+  const { mutate: toggleFavorite, isPending: isTogglingFavorite } =
+    useToggleFavorite();
   const { mutate: startWorkout, isPending: isStarting } =
     useStartWorkoutFromRoutine();
   const { success, error: toastError } = useToast();
@@ -80,6 +89,16 @@ export default function RoutineCard({ routine }: { routine: Routine }) {
       onError: (err) => toastError("Couldn't start workout", err.message),
     });
 
+  const handleToggleFavorite = () => {
+    toggleFavorite(
+      { routineId: routine._id, isFavorite },
+      {
+        onError: (err) =>
+          toastError("Couldn't update favorite", err.message),
+      },
+    );
+  };
+
   const handleDuplicate = () => {
     setMenuOpen(false);
     createRoutine(routineToDuplicateInput(routine), {
@@ -115,8 +134,24 @@ export default function RoutineCard({ routine }: { routine: Routine }) {
         )}
 
         <div className="flex items-center gap-2">
-          {/* Favourites aren't backed by the API yet */}
-          <FiStar aria-hidden="true" className="text-[var(--contrast-two)]" />
+          <button
+            type="button"
+            aria-label={
+              isFavorite
+                ? `Remove ${routine.name} from favorites`
+                : `Add ${routine.name} to favorites`
+            }
+            aria-pressed={isFavorite}
+            onClick={handleToggleFavorite}
+            disabled={isTogglingFavorite}
+            className={`flex h-7 w-7 items-center justify-center rounded-md transition-colors hover:bg-[var(--dark-two)] disabled:cursor-not-allowed disabled:opacity-60 ${
+              isFavorite
+                ? 'text-[var(--accent-primary)]'
+                : 'text-[var(--contrast-two)] hover:text-white'
+            }`}
+          >
+            <FiStar fill={isFavorite ? 'currentColor' : 'none'} />
+          </button>
 
           <div className="relative" ref={menuRef}>
             <button

@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { FiPlus } from 'react-icons/fi';
 import { useMutationState } from '@tanstack/react-query';
 import { useMyRoutines } from '../../queries/routines';
+import { useFavorites } from '../../queries/favorites';
 import { CREATE_ROUTINE_KEY } from '../../mutations/routines';
 import ErrorBoundaryModal from '../../components/utility/ErrorBoundaryModal';
 import RoutineCard from './components/RoutineCard';
@@ -26,6 +27,7 @@ type GridEntry =
 export default function RoutinesView() {
   const [builderOpen, setBuilderOpen] = useState(false);
   const { data: routines, isLoading, error } = useMyRoutines();
+  const { data: favoriteIds } = useFavorites();
 
   // Any create-routine mutation currently in flight, wherever it was fired
   // from. Each gets a ghost card until the list refetches.
@@ -107,7 +109,11 @@ export default function RoutinesView() {
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
                 {entries.map((entry) =>
                   entry.kind === 'routine' ? (
-                    <RoutineCard key={entry.key} routine={entry.routine} />
+                    <RoutineCard
+                      key={entry.key}
+                      routine={entry.routine}
+                      isFavorite={favoriteIds?.has(entry.routine._id) ?? false}
+                    />
                   ) : (
                     <RoutineGhostCard key={entry.key} name={entry.name} />
                   ),

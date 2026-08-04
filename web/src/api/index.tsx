@@ -2,6 +2,7 @@ import axios, { type AxiosError } from 'axios';
 import { workoutMethods } from './workout';
 import exerciseMethods from './exercises';
 import { routineMethods } from './routine';
+import { favoriteMethods } from './favorite';
 import { userMethods } from './user';
 
 export const baseClient = axios.create({
@@ -42,5 +43,6 @@ export const API = {
   workout: workoutMethods,
   exercise: exerciseMethods,
   routine: routineMethods,
+  favorite: favoriteMethods,
   user: userMethods
 };

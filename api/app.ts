@@ -3,6 +3,7 @@ import fs from "fs";
 import path from "path";
 import workoutRoutes from "./modules/workout/workout.routes";
 import routineRoutes from "./modules/routine/routine.routes";
+import favoriteRoutes from "./modules/favorite/favorite.routes";
 import userRoutes from "./modules/user/user.routes";
 import exerciseRoutes from "./modules/exercise/exercise.routes";
 import { errorHandler } from "./middleware/error.middleware";
@@ -35,6 +36,7 @@ export function createServer() {
   // API routes
   app.use("/api/workout", workoutRoutes);
   app.use("/api/routine", routineRoutes);
+  app.use("/api/favorite", favoriteRoutes);
   app.use("/api/user", userRoutes);
   app.use("/api/exercise", exerciseRoutes);
 
