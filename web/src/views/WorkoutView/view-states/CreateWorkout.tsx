@@ -35,7 +35,7 @@ export default function CreateWorkout() {
 
   return (
     <div className="flex-1 w-full min-h-screen flex items-center justify-center">
-      <div className="w-[500px] py-10 border-[var(--accent-primary)]! flex flex-col gap-6 items-center z-50 module-wrapper">
+      <div className="w-[500px] max-w-[95vw] py-10 border-[var(--accent-primary)]! flex flex-col gap-6 items-center z-50 module-wrapper">
         <div className="flex flex-col items-center gap-2">
           <div className="w-fit border border-[var(--accent-primary)] bg-[var(--hint-primary-dark)] rounded-xl p-5">
             <FaPlus className="text-[var(--accent-primary)] text-3xl" />

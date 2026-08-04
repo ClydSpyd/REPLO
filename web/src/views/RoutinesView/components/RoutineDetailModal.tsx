@@ -102,9 +102,12 @@ export default function RoutineDetailModal({
       <div className="-mt-1 mb-6 border-b border-[var(--contrast-one)] pb-6">
         <div className="flex items-center justify-between gap-3">
           <p className="space-mono text-sm text-[var(--contrast-three)]">
-            <span className="font-bold text-white">{exerciseCount}</span> ex
-            {' · '}
-            <span className="font-bold text-white">~{estimatedMinutes}</span> min
+            <span className="font-bold text-white">{exerciseCount}</span> exercises
+            {/* {' · '}
+            <span className="font-bold text-white">
+              ~{estimatedMinutes}
+            </span>{' '}
+            min */}
           </p>
 
           <button
@@ -121,9 +124,12 @@ export default function RoutineDetailModal({
         {showDetails && (
           <div className="mt-5">
             <div className="grid grid-cols-2 gap-3">
-              <StatCard value={exerciseCount} label="Exercises" />
+              {/* <StatCard value={exerciseCount} label="Exercises" /> */}
               <StatCard value={setCount} label="Sets" />
-              <StatCard value={totalVolume.toLocaleString()} label="kg Volume" />
+              {/* <StatCard
+                value={totalVolume.toLocaleString()}
+                label="kg Volume"
+              /> */}
               <StatCard value={estimatedMinutes} label="Est. min" />
             </div>
 
@@ -147,13 +153,12 @@ export default function RoutineDetailModal({
           This routine has no exercises yet
         </p>
       ) : (
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-2">
           {routine.exercises.map((exercise, index) => (
             <section
               key={`${exercise.exerciseId}-${index}`}
-              className="rounded-2xl border border-[var(--contrast-one)] bg-[var(--dark-one)] p-4 lg:p-5"
+              className="flex items-center justify-between gap-2 rounded-2xl border border-[var(--contrast-one)] bg-[var(--dark-one)] p-4 lg:p-5"
             >
-              <div className="flex items-start justify-between gap-3">
                 <div className="flex min-w-0 items-start gap-3 lg:gap-4">
                   <span className="anton flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[var(--dark-two)] text-sm text-[var(--contrast-two)]">
                     {String(index + 1).padStart(2, '0')}
@@ -162,18 +167,17 @@ export default function RoutineDetailModal({
                     <h3 className="heading-four truncate text-white">
                       {exercise.name}
                     </h3>
-                    <p className="mt-1 truncate text-xs lg:text-sm text-[var(--contrast-three)]">
+                    <p className="mt-1 truncate text-xs lg:text-sm text-[var(--accent-primary)]">
                       {muscleSubtitle(exercise)}
                     </p>
                   </div>
                 </div>
 
-                <span className="space-mono shrink-0 text-xs font-bold uppercase tracking-wide text-[var(--accent-primary)]">
-                  {exercise.sets.length} × sets
-                </span>
-              </div>
-
-              {exercise.sets.length > 0 && (
+              <h3 className="space-mono shrink-0 text-base font-bold uppercase tracking-wide text-[var(--accent-primary)]">
+                <span className="lowercase">x</span>
+                {exercise.sets.length}
+              </h3>
+              {/* {exercise.sets.length > 0 && (
                 <div className="mt-4 flex flex-wrap gap-2">
                   {exercise.sets.map((set, setIndex) => (
                     <span
@@ -184,7 +188,7 @@ export default function RoutineDetailModal({
                     </span>
                   ))}
                 </div>
-              )}
+              )} */}
             </section>
           ))}
         </div>
