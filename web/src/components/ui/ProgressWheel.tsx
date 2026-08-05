@@ -62,7 +62,7 @@ export default function ProgressWheel({
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="text-4xl font-bold text-white">{percent}%</span>
+        <span className="text-4xl font-bold text-[var(--text-strong)]">{percent}%</span>
         <span className="text-xs font-medium uppercase tracking-wider text-[var(--contrast-three)]">
           Complete
         </span>

@@ -1,3 +1,5 @@
+import { useTheme } from '../../../hooks/useTheme';
+
 interface ReploLoaderProps {
   size?: number;
   speed?: 'slow' | 'medium' | 'fast';
@@ -26,19 +28,32 @@ const BAR_BOTTOM = 90; // baseline all bars sit on
 const MIN_HEIGHT = 20; // shortest height in the pulse
 const CORNER_RADIUS = 4;
 
-const DEFAULT_COLORS: [string, string, string] = [
+const LIGHT_MODE_COLORS: [string, string, string] = [
   '#E8A33D',
   '#E8821E',
   '#D2570D',
 ];
 
+const DARK_MODE_COLORS: [string, string, string] = [
+  '#CDFF57',
+  '#A8E80C',
+  '#6F9E06',
+];
+
 export default function ReploLoader({
   size = 200,
   speed = 'medium',
-  barColors = DEFAULT_COLORS,
-  highlightColor = '#FFB700',
+  barColors,
+  highlightColor,
 }: ReploLoaderProps) {
   const duration = SPEED_DURATION[speed];
+  const { theme } = useTheme();
+
+  const finalColors =
+    barColors ?? (theme === 'dark' ? DARK_MODE_COLORS : LIGHT_MODE_COLORS);
+  
+    const finalHighlightColor =
+      highlightColor ?? (theme === 'dark' ? '#CDFF57' : '#FFB700');
 
   return (
     <svg
@@ -71,7 +86,7 @@ export default function ReploLoader({
             height={bar.peak}
             rx={CORNER_RADIUS}
             ry={CORNER_RADIUS}
-            fill={barColors[i]}
+            fill={finalColors[i]}
           >
             {/* Height + y animate together to keep bars pinned to the baseline. */}
             <animate
@@ -86,7 +101,7 @@ export default function ReploLoader({
             />
             <animate
               attributeName="fill"
-              values={`${barColors[i]};${highlightColor};${barColors[i]}`}
+              values={`${finalColors[i]};${finalHighlightColor};${finalColors[i]}`}
               {...anim}
             />
           </rect>

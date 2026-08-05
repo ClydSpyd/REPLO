@@ -95,7 +95,7 @@ export default function EndWorkoutModal({
             className="mt-0.5 h-4 w-4 shrink-0 accent-[var(--accent-primary)]"
           />
           <span className="min-w-0">
-            <span className="block text-sm font-bold text-white">
+            <span className="block text-sm font-bold text-[var(--text-strong)]">
               Save to my routines
             </span>
             <span className="block text-xs text-[var(--contrast-three)]">
@@ -123,7 +123,7 @@ export default function EndWorkoutModal({
             type="button"
             onClick={onClose}
             disabled={isPending}
-            className="space-mono rounded-lg border border-[var(--contrast-one)] px-5 py-2.5 text-xs font-bold uppercase tracking-wide text-[var(--contrast-three)] transition-colors hover:border-[var(--contrast-two)] hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
+            className="space-mono rounded-lg border border-[var(--contrast-one)] px-5 py-2.5 text-xs font-bold uppercase tracking-wide text-[var(--contrast-three)] transition-colors hover:border-[var(--contrast-two)] hover:text-[var(--text-strong)] disabled:cursor-not-allowed disabled:opacity-50"
           >
             Keep Going
           </button>
@@ -131,7 +131,7 @@ export default function EndWorkoutModal({
             type="button"
             onClick={handleConfirm}
             disabled={isPending}
-            className="anton flex items-center gap-2 rounded-lg bg-[var(--accent-primary)] px-6 py-2.5 text-sm font-extrabold uppercase tracking-wide text-black transition-colors hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-60"
+            className="anton flex items-center gap-2 rounded-lg bg-[var(--accent-primary)] px-6 py-2.5 text-sm font-extrabold uppercase tracking-wide text-[var(--text-contrast)] transition-colors hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-60"
           >
             <FaStop />
             {isSavingRoutine
@@ -152,7 +152,7 @@ function Stat({ label, value }: { label: string; value: string | number }) {
       <span className="space-mono text-xs uppercase tracking-wide text-[var(--contrast-three)]!">
         {label}
       </span>
-      <span className="anton text-lg text-white">{value}</span>
+      <span className="anton text-lg text-[var(--text-strong)]">{value}</span>
     </div>
   );
 }

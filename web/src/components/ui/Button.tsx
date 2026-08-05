@@ -33,7 +33,7 @@ export default function Button({
       disabled={disabled}
       type="button"
       onClick={onClick}
-      className={`anton inline-flex items-center justify-center rounded-lg  font-extrabold uppercase tracking-wide transition-colors whitespace-nowrap ${SIZE_STYLES[size]} ${disabled ? 'bg-[var(--contrast-one)] text-[var(--contrast-two)] cursor-not-allowed!' : 'bg-[var(--accent-primary)] text-black hover:brightness-95'} ${additionalClasses ?? ''}`}
+      className={`anton inline-flex items-center justify-center rounded-lg  font-extrabold uppercase tracking-wide transition-colors whitespace-nowrap ${SIZE_STYLES[size]} ${disabled ? 'bg-[var(--contrast-one)] text-[var(--contrast-two)] cursor-not-allowed!' : 'bg-[var(--accent-primary)] text-[var(--text-contrast)] hover:brightness-95'} ${additionalClasses ?? ''}`}
     >
       {icon && <span className="flex items-center text-[1.1em]">{icon}</span>}
       {text}

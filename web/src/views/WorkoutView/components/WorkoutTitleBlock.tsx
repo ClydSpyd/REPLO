@@ -45,7 +45,7 @@ export default function WorkoutTitleBlock() {
       ) : (
         <input
           key={workout._id}
-          className="heading-one bg-transparent border-b border-[var(--accent-primary)] focus:outline-none focus:border-[var(--accent-secondary)] text-white"
+          className="heading-one bg-transparent border-b border-[var(--accent-primary)] focus:outline-none focus:border-[var(--accent-secondary)] text-[var(--text-strong)]"
           type="text"
           defaultValue={workout.name}
           onChange={(e) => {

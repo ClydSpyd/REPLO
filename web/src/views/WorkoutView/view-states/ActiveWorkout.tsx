@@ -3,17 +3,21 @@ import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { useUpdateCurrentWorkout } from '../../../mutations/workouts';
 import { useMyCurrentWorkout } from '../../../queries/workouts';
-import WorkoutNotes from '../components/WorkoutNotes';
 import WorkoutSummary from '../components/WorkoutSummary';
 import WorkoutProgress from '../components/WorkoutProgress';
 import AddExerciseModal from '../components/AddExerciseModal';
 import ExerciseList from '../components/ExerciseList';
+import EndWorkoutModal from '../components/EndWorkoutModal';
+import Button from '../../../components/ui/Button';
+import { FaStop } from 'react-icons/fa';
 
 export default function ActiveWorkout() {
   const { data: workout } = useMyCurrentWorkout();
   const { mutate: updateWorkout } = useUpdateCurrentWorkout();
   const nameChange$ = useMemo(() => new Subject<string>(), []);
   const [addExerciseOpen, setAddExerciseOpen] = useState(false);
+  const [confirmingEnd, setConfirmingEnd] = useState(false);
+  
 
   useEffect(() => {
     const sub = nameChange$
@@ -28,14 +32,14 @@ export default function ActiveWorkout() {
   if (!workout) {
     return (
       <div className="w-full h-[calc(100vh-80px)] grow rounded-md border-2 border-dashed border-[var(--contrast-one)] flex items-center justify-center">
-        <p className="text-white/50 text-sm">No active workout session</p>
+        <p className="text-[var(--text-strong)]/50 text-sm">No active workout session</p>
       </div>
     );
   }
 
   return (
     <div className="w-full px-6 lg:px-2">
-      <WorkoutSummary session={workout} />
+      <WorkoutSummary session={workout} setConfirmingEnd={setConfirmingEnd} />
       <div className="h-full w-full grow grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_400px] gap-4">
         <div className="flex flex-col gap-4 min-w-0">
           <ExerciseList exercises={workout.exercises} />
@@ -52,18 +56,34 @@ export default function ActiveWorkout() {
         </div>
         <div className="flex flex-col gap-4 h-full">
           <WorkoutProgress session={workout} />
-          <WorkoutNotes
+          {/* <WorkoutNotes
             key={workout._id}
             notes={workout.notes}
             onSave={(notes) => updateWorkout({ notes })}
-          />
+          /> */}
         </div>
+
+        <Button
+          icon={<FaStop />}
+          text="End Workout"
+          size="xl"
+          onClick={() => setConfirmingEnd(true)}
+          disabled={!workout}
+          additionalClasses="lg:hidden w-full"
+        />
       </div>
 
       {addExerciseOpen && (
         <AddExerciseModal
           toggleOpen={setAddExerciseOpen}
           onClose={() => setAddExerciseOpen(false)}
+        />
+      )}
+
+      {confirmingEnd && (
+        <EndWorkoutModal
+          session={workout}
+          onClose={() => setConfirmingEnd(false)}
         />
       )}
     </div>

@@ -72,13 +72,13 @@ export default function RoutinesView() {
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div>
               <p className="anotation">Routine library</p>
-              <h1 className="heading-one text-white">Workouts</h1>
+              <h1 className="heading-one text-[var(--text-strong)]">Workouts</h1>
             </div>
 
             <button
               type="button"
               onClick={() => setBuilderOpen(true)}
-              className="anton flex items-center justify-center gap-2 rounded-xl bg-[var(--accent-primary)] px-6 py-4 text-lg font-extrabold uppercase tracking-wide text-black transition-colors hover:brightness-95 lg:px-8"
+              className="anton flex items-center justify-center gap-2 rounded-xl bg-[var(--accent-primary)] px-6 py-4 text-lg font-extrabold uppercase tracking-wide text-[var(--text-contrast)] transition-colors hover:brightness-95 lg:px-8"
             >
               <FiPlus className="text-xl" />
               New Routine
@@ -102,7 +102,7 @@ export default function RoutinesView() {
             )}
 
             {!isLoading && !error && entries.length === 0 && (
-              <Placeholder text="No routines saved yet — Create one here or finish a session and tick 'save to my routines'" />
+              <EmptyRoutines onCreate={() => setBuilderOpen(true)} />
             )}
 
             {entries.length > 0 && (
@@ -128,6 +128,39 @@ export default function RoutinesView() {
         <RoutineBuilderModal onClose={() => setBuilderOpen(false)} />
       )}
     </ErrorBoundaryModal>
+  );
+}
+
+/**
+ * Empty-library state — mirrors the workout view's "no favorites" nudge
+ * (icon tile, heading, copy, accent CTA), but the button opens the routine
+ * builder here rather than routing to the library.
+ */
+function EmptyRoutines({ onCreate }: { onCreate: () => void }) {
+  return (
+    <div className="flex flex-col items-center rounded-2xl border border-[var(--contrast-one)] bg-[color-mix(in_srgb,var(--dark-one)_60%,transparent)] px-6 py-16 text-center lg:py-20">
+      <div className="flex h-[68px] w-[68px] items-center justify-center rounded-2xl border border-[var(--accent-primary)] bg-[var(--hint-primary-dark)] text-2xl text-[var(--accent-primary)]">
+        <FiPlus />
+      </div>
+
+      <h3 className="anton mt-6 text-3xl uppercase tracking-wide text-[var(--text-strong)]">
+        No routines saved yet
+      </h3>
+
+      <p className="body-text mt-3 max-w-[440px] text-sm! text-[var(--contrast-three)]">
+        Build your first plan and it'll show up here, ready to launch whenever
+        you train — or save one after finishing a session.
+      </p>
+
+      <button
+        type="button"
+        onClick={onCreate}
+        className="anton mt-6 flex items-center gap-2 rounded-lg bg-[var(--accent-primary)] px-6 py-3 text-sm font-extrabold uppercase tracking-wide text-[var(--text-contrast)] transition-colors hover:brightness-95"
+      >
+        <FiPlus />
+        Create Routine now
+      </button>
+    </div>
   );
 }
 

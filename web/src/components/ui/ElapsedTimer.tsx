@@ -33,7 +33,7 @@ export default function ElapsedTimer({
       <div
         role="timer"
         aria-label={`${label || 'Elapsed'}: ${elapsed}`}
-        className="anotation text-7xl! font-bold text-white/80! mb-2 tabular-nums whitespace-nowrap"
+        className="anotation text-7xl! font-bold text-[var(--text-strong)]/80! mb-2 tabular-nums whitespace-nowrap"
       >
         {elapsed}
       </div>

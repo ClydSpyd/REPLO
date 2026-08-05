@@ -12,7 +12,7 @@ import BarsLogo from '../components/ui/BarsLogo';
 const EMPTY_FORM: LoginInput = { email: '', password: '' };
 
 const inputBase =
-  'w-full rounded-md border bg-[var(--dark-one)] p-3 text-white placeholder:text-[var(--contrast-two)]';
+  'w-full rounded-md border bg-[var(--dark-one)] p-3 text-[var(--text-strong)] placeholder:text-[var(--contrast-two)]';
 
 export default function Login() {
   const [form, setForm] = useState<LoginInput>(EMPTY_FORM);
@@ -55,13 +55,12 @@ export default function Login() {
 
   return (
     <>
-      <div className="mt-[-15vh] mb-10 w-full flex flex-col items-center justify-center">
+      <div className="mt-[-15vh] mb-10 w-full lg:hidden flex flex-col items-center justify-center">
         <BarsLogo
           size={80}
-          barColors={['#e8a13c', '#e8823c', '#d9662a']}
           cornerRadius={3}
         />
-        <h1 className="text-5xl font-extrabold text-white tracking-normal">
+        <h1 className="text-5xl font-extrabold text-[var(--text-strong)] tracking-normal">
           REPLO
         </h1>
       </div>
@@ -98,7 +97,7 @@ export default function Login() {
           </div>
           <button
             type="submit"
-            className="mt-2 w-full rounded-md bg-[var(--accent-primary)] p-3 font-semibold text-black disabled:opacity-60"
+            className="mt-2 w-full rounded-md bg-[var(--accent-primary)] p-3 font-semibold text-[var(--text-contrast)] disabled:opacity-60"
             disabled={loading}
           >
             {loading ? 'Logging in...' : 'Log in'}

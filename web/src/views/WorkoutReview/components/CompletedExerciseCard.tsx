@@ -27,7 +27,7 @@ export default function CompletedExerciseCard({
             {number}
           </span>
           <div className="min-w-0">
-            <h3 className="heading-four truncate text-white">
+            <h3 className="heading-four truncate text-[var(--text-strong)]">
               {exercise.name}
             </h3>
             <p className="mt-1 text-[10px] lg:text-sm text-[var(--contrast-three)]">

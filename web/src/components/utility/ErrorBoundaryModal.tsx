@@ -18,7 +18,7 @@ export default function ErrorBoundaryModal({
           <p className="anotation text-[var(--accent-primary)]! text-base! uppercase tracking-wide">
             Error Loading {pageType}
           </p>
-          <p className="body-text text-white/80 text-sm! max-w-[560px] break-words">
+          <p className="body-text text-[var(--text-strong)]/80 text-sm! max-w-[560px] break-words">
             {error instanceof Error ? error.message : 'Unknown error'}
           </p>
         </div>

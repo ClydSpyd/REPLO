@@ -126,7 +126,7 @@ export default function ExerciseCard({
               {number}
             </span>
             <div className="min-w-0">
-              <h3 className="heading-four truncate text-white">
+              <h3 className="heading-four truncate text-[var(--text-strong)]">
                 {exercise.name}
               </h3>
               <p className="mt-1 text-[10px] lg:text-sm text-[var(--contrast-three)]">
@@ -195,7 +195,7 @@ export default function ExerciseCard({
             </span>
           </div>
           <div className="mt-1 flex flex-wrap items-center gap-3">
-            <h3 className="heading-three text-white">{exercise.name}</h3>
+            <h3 className="heading-three text-[var(--text-strong)]">{exercise.name}</h3>
             <HeaderButton
               icon={<FiRepeat />}
               label="Switch"
@@ -338,7 +338,7 @@ function RemoveConfirmOverlay({
         <div className="mb-1 flex h-12 w-12 items-center justify-center rounded-xl border border-[var(--accent-primary)] bg-[var(--hint-primary-dark)]">
           <FiTrash2 className="text-xl text-[var(--accent-primary)]" />
         </div>
-        <h4 className="heading-four text-white">Remove exercise?</h4>
+        <h4 className="heading-four text-[var(--text-strong)]">Remove exercise?</h4>
         <p className="body-text text-sm! text-[var(--contrast-three)]">
           {exerciseName} and all its sets will be removed from this session.
         </p>
@@ -348,14 +348,14 @@ function RemoveConfirmOverlay({
         <button
           type="button"
           onClick={onCancel}
-          className="space-mono rounded-lg border border-[var(--contrast-one)] px-5 py-2.5 text-xs font-bold uppercase tracking-wide text-[var(--contrast-three)] transition-colors hover:border-[var(--contrast-two)] hover:text-white"
+          className="space-mono rounded-lg border border-[var(--contrast-one)] px-5 py-2.5 text-xs font-bold uppercase tracking-wide text-[var(--contrast-three)] transition-colors hover:border-[var(--contrast-two)] hover:text-[var(--text-strong)]"
         >
           Cancel
         </button>
         <button
           type="button"
           onClick={onConfirm}
-          className="anton rounded-lg bg-[var(--accent-primary)] px-6 py-2.5 text-sm font-extrabold uppercase tracking-wide text-black transition-colors hover:brightness-95"
+          className="anton rounded-lg bg-[var(--accent-primary)] px-6 py-2.5 text-sm font-extrabold uppercase tracking-wide text-[var(--text-contrast)] transition-colors hover:brightness-95"
         >
           Remove
         </button>
@@ -384,7 +384,7 @@ function SetEditor({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="text-[var(--accent-primary)]">●</span>
-          <span className="anton text-xl text-white">Set {setNumber}</span>
+          <span className="anton text-xl text-[var(--text-strong)]">Set {setNumber}</span>
         </div>
         <div className="flex items-center gap-4">
           {/* <span className="space-mono text-xs uppercase tracking-wide text-[var(--contrast-three)]!">
@@ -419,7 +419,7 @@ function SetEditor({
       <button
         type="button"
         onClick={onLog}
-        className="anton mt-6 flex w-full items-center justify-center gap-2 rounded-lg bg-[var(--accent-primary)] py-4 text-xl font-extrabold uppercase tracking-wide text-black transition-colors hover:brightness-95"
+        className="anton mt-6 flex w-full items-center justify-center gap-2 rounded-lg bg-[var(--accent-primary)] py-4 text-xl font-extrabold uppercase tracking-wide text-[var(--text-contrast)] transition-colors hover:brightness-95"
       >
         <FiCheck /> Log Set
       </button>
@@ -445,7 +445,7 @@ function Stepper({
       </span>
       <div className="mt-2 flex items-center gap-4 w-full">
         <StepperButton icon={<FiMinus />} onClick={onDecrement} />
-        <span className="anton min-w-[2ch] grow text-center text-4xl lg:text-6xl text-white">
+        <span className="anton min-w-[2ch] grow text-center text-4xl lg:text-6xl text-[var(--text-strong)]">
           {value}
         </span>
         <StepperButton icon={<FiPlus />} onClick={onIncrement} />
@@ -465,7 +465,7 @@ function StepperButton({
     <button
       type="button"
       onClick={onClick}
-      className="flex h-11 w-11 items-center justify-center rounded-lg border border-[var(--contrast-one)] text-lg text-white transition-colors hover:border-[var(--accent-primary)] hover:text-[var(--accent-primary)]"
+      className="flex h-11 w-11 items-center justify-center rounded-lg border border-[var(--contrast-one)] text-lg text-[var(--text-strong)] transition-colors hover:border-[var(--accent-primary)] hover:text-[var(--accent-primary)]"
     >
       {icon}
     </button>

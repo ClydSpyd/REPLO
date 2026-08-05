@@ -16,7 +16,7 @@ const ProtectedLayout = () => {
     <RestTimerProvider>
       <div className="app-bg w-screen h-dvh flex flex-col">
         <ViewHeader />
-        <main className="container grow min-w-screen flex flex-1 overflow-hidden">
+        <main className="container grow min-w-screen flex flex-1 overflow-hidden overflow-y-auto">
           <ErrorBoundaryModal pageType="Page">
             <Outlet />
           </ErrorBoundaryModal>

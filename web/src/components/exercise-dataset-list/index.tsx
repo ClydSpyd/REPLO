@@ -138,7 +138,7 @@ export default function ExerciseDatasetList(props: Props) {
             className="flex items-center justify-between gap-3 lg:gap-4 rounded-xl border border-[var(--contrast-one)] bg-[var(--dark-one)] px-4 py-4 lg:px-6 lg:py-5"
           >
             <div className="min-w-0">
-              <h3 className="heading-four truncate text-white">
+              <h3 className="heading-four truncate text-[var(--text-strong)]">
                 {exercise.name}
               </h3>
               <div className="mt-2 lg:mt-3 flex flex-wrap gap-1.5 lg:gap-2">
@@ -185,7 +185,7 @@ export default function ExerciseDatasetList(props: Props) {
               <button
                 type="button"
                 onClick={() => props.onSelect(exercise)}
-                className="anton shrink-0 rounded-lg border border-[var(--contrast-one)] bg-[var(--dark-two)] px-4 py-2.5 text-sm lg:px-6 lg:py-3 lg:text-lg font-extrabold uppercase tracking-wide text-white transition-colors hover:border-[var(--accent-primary)] hover:text-[var(--accent-primary)]"
+                className="anton shrink-0 rounded-lg border border-[var(--contrast-one)] bg-[var(--dark-two)] px-4 py-2.5 text-sm lg:px-6 lg:py-3 lg:text-lg font-extrabold uppercase tracking-wide text-[var(--text-strong)] transition-colors hover:border-[var(--accent-primary)] hover:text-[var(--accent-primary)]"
               >
                 {props.selectLabel ?? 'Add'}
               </button>

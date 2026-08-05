@@ -14,10 +14,9 @@ const AuthLayout = () => {
         <div className="flex items-center gap-3">
           <BarsLogo
             size={36}
-            barColors={['#e8a13c', '#e8823c', '#d9662a']}
             cornerRadius={3}
           />
-          <h1 className="text-3xl font-extrabold text-white tracking-normal">
+          <h1 className="text-3xl font-extrabold text-[var(--text-strong)] tracking-normal">
             REPLO
           </h1>
         </div>

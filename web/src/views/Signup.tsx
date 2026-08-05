@@ -16,7 +16,7 @@ const EMPTY_FORM: RegisterInput = {
 };
 
 const inputBase =
-  'w-full rounded-md border bg-[var(--dark-one)] p-3 text-white placeholder:text-[var(--contrast-two)]';
+  'w-full rounded-md border bg-[var(--dark-one)] p-3 text-[var(--text-strong)] placeholder:text-[var(--contrast-two)]';
 
 export default function Signup() {
   const [form, setForm] = useState<RegisterInput>(EMPTY_FORM);
@@ -61,7 +61,7 @@ export default function Signup() {
 
   return (
     <div className="w-full">
-      <h2 className="mb-1 text-2xl font-bold text-white">
+      <h2 className="mb-1 text-2xl font-bold text-[var(--text-strong)]">
         Create your account
       </h2>
       <p className="mb-6 text-sm text-[var(--contrast-three)]">
@@ -119,7 +119,7 @@ export default function Signup() {
         </div>
         <button
           type="submit"
-          className="mt-2 w-full rounded-md bg-[var(--accent-primary)] p-3 font-semibold text-black disabled:opacity-60"
+          className="mt-2 w-full rounded-md bg-[var(--accent-primary)] p-3 font-semibold text-[var(--text-contrast)] disabled:opacity-60"
           disabled={loading}
         >
           {loading ? 'Creating account...' : 'Sign up'}

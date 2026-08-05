@@ -8,7 +8,7 @@ export default function VolumeAnalysisBlock() {
     <div className="relative flex h-full flex-col gap-4">
       <ComingSoonOverlay />
       {/* Weekly volume */}
-      <section className="relative rounded-lg border border-[var(--contrast-one)] bg-[var(--dark-one)] px-8 py-6 text-white">
+      <section className="relative rounded-lg border border-[var(--contrast-one)] bg-[var(--dark-one)] px-8 py-6 text-[var(--text-strong)]">
         <div className="flex items-start justify-between">
           <p className="space-mono text-xs text-[var(--accent-primary)]">
             LAST 8 WEEKS
@@ -52,7 +52,7 @@ export default function VolumeAnalysisBlock() {
       </section>
 
       {/* Last 4 weeks activity strip */}
-      <section className="flex items-center gap-6 rounded-lg border border-[var(--contrast-one)] bg-[var(--dark-one)] px-8 py-5 text-white">
+      <section className="flex items-center gap-6 rounded-lg border border-[var(--contrast-one)] bg-[var(--dark-one)] px-8 py-5 text-[var(--text-strong)]">
         <p className="space-mono whitespace-nowrap text-xs text-[var(--contrast-three)]">
           LAST 4 WEEKS
         </p>

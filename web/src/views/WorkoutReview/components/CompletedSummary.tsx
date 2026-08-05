@@ -44,7 +44,7 @@ export default function CompletedSummary({
           <p className="anotation">Completed session</p>
         </div>
 
-        <h1 className="heading-one text-white">{session.name}</h1>
+        <h1 className="heading-one text-[var(--text-strong)]">{session.name}</h1>
 
         <div className="hidden lg:flex gap-2 mt-2">
           <div className="flex items-center px-4 py-2 rounded-md bg-[var(--dark-one)] text-[var(--contrast-three)] border border-[var(--contrast-one)]">
@@ -77,7 +77,7 @@ export default function CompletedSummary({
         <p className="text-[var(--contrast-three)]! text-xs! font-[700] pr-1">
           DURATION
         </p>
-        <div className="anotation text-7xl! font-bold text-white/80! mb-2 tabular-nums whitespace-nowrap">
+        <div className="anotation text-7xl! font-bold text-[var(--text-strong)]/80! mb-2 tabular-nums whitespace-nowrap">
           {durationSeconds === null ? '--:--' : formatElapsed(durationSeconds)}
         </div>
       </div>

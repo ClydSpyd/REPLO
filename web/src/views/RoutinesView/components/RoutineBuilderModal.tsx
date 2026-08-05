@@ -284,7 +284,7 @@ export default function RoutineBuilderModal({
               type="button"
               onClick={onClose}
               disabled={isPending}
-              className="manrope hidden rounded-lg border border-(--contrast-one) px-5 py-3 text-sm font-bold text-white transition-colors hover:border-(--contrast-two) disabled:opacity-50 lg:block"
+              className="manrope hidden rounded-lg border border-(--contrast-one) px-5 py-3 text-sm font-bold text-[var(--text-strong)] transition-colors hover:border-(--contrast-two) disabled:opacity-50 lg:block"
             >
               Cancel
             </button>
@@ -292,7 +292,7 @@ export default function RoutineBuilderModal({
               type="button"
               onClick={handleSave}
               disabled={!canSave}
-              className="anton rounded-lg px-6 py-3 text-lg font-extrabold uppercase tracking-wide transition-colors disabled:cursor-not-allowed disabled:bg-(--contrast-one) disabled:text-(--contrast-two) enabled:bg-(--accent-primary) enabled:text-black enabled:hover:brightness-95"
+              className="anton rounded-lg px-6 py-3 text-lg font-extrabold uppercase tracking-wide transition-colors disabled:cursor-not-allowed disabled:bg-(--contrast-one) disabled:text-(--contrast-two) enabled:bg-(--accent-primary) enabled:text-[var(--text-contrast)] enabled:hover:brightness-95"
             >
               {isPending ? (
                 'Saving…'
@@ -317,7 +317,7 @@ export default function RoutineBuilderModal({
           onChange={(e) => setName(e.target.value)}
           placeholder="Name your routine..."
           aria-label="Routine name"
-          className="heading-three w-full border-none bg-transparent p-0 text-white placeholder:text-[var(--contrast-two)] focus:outline-none"
+          className="heading-three w-full border-none bg-transparent p-0 text-[var(--text-strong)] placeholder:text-[var(--contrast-two)] focus:outline-none"
         />
 
         <div className="mt-6 lg:mt-4 flex items-center gap-1">
@@ -335,8 +335,8 @@ export default function RoutineBuilderModal({
                 }}
                 className={`space-mono shrink-0 whitespace-nowrap rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-wide transition-colors ${
                   effectiveTag === option
-                    ? 'bg-[var(--accent-primary)] text-black!'
-                    : 'border border-[var(--contrast-one)] text-[var(--contrast-three)]! hover:text-white!'
+                    ? 'bg-[var(--accent-primary)] text-[var(--text-contrast)]!'
+                    : 'border border-[var(--contrast-one)] text-[var(--contrast-three)]! hover:text-[var(--text-strong)]!'
                 }`}
               >
                 {formatLabel(option)}
@@ -461,7 +461,7 @@ export default function RoutineBuilderModal({
                     <LuDumbbell className="text-xl text-[var(--accent-primary)]" />
                   </div>
                   <div>
-                    <h4 className="heading-four text-white">
+                    <h4 className="heading-four text-[var(--text-strong)]">
                       No exercises yet
                     </h4>
                     <p className="body-text mt-1 text-sm! text-[var(--contrast-three)]">
@@ -471,7 +471,7 @@ export default function RoutineBuilderModal({
                   <button
                     type="button"
                     onClick={() => setMobileView('add')}
-                    className="anton mt-1 rounded-lg bg-[var(--accent-primary)] px-6 py-3 text-sm font-extrabold uppercase tracking-wide text-black transition-colors hover:brightness-95"
+                    className="anton mt-1 rounded-lg bg-[var(--accent-primary)] px-6 py-3 text-sm font-extrabold uppercase tracking-wide text-[var(--text-contrast)] transition-colors hover:brightness-95"
                   >
                     Add Exercises
                   </button>
@@ -491,7 +491,7 @@ export default function RoutineBuilderModal({
                       </span>
 
                       <div className="bordermin-w-0 flex-1">
-                        <p className="heading-four truncate text-white">
+                        <p className="heading-four truncate text-[var(--text-strong)]">
                           {entry.name}
                         </p>
                         <p className="mt-0.5 truncate text-xs text-[var(--contrast-three)]">
@@ -511,7 +511,7 @@ export default function RoutineBuilderModal({
                         >
                           <FiMinus />
                         </IconButton>
-                        <span className="space-mono w-16 text-center text-xs text-white whitespace-nowrap">
+                        <span className="space-mono w-16 text-center text-xs text-[var(--text-strong)] whitespace-nowrap">
                           {entry.setCount} set{entry.setCount === 1 ? '' : 's'}
                         </span>
                         <IconButton
@@ -593,7 +593,7 @@ function ViewTab({
       aria-pressed={active}
       className={`anton flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-extrabold uppercase tracking-wide transition-colors ${
         active
-          ? 'bg-[var(--accent-primary)] text-black'
+          ? 'bg-[var(--accent-primary)] text-[var(--text-contrast)]'
           : 'text-[var(--contrast-three)]'
       }`}
     >
@@ -602,8 +602,8 @@ function ViewTab({
         <span
           className={`flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-[10px] ${
             active
-              ? 'bg-black/25 text-black'
-              : 'bg-[var(--accent-primary)] text-black'
+              ? 'bg-black/25 text-[var(--text-contrast)]'
+              : 'bg-[var(--accent-primary)] text-[var(--text-contrast)]'
           }`}
         >
           {count}
@@ -640,7 +640,7 @@ function IconButton({
 function Stat({ value, label }: { value: string | number; label: string }) {
   return (
     <div className="flex items-baseline gap-2">
-      <span className="anton text-xl text-white">{value}</span>
+      <span className="anton text-xl text-[var(--text-strong)]">{value}</span>
       <span className="space-mono text-[10px] uppercase tracking-wide text-[var(--contrast-three)]!">
         {label}
       </span>

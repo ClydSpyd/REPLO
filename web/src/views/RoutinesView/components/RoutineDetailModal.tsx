@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { FaPlay } from 'react-icons/fa';
 import { FiChevronDown, FiChevronUp, FiTrash2 } from 'react-icons/fi';
 import Modal from '../../../components/ui/Modal';
+import { RoutineActionMenu } from './RoutineCard';
 import { useDeleteRoutine } from '../../../mutations/routines';
 import {
   formatLabel,
@@ -17,9 +18,16 @@ import {
 export default function RoutineDetailModal({
   routine,
   onClose,
+  onEdit,
+  onDuplicate,
+  isDuplicating = false,
 }: {
   routine: Routine;
   onClose: () => void;
+  /** Edit/duplicate handlers back the mobile ⋯ menu (desktop keeps it on the card). */
+  onEdit?: () => void;
+  onDuplicate?: () => void;
+  isDuplicating?: boolean;
 }) {
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
@@ -65,24 +73,41 @@ export default function RoutineDetailModal({
       }
       footer={
         <div className="flex items-center gap-3">
+          {/* Mobile: the ⋯ menu (edit/duplicate/delete) that used to sit on the
+              card. Desktop keeps that menu on the card, so here it's just the
+              delete shortcut. */}
+          {onEdit && onDuplicate && (
+            <div className="lg:hidden">
+              <RoutineActionMenu
+                routineName={routine.name}
+                isDuplicating={isDuplicating}
+                direction="up"
+                onEdit={onEdit}
+                onDuplicate={onDuplicate}
+                onDelete={() => setConfirmingDelete(true)}
+                triggerClassName="h-12 w-12 rounded-lg border border-[var(--contrast-one)] text-[var(--contrast-three)] hover:border-[var(--accent-primary)] hover:text-[var(--text-strong)]"
+              />
+            </div>
+          )}
+
           <button
             type="button"
             onClick={() => setConfirmingDelete(true)}
             aria-label="Delete routine"
-            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border border-red-400/50 text-red-400 transition-colors hover:border-red-400 hover:bg-red-400/10"
+            className="hidden h-12 w-12 shrink-0 items-center justify-center rounded-lg border border-red-400/50 text-red-400 transition-colors hover:border-red-400 hover:bg-red-400/10 lg:flex"
           >
             <FiTrash2 className="text-lg" />
           </button>
 
           <button
             type="button"
-            className="space-mono flex-1 rounded-lg border border-[var(--contrast-one)] px-5 py-3.5 text-xs font-bold uppercase tracking-wide text-white transition-colors hover:border-[var(--accent-primary)] hover:text-[var(--accent-primary)]"
+            className="space-mono flex-1 rounded-lg border border-[var(--contrast-one)] px-5 py-3.5 text-xs font-bold uppercase tracking-wide text-[var(--text-strong)] transition-colors hover:border-[var(--accent-primary)] hover:text-[var(--accent-primary)]"
           >
             Schedule
           </button>
           <button
             type="button"
-            className="anton flex flex-[1.6] items-center justify-center gap-2 rounded-lg bg-[var(--accent-primary)] px-6 py-3.5 text-sm font-extrabold uppercase tracking-wide text-black transition-colors hover:brightness-95"
+            className="anton flex flex-[1.6] items-center justify-center gap-2 rounded-lg bg-[var(--accent-primary)] px-6 py-3.5 text-sm font-extrabold uppercase tracking-wide ntext-[var(--text-contrast)] transition-colors hover:brightness-95"
           >
             <FaPlay className="text-xs" />
             Start
@@ -102,9 +127,9 @@ export default function RoutineDetailModal({
       <div className="-mt-1 mb-6 border-b border-[var(--contrast-one)] pb-6">
         <div className="flex items-center justify-between gap-3">
           <p className="space-mono text-sm text-[var(--contrast-three)]">
-            <span className="font-bold text-white">{exerciseCount}</span> exercises
+            <span className="font-bold text-[var(--text-strong)]">{exerciseCount}</span> exercises
             {/* {' · '}
-            <span className="font-bold text-white">
+            <span className="font-bold text-[var(--text-strong)]">
               ~{estimatedMinutes}
             </span>{' '}
             min */}
@@ -114,7 +139,7 @@ export default function RoutineDetailModal({
             type="button"
             onClick={() => setShowDetails((open) => !open)}
             aria-expanded={showDetails}
-            className="space-mono flex shrink-0 items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-[var(--contrast-three)] transition-colors hover:text-white"
+            className="space-mono flex shrink-0 items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-[var(--contrast-three)] transition-colors hover:text-[var(--text-strong)]"
           >
             {showDetails ? 'Hide' : 'Details'}
             {showDetails ? <FiChevronUp /> : <FiChevronDown />}
@@ -138,7 +163,7 @@ export default function RoutineDetailModal({
                 <p className="space-mono mb-2 text-[10px] uppercase tracking-wide text-[var(--contrast-three)]!">
                   Targets
                 </p>
-                <p className="space-mono text-xs uppercase tracking-wide text-white">
+                <p className="space-mono text-xs uppercase tracking-wide text-[var(--text-strong)]">
                   {muscles.map(formatLabel).join(' · ')}
                 </p>
               </div>
@@ -164,7 +189,7 @@ export default function RoutineDetailModal({
                     {String(index + 1).padStart(2, '0')}
                   </span>
                   <div className="min-w-0">
-                    <h3 className="heading-four truncate text-white">
+                    <h3 className="heading-four truncate text-[var(--text-strong)]">
                       {exercise.name}
                     </h3>
                     <p className="mt-1 truncate text-xs lg:text-sm text-[var(--accent-primary)]">
@@ -216,7 +241,7 @@ function DeleteConfirmOverlay({
         <div className="mb-1 flex h-12 w-12 items-center justify-center rounded-xl border border-red-400/60 bg-red-400/10">
           <FiTrash2 className="text-xl text-red-400" />
         </div>
-        <h4 className="heading-four text-white">Delete this routine?</h4>
+        <h4 className="heading-four text-[var(--text-strong)]">Delete this routine?</h4>
         <p className="body-text max-w-md text-sm! text-[var(--contrast-three)]">
           {routineName} will be removed from your library. Workouts you've
           already done from it are not affected.
@@ -234,7 +259,7 @@ function DeleteConfirmOverlay({
           type="button"
           onClick={onCancel}
           disabled={isDeleting}
-          className="space-mono rounded-lg border border-[var(--contrast-one)] px-5 py-2.5 text-xs font-bold uppercase tracking-wide text-[var(--contrast-three)] transition-colors hover:border-[var(--contrast-two)] hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
+          className="space-mono rounded-lg border border-[var(--contrast-one)] px-5 py-2.5 text-xs font-bold uppercase tracking-wide text-[var(--contrast-three)] transition-colors hover:border-[var(--contrast-two)] hover:text-[var(--text-strong)] disabled:cursor-not-allowed disabled:opacity-50"
         >
           Cancel
         </button>
@@ -242,7 +267,7 @@ function DeleteConfirmOverlay({
           type="button"
           onClick={onConfirm}
           disabled={isDeleting}
-          className="anton rounded-lg bg-red-500 px-6 py-2.5 text-sm font-extrabold uppercase tracking-wide text-white transition-colors hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-60"
+          className="anton rounded-lg bg-red-500 px-6 py-2.5 text-sm font-extrabold uppercase tracking-wide text-[var(--text-strong)] transition-colors hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {isDeleting ? 'Deleting…' : 'Delete'}
         </button>
@@ -254,7 +279,7 @@ function DeleteConfirmOverlay({
 function StatCard({ value, label }: { value: string | number; label: string }) {
   return (
     <div className="rounded-xl border border-[var(--contrast-one)] bg-[var(--dark-one)] px-5 py-4">
-      <div className="anton text-3xl leading-none text-white">{value}</div>
+      <div className="anton text-3xl leading-none text-[var(--text-strong)]">{value}</div>
       <div className="space-mono mt-2 text-xs uppercase tracking-wide text-[var(--contrast-three)]!">
         {label}
       </div>

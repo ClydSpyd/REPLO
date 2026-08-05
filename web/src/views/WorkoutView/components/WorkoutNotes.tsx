@@ -34,7 +34,7 @@ export default function WorkoutNotes({
 
   return (
     <div className="w-full h-fit module-wrapper">
-      <p className="text-white/80 font-bold text-xs mb-2">NOTES</p>
+      <p className="text-[var(--text-strong)]/80 font-bold text-xs mb-2">NOTES</p>
       <textarea
         defaultValue={notes ?? ''}
         readOnly={readOnly}
@@ -44,7 +44,7 @@ export default function WorkoutNotes({
             : 'Add notes about this workout...'
         }
         onChange={(e) => handleChange(e.target.value)}
-        className="w-full h-[100px] bg-[var(--dark-two)] border-2 border-[var(--contrast-one)] rounded-md text-white resize-none p-2! read-only:opacity-70"
+        className="w-full h-[100px] bg-[var(--dark-two)] border-2 border-[var(--contrast-one)] rounded-md text-[var(--text-strong)] resize-none p-2! read-only:opacity-70"
       />
     </div>
   );

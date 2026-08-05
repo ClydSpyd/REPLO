@@ -1,8 +1,10 @@
+import { useTheme } from "../../hooks/useTheme";
+
 interface BarsLogoProps {
   /** Width and height of the (square) logo, in pixels. */
   size: number;
   /** Fill colors for the three bars, shortest to tallest. */
-  barColors: string[];
+  barColors?: string[];
   /**
    * Bar corner radius in viewBox units. Defaults to 8 (soft). Use a smaller
    * value (e.g. 3) for a more angular mark that pairs with angular wordmarks.
@@ -23,12 +25,31 @@ const BARS = [
 const BAR_WIDTH = 18;
 const BAR_BOTTOM = 84;
 
+const LIGHT_MODE_COLORS: [string, string, string] = [
+  '#E8A33D',
+  '#E8821E',
+  '#D2570D',
+];
+
+const DARK_MODE_COLORS: [string, string, string] = [
+  '#CDFF57',
+  '#A8E80C',
+  '#6F9E06',
+];
+
+
 export default function BarsLogo({
   size,
-  barColors,
   cornerRadius = 8,
-  className
+  className,
+  barColors, // default to dark mode colors for the header and nav
+  // barColors = ['#E8A33D', '#E8821E', '#D2570D'],
 }: BarsLogoProps) {
+  const { theme } = useTheme();
+
+  const finalColors =
+    barColors ?? (theme === 'dark' ? DARK_MODE_COLORS : LIGHT_MODE_COLORS);
+
   return (
     <svg
       width={size}
@@ -47,7 +68,7 @@ export default function BarsLogo({
             height={bar.height}
             rx={cornerRadius}
             ry={cornerRadius}
-            fill={barColors[i] ?? 'currentColor'}
+            fill={finalColors[i] ?? 'currentColor'}
           />
         ))}
       </g>

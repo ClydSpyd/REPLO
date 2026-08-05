@@ -10,7 +10,7 @@ const RECORDS = [
 
 export default function RecordsBlock() {
   return (
-    <section className="relative rounded-lg border border-[var(--contrast-one)] bg-[var(--dark-one)] px-8 py-6 text-white">
+    <section className="relative rounded-lg border border-[var(--contrast-one)] bg-[var(--dark-one)] px-8 py-6 text-[var(--text-strong)]">
       <ComingSoonOverlay />
       <div className="flex items-center justify-between">
         <p className="space-mono text-xs text-[var(--contrast-three)]">
@@ -25,7 +25,7 @@ export default function RecordsBlock() {
               <FiStar className="text-base" />
             </div>
             <div className="flex-1">
-              <p className="text-sm font-semibold text-white">{record.lift}</p>
+              <p className="text-sm font-semibold text-[var(--text-strong)]">{record.lift}</p>
               <p className="space-mono text-xs text-[var(--contrast-three)]">
                 {record.date}
               </p>

@@ -1,8 +1,9 @@
 import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { FiLogOut, FiUser, FiX } from 'react-icons/fi';
+import { FiLogOut, FiMoon, FiSun, FiUser, FiX } from 'react-icons/fi';
 import { NavLink } from 'react-router-dom';
 import { navItems } from '../../config/nav';
+import { useTheme } from '../../hooks/useTheme';
 
 interface MobileNavSheetProps {
   /** Dismiss the sheet (backdrop, close button, Escape, or after navigating). */
@@ -21,6 +22,13 @@ export default function MobileNavSheet({
   onClose,
   onLogout,
 }: MobileNavSheetProps) {
+  const { theme, toggleTheme } = useTheme();
+
+  const handleThemetoggle = () => {
+    toggleTheme();
+    onClose();
+  };
+
   // Lock body scroll and close on Escape while mounted.
   useEffect(() => {
     const previousOverflow = document.body.style.overflow;
@@ -56,7 +64,7 @@ export default function MobileNavSheet({
             type="button"
             aria-label="Close menu"
             onClick={onClose}
-            className="flex h-10 w-10 items-center justify-center rounded-lg border border-[var(--contrast-one)] text-[var(--contrast-three)] transition-colors hover:border-[var(--accent-primary)] hover:text-white"
+            className="flex h-10 w-10 items-center justify-center rounded-lg border border-[var(--contrast-one)] text-[var(--contrast-three)] transition-colors hover:border-[var(--accent-primary)] hover:text-[var(--text-strong)]"
           >
             <FiX className="text-xl" />
           </button>
@@ -75,7 +83,7 @@ export default function MobileNavSheet({
                     `flex items-center gap-4 rounded-xl border px-5 py-4 text-lg font-semibold transition-colors ${
                       isActive
                         ? 'border-[var(--accent-primary)] bg-[var(--hint-primary-dark)] text-[var(--accent-primary)]'
-                        : 'border-[var(--contrast-one)] bg-[var(--dark-one)] text-white'
+                        : 'border-[var(--contrast-one)] bg-[var(--dark-one)] text-[var(--text-strong)]'
                     }`
                   }
                 >
@@ -91,8 +99,20 @@ export default function MobileNavSheet({
         <div className="border-t border-[var(--contrast-one)] px-6 py-6 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
           <button
             type="button"
+            onClick={handleThemetoggle}
+            className="flex w-full items-center gap-4 rounded-xl px-5 py-4 text-left text-base text-[var(--text-strong)] transition-colors hover:bg-[var(--hint-primary-dark)]"
+          >
+            {theme === 'dark' ? (
+              <FiSun className="text-xl text-[var(--contrast-three)]" />
+            ) : (
+              <FiMoon className="text-xl text-[var(--contrast-three)]" />
+            )}
+            {theme === 'dark' ? 'Light mode' : 'Dark mode'}
+          </button>
+          <button
+            type="button"
             onClick={onClose}
-            className="flex w-full items-center gap-4 rounded-xl px-5 py-4 text-left text-base text-white transition-colors hover:bg-[var(--hint-primary-dark)]"
+            className="mt-1 flex w-full items-center gap-4 rounded-xl px-5 py-4 text-left text-base text-[var(--text-strong)] transition-colors hover:bg-[var(--hint-primary-dark)]"
           >
             <FiUser className="text-xl text-[var(--contrast-three)]" />
             Account
@@ -100,7 +120,7 @@ export default function MobileNavSheet({
           <button
             type="button"
             onClick={onLogout}
-            className="mt-1 flex w-full items-center gap-4 rounded-xl px-5 py-4 text-left text-base text-white transition-colors hover:bg-[var(--hint-primary-dark)]"
+            className="mt-1 flex w-full items-center gap-4 rounded-xl px-5 py-4 text-left text-base text-[var(--text-strong)] transition-colors hover:bg-[var(--hint-primary-dark)]"
           >
             <FiLogOut className="text-xl text-[var(--contrast-three)]" />
             Logout

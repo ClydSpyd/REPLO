@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
-import { FiUser, FiLogOut, FiMenu } from 'react-icons/fi';
+import { FiUser, FiLogOut, FiMenu, FiSun, FiMoon } from 'react-icons/fi';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import BarsLogo from './BarsLogo';
 import MobileNavSheet from './MobileNavSheet';
 import HeaderRestTimerButton from './HeaderRestTimerButton';
 import { navItems } from '../../config/nav';
+import { useTheme } from '../../hooks/useTheme';
 import { useQueryClient } from '@tanstack/react-query';
 
 export default function ViewHeader() {
@@ -13,6 +14,7 @@ export default function ViewHeader() {
   const [sheetOpen, setSheetOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
+  const { theme, toggleTheme } = useTheme();
 
 
   // Close the popover on outside click or Escape.
@@ -46,15 +48,14 @@ export default function ViewHeader() {
   };
 
   return (
-    <div className="bg-transparent text-white px-4 py-3 shadow flex items-center justify-between">
+    <div className="bg-transparent text-[var(--text-strong)] px-4 py-3 shadow flex items-center justify-between">
       <div className="w-30">
         <Link to="/" className="flex gap-0 items-center">
           <BarsLogo
             size={43}
-            barColors={['#E8A33D', '#E8821E', '#D2570D']}
             cornerRadius={5}
           />
-          <h1 className="text-3xl font-extrabold text-white tracking-normal">
+          <h1 className="text-3xl font-extrabold text-[var(--text-strong)] tracking-normal">
             REPLO
           </h1>
         </Link>
@@ -70,8 +71,8 @@ export default function ViewHeader() {
               className={({ isActive }) =>
                 `rounded-md px-6 py-2 text-sm font-semibold transition-colors ${
                   isActive
-                    ? 'bg-[var(--accent-primary)] text-black'
-                    : 'text-[var(--contrast-three)] hover:text-white'
+                    ? 'bg-[var(--accent-primary)] text-[var(--text-contrast)]'
+                    : 'text-[var(--contrast-three)] hover:text-[var(--text-strong)]'
                 }`
               }
             >
@@ -117,8 +118,21 @@ export default function ViewHeader() {
               <button
                 type="button"
                 role="menuitem"
+                onClick={toggleTheme}
+                className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm text-[var(--text-strong)] transition-colors hover:bg-[var(--hint-primary-dark)]"
+              >
+                {theme === 'dark' ? (
+                  <FiSun className="text-base text-[var(--contrast-three)]" />
+                ) : (
+                  <FiMoon className="text-base text-[var(--contrast-three)]" />
+                )}
+                {theme === 'dark' ? 'Light mode' : 'Dark mode'}
+              </button>
+              <button
+                type="button"
+                role="menuitem"
                 onClick={() => setMenuOpen(false)}
-                className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm text-white transition-colors hover:bg-[var(--hint-primary-dark)]"
+                className="flex w-full items-center gap-2 border-t border-[var(--contrast-one)] px-4 py-2.5 text-left text-sm text-[var(--text-strong)] transition-colors hover:bg-[var(--hint-primary-dark)]"
               >
                 <FiUser className="text-base text-[var(--contrast-three)]" />
                 Account
@@ -127,7 +141,7 @@ export default function ViewHeader() {
                 type="button"
                 role="menuitem"
                 onClick={handleLogout}
-                className="flex w-full items-center gap-2 border-t border-[var(--contrast-one)] px-4 py-2.5 text-left text-sm text-white transition-colors hover:bg-[var(--hint-primary-dark)]"
+                className="flex w-full items-center gap-2 border-t border-[var(--contrast-one)] px-4 py-2.5 text-left text-sm text-[var(--text-strong)] transition-colors hover:bg-[var(--hint-primary-dark)]"
               >
                 <FiLogOut className="text-base text-[var(--contrast-three)]" />
                 Logout

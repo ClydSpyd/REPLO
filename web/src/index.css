@@ -1,21 +1,85 @@
 @import url('https://fonts.googleapis.com/css2?family=Anton&family=Manrope:wght@200..800&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
 @import 'tailwindcss';
 
+/*
+ * Theme tokens — the single source of truth for colour.
+ *
+ * Dark is the default (bare `:root`), so no-JS and first paint render dark;
+ * `[data-theme="light"]` overrides for the light colourway. A pre-paint script
+ * in index.html stamps data-theme from localStorage to avoid a flash.
+ *
+ * Naming note: the `--dark-*` names are historical surface layers (1 = card,
+ * 2 = recessed, 3 = raised) — read them as surfaces, not literal darkness; they
+ * carry light values under the light theme. Newer semantic tokens
+ * (`--text-strong`, `--surface-base`, `--on-accent`) cover what used to be
+ * hardcoded `text-white` / `bg-black` utilities.
+ *
+ * The accent hue is intentionally theme-dependent: orange in light, lime in
+ * dark.
+ */
 :root {
-  /* --accent-primary: #b3ff00; */
-  /* --accent-secondary: #b3ff00; */
-  /* --accent-secondary: #5eff00; */
-  --accent-primary: #bd6206;
-  --accent-secondary: #ff9021ba;
-  --hint-primary-light: #f77c0066;
-  --hint-primary-dark: #f77c0018;
-  --accent-secondary: #ffb700;
+  color-scheme: dark;
+
+  /* Accent */
+  --accent-primary: #a8e80c;
+  --accent-secondary: #c6ff4d;
+  --hint-primary-light: #a8e80c66;
+  --hint-primary-dark: #a8e80c1f;
+  --on-accent: #0a0a09;
+
+  /* Surfaces */
+  --surface-base: #000000;
   --dark-one: #111112;
   --dark-two: #0a0a09;
   --dark-three: #2f2f2e;
+
+  /* Borders + muted text/icons */
   --contrast-one: #222121;
   --contrast-two: #616161;
   --contrast-three: #7b7b7b;
+
+  /* Primary text (headings, foreground) */
+  --text-strong: #f5f5f3;
+
+  /* Secondary text (body, muted) */
+  --text-contrast: #000000;
+
+  /* App background: glow + grid lines over the base */
+  --app-glow: rgba(177, 243, 11, 0.15);
+  --grid-line: rgba(255, 255, 255, 0.057);
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+
+  /* Accent */
+  --accent-primary: #ea580c;
+  --accent-secondary: #f97316;
+  --hint-primary-light: #ea580c33;
+  --hint-primary-dark: #ea580c14;
+  --on-accent: #0a0a09;
+
+  /* Surfaces */
+  --surface-base: #e9e7e2;
+  --dark-one: #f7f6f3;
+  --dark-two: #eceae4;
+  --dark-three: #dedcd4;
+
+  /* Borders + muted text/icons */
+  --contrast-one: #dcdad3;
+  --contrast-two: #8f8f8a;
+  --contrast-three: #6b6b66;
+
+  /* Primary text */
+  --text-strong: #14140f;
+
+  /* Secondary text */
+  --text-contrast: #ffffff;
+  
+
+  /* App background */
+  --app-glow: rgba(234, 88, 12, 0.08);
+  --grid-line: transparent; /* grid lines are dark-mode only */
 }
 
 /* Modal enter animations. */
@@ -96,7 +160,7 @@ h6 {
   text-transform: uppercase;
   letter-spacing: 0;
   font-weight: 800;
-  color: white;
+  color: var(--text-strong);
 }
 
 .heading-one,
@@ -186,31 +250,25 @@ button {
 
 .bg-grad {
   background:
-    linear-gradient(
-      120deg,
-      oklch(0.72 0.19 47 / 0.16),
-      oklch(0.185 0.007 60) 55%
-    ),
-    oklch(0.185 0.007 60);
+    linear-gradient(120deg, var(--hint-primary-light), var(--dark-one) 55%),
+    var(--dark-one);
 }
 
 /*
  * App background: a fine grid of small squares in very light grey on black,
- * with a subtle orange hotspot glowing out from the top-right corner.
+ * with a subtle hotspot glowing out from the top-right corner.
  * Layer order (top to bottom): hotspot glow, vertical grid lines, horizontal
  * grid lines, black base.
  */
 .app-bg {
   --grid-size: 43px;
-  --grid-line: rgba(255, 255, 255, 0.057);
 
-  background-color: black;
+  background-color: var(--surface-base);
   background-image:
     radial-gradient(
-      120% 90% at 100% 0%,
-      rgba(255, 128, 0, 0.156),
-      rgba(255, 128, 0, 0.117) 30%,
-      transparent 100%
+      120% 190% at 100% 0%,
+      var(--app-glow),
+      transparent 60%
     ),
     linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
     linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
@@ -220,25 +278,22 @@ button {
     var(--grid-size) var(--grid-size);
 }
 .app-bg--mobile-only {
-  @media
-    (max-width: 760px)
-  {
+  @media (max-width: 760px) {
     --grid-size: 43px;
-      --grid-line: rgba(255, 255, 255, 0.057);
-    
-      background-color: black;
-      background-image:
-        radial-gradient(120% 90% at 100% 0%,
-          rgba(255, 128, 0, 0.156),
-          rgba(255, 128, 0, 0.117) 30%,
-          transparent 100%),
-        linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
-        linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
-      background-size:
-        100% 100%,
-        var(--grid-size) var(--grid-size),
-        var(--grid-size) var(--grid-size);
 
+    background-color: var(--surface-base);
+    background-image:
+      radial-gradient(
+        120% 90% at 100% 0%,
+        var(--app-glow),
+        transparent 60%
+      ),
+      linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+    background-size:
+      100% 100%,
+      var(--grid-size) var(--grid-size),
+      var(--grid-size) var(--grid-size);
   }
 }
 
@@ -261,7 +316,7 @@ button {
   max-width: 1280px;
   margin: 0 auto;
   width: 100%;
-  height: 100%;
+  height:  fit-content;
   flex: 1;
   flex-grow: 1;
   display: flex;

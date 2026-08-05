@@ -41,7 +41,7 @@ export default function WorkoutProgress({ session }: WorkoutProgressProps) {
   return (
     <div className="flex flex-col gap-4">
       {/* Session progress */}
-      <section className="rounded-2xl border border-[var(--contrast-one)] bg-[var(--dark-one)] px-8 py-6 text-white">
+      <section className="rounded-2xl border border-[var(--contrast-one)] bg-[var(--dark-one)] px-8 py-6 text-[var(--text-strong)]">
         <p className="space-mono text-xs text-[var(--contrast-three)]">
           SESSION PROGRESS
         </p>
@@ -70,7 +70,7 @@ export default function WorkoutProgress({ session }: WorkoutProgressProps) {
       </section>
 
       {/* Muscle coverage */}
-      <section className="rounded-2xl border border-[var(--contrast-one)] bg-[var(--dark-one)] px-8 py-6 text-white">
+      <section className="rounded-2xl border border-[var(--contrast-one)] bg-[var(--dark-one)] px-8 py-6 text-[var(--text-strong)]">
         <p className="space-mono text-xs text-[var(--contrast-three)]">
           MUSCLE COVERAGE
         </p>
@@ -105,7 +105,7 @@ export default function WorkoutProgress({ session }: WorkoutProgressProps) {
         <section className="flex items-start gap-3 rounded-2xl border border-[var(--contrast-one)] bg-[var(--dark-one)] px-6 py-4 text-sm text-[var(--contrast-three)]">
           <FiInfo className="mt-0.5 shrink-0 text-base text-[var(--accent-primary)]" />
           <p>
-            <span className="font-semibold text-white">Tip:</span> your rest
+            <span className="font-semibold text-[var(--text-strong)]">Tip:</span> your rest
             timer and set logging unlock as soon as the first exercise lands.
           </p>
         </section>
@@ -117,7 +117,7 @@ export default function WorkoutProgress({ session }: WorkoutProgressProps) {
 function Stat({ label, value }: { label: string; value: number }) {
   return (
     <div className="flex flex-col">
-      <span className="anton text-3xl text-white">
+      <span className="anton text-3xl text-[var(--text-strong)]">
         {value.toLocaleString()}
       </span>
       <span className="space-mono mt-1 text-[10px] uppercase tracking-wide text-[var(--contrast-three)]">

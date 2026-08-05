@@ -63,7 +63,7 @@ export default function ExerciseFiltersBar({
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
           placeholder={searchPlaceholder}
-          className={`w-full rounded-lg border border-[var(--contrast-one)] bg-transparent py-3.5 pl-12 text-white placeholder:text-[var(--contrast-two)] ${
+          className={`w-full rounded-lg border border-[var(--contrast-one)] bg-transparent py-3.5 pl-12 text-[var(--text-strong)] placeholder:text-[var(--contrast-two)] ${
             collapsibleFilters
               ? 'pr-14 lg:pr-32'
               : resultCount === undefined
@@ -194,7 +194,7 @@ function FilterPill({
       className={`space-mono shrink-0 whitespace-nowrap rounded-full px-4 py-2 lg:py-1.5 text-[10px] font-bold transition-colors ${
         active
           ? 'border border-[var(--accent-primary)] bg-[var(--hint-primary-dark)] text-[var(--accent-primary)]'
-          : 'border border-[var(--contrast-one)] lg:border-transparent text-[var(--contrast-three)]! hover:text-white/80!'
+          : 'border border-[var(--contrast-one)] lg:border-transparent text-[var(--contrast-three)]! hover:text-[var(--text-strong)]/80!'
       }`}
     >
       {label}

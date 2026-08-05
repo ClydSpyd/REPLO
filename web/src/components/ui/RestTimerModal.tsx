@@ -77,7 +77,7 @@ export default function RestTimerModal({
     >
       <div
         ref={panelRef}
-        className="animate-modal-panel relative w-full max-w-[560px] rounded-2xl border border-[var(--contrast-one)] bg-[var(--dark-two)] p-6 text-white shadow-2xl lg:p-8"
+        className="animate-modal-panel relative w-full max-w-[560px] rounded-2xl border border-[var(--contrast-one)] bg-[var(--dark-two)] p-6 text-[var(--text-strong)] shadow-2xl lg:p-8"
       >
         {/* Header */}
         <div className="flex items-start justify-between">
@@ -88,7 +88,7 @@ export default function RestTimerModal({
             type="button"
             aria-label="Close"
             onClick={onClose}
-            className="flex h-10 w-10 items-center justify-center rounded-lg border border-[var(--contrast-one)] text-[var(--contrast-three)] transition-colors hover:border-[var(--accent-primary)] hover:text-white"
+            className="flex h-10 w-10 items-center justify-center rounded-lg border border-[var(--contrast-one)] text-[var(--contrast-three)] transition-colors hover:border-[var(--accent-primary)] hover:text-[var(--text-strong)]"
           >
             <FiX className="text-xl" />
           </button>
@@ -111,7 +111,7 @@ export default function RestTimerModal({
         </div>
 
         {/* Display */}
-        <div className="anotation my-8 text-center text-7xl! font-bold tracking-normal! text-white! tabular-nums lg:text-8xl!">
+        <div className="anotation my-8 text-center text-7xl! font-bold tracking-normal! text-[var(--text-strong)]! tabular-nums lg:text-8xl!">
           {formatClock(displayMs, mode)}
         </div>
 
@@ -189,7 +189,7 @@ export default function RestTimerModal({
             type="button"
             onClick={isRunning ? pause : start}
             disabled={!isRunning && !canStart}
-            className="anton flex items-center justify-center gap-2 rounded-xl bg-[var(--accent-primary)] px-6 py-4 text-lg font-extrabold uppercase tracking-wide text-black transition-colors hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-50"
+            className="anton flex items-center justify-center gap-2 rounded-xl bg-[var(--accent-primary)] px-6 py-4 text-lg font-extrabold uppercase tracking-wide text-[var(--text-contrast)] transition-colors hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isRunning ? (
               <>
@@ -206,7 +206,7 @@ export default function RestTimerModal({
           <button
             type="button"
             onClick={reset}
-            className="anton rounded-xl border border-[var(--contrast-one)] bg-[var(--dark-one)] px-6 py-4 text-lg font-extrabold uppercase tracking-wide text-white transition-colors hover:border-[var(--accent-primary)]"
+            className="anton rounded-xl border border-[var(--contrast-one)] bg-[var(--dark-one)] px-6 py-4 text-lg font-extrabold uppercase tracking-wide text-[var(--text-strong)] transition-colors hover:border-[var(--accent-primary)]"
           >
             Reset
           </button>
@@ -235,8 +235,8 @@ function ModeTab({
       aria-pressed={active}
       className={`anton flex items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-extrabold uppercase tracking-wide transition-colors ${
         active
-          ? 'bg-[var(--accent-primary)] text-black'
-          : 'text-[var(--contrast-three)] hover:text-white'
+          ? 'bg-[var(--accent-primary)] ntext-[var(--text-contrast)]'
+          : 'text-[var(--contrast-three)] hover:text-[var(--text-strong)]'
       }`}
     >
       {icon}
@@ -259,7 +259,7 @@ function StepButton({
       type="button"
       aria-label={label}
       onClick={onClick}
-      className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[var(--contrast-one)] bg-[var(--dark-two)] text-[var(--contrast-three)] transition-colors hover:border-[var(--accent-primary)] hover:text-white"
+      className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[var(--contrast-one)] bg-[var(--dark-two)] text-[var(--contrast-three)] transition-colors hover:border-[var(--accent-primary)] hover:text-[var(--text-strong)]"
     >
       {children}
     </button>

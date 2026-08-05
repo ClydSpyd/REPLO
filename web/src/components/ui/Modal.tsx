@@ -80,7 +80,7 @@ export default function Modal({
       : 'items-center p-4'
   }`;
 
-  const panelClassName = `animate-modal-panel relative flex w-full flex-col overflow-hidden bg-[var(--dark-two)] text-white shadow-2xl lg:h-fit lg:max-h-[90vh] ${
+  const panelClassName = `animate-modal-panel relative flex w-full flex-col overflow-hidden bg-[var(--dark-two)] text-[var(--text-strong)] shadow-2xl lg:h-fit lg:max-h-[90vh] ${
     size === 'wide' ? 'max-w-6xl' : 'max-w-3xl'
   } ${
     mobileFullScreen
@@ -104,7 +104,7 @@ export default function Modal({
             type="button"
             aria-label="Close"
             onClick={handleClose}
-            className="absolute z-10 right-6 top-6 flex h-10 w-10 items-center justify-center rounded-lg border border-[var(--contrast-one)] text-[var(--contrast-three)] transition-colors hover:border-[var(--accent-primary)] hover:text-white bg-[var(--dark-two)]"
+            className="absolute z-10 right-6 top-6 flex h-10 w-10 items-center justify-center rounded-lg border border-[var(--contrast-one)] text-[var(--contrast-three)] transition-colors hover:border-[var(--accent-primary)] hover:text-[var(--text-strong)] bg-[var(--dark-two)]"
           >
             <FiX className="text-xl" />
           </button>

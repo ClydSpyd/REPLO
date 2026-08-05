@@ -110,7 +110,7 @@ export default function ToastProvider({
                 <Icon className={`mt-0.5 shrink-0 text-lg ${styles.icon}`} />
 
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-bold text-white">{entry.title}</p>
+                  <p className="text-sm font-bold text-[var(--text-strong)]">{entry.title}</p>
                   {entry.description && (
                     <p className="body-text mt-0.5 text-xs! break-words">
                       {entry.description}
@@ -122,7 +122,7 @@ export default function ToastProvider({
                   type="button"
                   aria-label="Dismiss"
                   onClick={() => dismiss(entry.id)}
-                  className="shrink-0 text-[var(--contrast-three)] transition-colors hover:text-white"
+                  className="shrink-0 text-[var(--contrast-three)] transition-colors hover:text-[var(--text-strong)]"
                 >
                   <FiX />
                 </button>

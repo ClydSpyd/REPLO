@@ -76,7 +76,7 @@ export default function CreateWorkout() {
           type="button"
           aria-label="Close"
           onClick={handleClose}
-          className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-lg border border-[var(--contrast-one)] bg-[var(--dark-two)] text-[var(--contrast-three)] transition-colors hover:border-[var(--accent-primary)] hover:text-white"
+          className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-lg border border-[var(--contrast-one)] bg-[var(--dark-two)] text-[var(--contrast-three)] transition-colors hover:border-[var(--accent-primary)] hover:text-[var(--text-strong)]"
         >
           <FiX className="text-xl" />
         </button>
@@ -103,7 +103,7 @@ export default function CreateWorkout() {
             placeholder="e.g 'Leg Day', 'Full Body'"
             value={workoutName}
             onChange={(e) => setWorkoutName(e.target.value)}
-            className="w-full p-4 mb-4 border border-[var(--contrast-one)]! bg-[var(--dark-two)] text-white rounded-lg placeholder:text-[var(--contrast-one)]! placeholder:tracking-wider"
+            className="w-full p-4 mb-4 border border-[var(--contrast-one)]! bg-[var(--dark-two)] text-[var(--text-strong)] rounded-lg placeholder:text-[var(--contrast-one)]! placeholder:tracking-wider"
           />
         </div>
         <div className="w-full">

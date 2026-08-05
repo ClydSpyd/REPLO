@@ -36,7 +36,6 @@ export default function NoActiveSession() {
       <div className="flex h-[80px] w-[80px] lg:h-[104px] lg:w-[104px] items-center justify-center rounded-3xl border border-[var(--accent-primary)] bg-[var(--hint-primary-dark)]">
         <BarsLogo
           size={isDesktop ? 52 : 40}
-          barColors={['#E8A33D', '#E8821E', '#D2570D']}
           cornerRadius={5}
         />
       </div>
@@ -45,7 +44,7 @@ export default function NoActiveSession() {
         No active session
       </p>
 
-      <h1 className="hidden lg:block anton mt-2 text-center text-6xl lg:text-8xl uppercase text-white">
+      <h1 className="hidden lg:block anton mt-2 text-center text-6xl lg:text-8xl uppercase text-[var(--text-strong)]">
         Nothing on the bar
       </h1>
 
@@ -175,11 +174,11 @@ function FavoritesContent({ onBrowseAll }: { onBrowseAll: () => void }) {
           onClick={onBrowseAll}
           className="mt-4 flex w-full items-center gap-4 rounded-xl border border-[var(--contrast-one)] bg-[var(--dark-one)] px-4 py-3.5 text-left transition-colors hover:border-[var(--accent-primary)]"
         >
-          <span className="flex h-10 w-10 items-center justify-center rounded-lg border border-[var(--contrast-one)] bg-[var(--dark-two)] text-white">
+          <span className="flex h-10 w-10 items-center justify-center rounded-lg border border-[var(--contrast-one)] bg-[var(--dark-two)] text-[var(--text-strong)]">
             <FiLayers />
           </span>
           <span className="min-w-0 flex-1">
-            <span className="block truncate font-bold text-white">
+            <span className="block truncate font-bold text-[var(--text-strong)]">
               Full routine library
             </span>
             <span className="space-mono block text-xs uppercase tracking-tight! text-[var(--accent-primary)]">
@@ -232,7 +231,7 @@ function FavoritesModal({
           type="button"
           aria-label="Close favorites"
           onClick={onClose}
-          className="flex h-10 w-10 items-center justify-center rounded-lg border border-[var(--contrast-one)] text-[var(--contrast-three)] transition-colors hover:border-[var(--accent-primary)] hover:text-white"
+          className="flex h-10 w-10 items-center justify-center rounded-lg border border-[var(--contrast-one)] text-[var(--contrast-three)] transition-colors hover:border-[var(--accent-primary)] hover:text-[var(--text-strong)]"
         >
           <FiX className="text-xl" />
         </button>
@@ -257,7 +256,7 @@ function EmptyFavorites({ onBrowseAll }: { onBrowseAll: () => void }) {
         <FiStar />
       </div>
 
-      <h3 className="anton mt-6 text-3xl uppercase tracking-wide text-white">
+      <h3 className="anton mt-6 text-3xl uppercase tracking-wide text-[var(--text-strong)]">
         No saved routines yet
       </h3>
 
@@ -269,7 +268,7 @@ function EmptyFavorites({ onBrowseAll }: { onBrowseAll: () => void }) {
       <button
         type="button"
         onClick={onBrowseAll}
-        className="anton mt-6 flex items-center gap-2 rounded-lg bg-[var(--accent-primary)] px-6 py-3 text-sm font-extrabold uppercase tracking-wide text-black transition-colors hover:brightness-95"
+        className="anton mt-6 flex items-center gap-2 rounded-lg bg-[var(--accent-primary)] px-6 py-3 text-sm font-extrabold uppercase tracking-wide text-[var(--text-contrast)] transition-colors hover:brightness-95"
       >
         <FiLayers />
         Open routine library
@@ -309,7 +308,7 @@ function FavoriteRoutineCard({ routine }: { routine: Routine }) {
             {primaryTag}
           </span>
         )}
-        <h4 className="anton mt-2 truncate text-lg uppercase tracking-wide text-white">
+        <h4 className="anton mt-2 truncate text-lg uppercase tracking-wide text-[var(--text-strong)]">
           {routine.name}
         </h4>
         <p className="space-mono mt-1 text-xs text-[var(--contrast-three)]">
@@ -323,7 +322,7 @@ function FavoriteRoutineCard({ routine }: { routine: Routine }) {
         onClick={handleStart}
         disabled={isStarting}
         aria-label={`Start ${routine.name}`}
-        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-[var(--accent-primary)] text-black transition-colors hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-60"
+        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-[var(--accent-primary)] text-[var(--text-contrast)] transition-colors hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-60"
       >
         <FaPlay className="text-sm" />
       </button>
@@ -370,8 +369,8 @@ function OptionCard({
       <div
         className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl text-xl lg:h-[68px] lg:w-[68px] lg:text-2xl ${
           highlighted
-            ? 'bg-[var(--accent-primary)] text-black'
-            : 'border border-[var(--contrast-one)] bg-[var(--dark-two)] text-white'
+            ? 'bg-[var(--accent-primary)] text-[var(--text-contrast)]'
+            : 'border border-[var(--contrast-one)] bg-[var(--dark-two)] text-[var(--text-strong)]'
         }`}
       >
         {icon}
@@ -379,7 +378,7 @@ function OptionCard({
 
       {/* Row body on mobile; stacked card body from lg. */}
       <div className="min-w-0 flex-1 lg:flex-none">
-        <h3 className="anton text-xl uppercase tracking-wide text-white lg:mt-8 lg:text-2xl">
+        <h3 className="anton text-xl uppercase tracking-wide text-[var(--text-strong)] lg:mt-8 lg:text-2xl">
           {title}
         </h3>
 

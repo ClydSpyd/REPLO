@@ -11,7 +11,7 @@ const GROUPS = [
 
 export default function MuscleAnalysisBlock() {
   return (
-    <section className="relative rounded-lg border border-[var(--contrast-one)] bg-[var(--dark-one)] px-8 py-6 text-white">
+    <section className="relative rounded-lg border border-[var(--contrast-one)] bg-[var(--dark-one)] px-8 py-6 text-[var(--text-strong)]">
       <ComingSoonOverlay />
       <div className="flex items-start justify-between">
         <p className="space-mono text-xs text-[var(--contrast-three)]">
@@ -23,7 +23,7 @@ export default function MuscleAnalysisBlock() {
         {GROUPS.map((group) => (
           <div key={group.label}>
             <div className="flex items-center justify-between text-sm">
-              <span className="text-white/90">{group.label}</span>
+              <span className="text-[var(--text-strong)]/90">{group.label}</span>
               <span className="text-[var(--contrast-three)]">{group.fill}%</span>
             </div>
             <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-[var(--dark-three)]">

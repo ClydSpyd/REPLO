@@ -5,7 +5,7 @@
 export default function PlaceholderView({ title }: { title: string }) {
   return (
     <div className="flex w-full grow flex-col items-center justify-center p-6 text-center">
-      <h1 className="text-2xl font-bold text-white">{title}</h1>
+      <h1 className="text-2xl font-bold text-[var(--text-strong)]">{title}</h1>
       <p className="mt-2 text-sm text-[var(--contrast-three)]">Coming soon.</p>
     </div>
   );

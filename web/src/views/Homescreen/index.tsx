@@ -20,7 +20,7 @@ export default function Homescreen() {
         <Suspense
           fallback={
             <div
-              className="flex flex-col gap-1 justify-center items-center h-[185px] rounded-lg border border-dashed border-white/30 p-4 text-sm text-white/70"
+              className="flex flex-col gap-1 justify-center items-center h-[185px] rounded-lg border border-dashed border-white/30 p-4 text-sm text-[var(--text-strong)]/70"
               style={{
                 backgroundColor:
                   'color-mix(in srgb, var(--dark-one) 60%, transparent)',

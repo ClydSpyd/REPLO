@@ -17,7 +17,7 @@ export default function TodayBlock() {
 
   return (
     <section
-      className={`lg:h-[185px] flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between text-white module-wrapper px-5! py-6! lg:px-10! lg:py-8! ${activeWorkout ? 'border-[var(--accent-primary)]! bg-grad' : ''}`}
+      className={`lg:h-[185px] flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between text-[var(--text-strong)] module-wrapper px-5! py-6! lg:px-10! lg:py-8! ${activeWorkout ? 'border-[var(--accent-primary)]! bg-grad' : ''}`}
     >
       <div className="flex w-full lg:w-auto min-w-0 flex-col gap-2 opacity-80">
         <div className="text-xs flex gap-2 items-center">
@@ -25,7 +25,7 @@ export default function TodayBlock() {
           <p className="text-[var(--accent-primary)]">•</p>
           <p className="text-[var(--accent-primary)] space-mono">TODAY</p>
         </div>
-        <h3 className="heading-three text-white uppercase my-2">
+        <h3 className="heading-three text-[var(--text-strong)] uppercase my-2">
           {activeWorkout ? activeWorkout.name : 'REST DAY - NOTHING SCHEDULED'}
         </h3>
         {error ? (
