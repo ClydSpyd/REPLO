@@ -1,21 +1,20 @@
-import { useState } from 'react';
 import { FaRegCalendar, FaRegClock, FaStop, FaStopwatch } from 'react-icons/fa';
 import { format } from 'date-fns';
 import WorkoutTitleBlock from './WorkoutTitleBlock';
 import Button from '../../../components/ui/Button';
 import ElapsedTimer from '../../../components/ui/ElapsedTimer';
-import EndWorkoutModal from './EndWorkoutModal';
 import { useWorkoutSessionData } from '../../../hooks/useWorkoutSessionData';
 import { useRestTimer } from '../../../hooks/useRestTimer';
 
 export default function WorkoutSummary({
   session,
+  setConfirmingEnd,
 }: {
+  setConfirmingEnd: React.Dispatch<React.SetStateAction<boolean>>;
   session?: WorkoutSession | null;
 }) {
   const { exerciseCount, setCount, estimatedDurationSec } =
     useWorkoutSessionData(session ?? null);
-  const [confirmingEnd, setConfirmingEnd] = useState(false);
   const { open: openRestTimer } = useRestTimer();
   return (
     <div className="w-full flex flex-col lg:flex-row justify-between gap-4 min-h-0 mb-4">
@@ -79,13 +78,6 @@ export default function WorkoutSummary({
           />
         </div>
       </div>
-
-      {confirmingEnd && session && (
-        <EndWorkoutModal
-          session={session}
-          onClose={() => setConfirmingEnd(false)}
-        />
-      )}
     </div>
   );
 }
