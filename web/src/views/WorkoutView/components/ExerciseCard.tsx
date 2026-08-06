@@ -73,7 +73,7 @@ export default function ExerciseCard({
       ? { reps: previous.reps, weight: previous.weight, completed: false }
       : { reps: 0, weight: 0, completed: false };
     addSetToExercise({ exerciseId: exercise.exerciseId!, setData });
-    setOpenSetIndex(sets.length); // open the new set
+    // setOpenSetIndex(sets.length); // open the new set
   };
 
   const updateSet = (i: number, patch: Partial<WorkoutSetInput>) => {
@@ -84,8 +84,15 @@ export default function ExerciseCard({
     });
   };
 
-  const adjust = (i: number, field: 'reps' | 'weight', delta: number) =>
-    updateSet(i, { [field]: Math.max(0, sets[i][field] + delta) });
+  const adjust = (i: number, field: 'reps' | 'weight', delta: number) =>{
+    const nextValue = Math.max(0, sets[i][field] + delta);
+    updateSet(i, { [field]: nextValue });
+    if (sets[openSetIndex ?? 0].completed) return; // don't propagate if the current set is logged
+    for (let j = i + 1; j < sets.length; j++) {
+      if (sets[j].completed) continue; // skip logged sets
+      updateSet(j, { [field]: nextValue });
+    }
+  };
 
   const logSet = (i: number) => {
     updateSet(i, { completed: true });
@@ -146,13 +153,13 @@ export default function ExerciseCard({
         </div>
 
         {/* Set summary chips */}
-        <div className="mt-5 flex flex-wrap gap-3">
+        <div className="mt-5 flex flex-wrap gap-2">
           {sets.map((set, i) => (
             <div
               key={i}
               className="flex items-center gap-2 rounded-lg border border-[var(--contrast-one)] px-2 lg:px-4 py-2.5"
             >
-              <span className="space-mono text-xs lg:text-sm text-[var(--contrast-two)]!">
+              <span className="space-mono text-[10px] lg:text-sm text-[var(--contrast-two)]!">
                 {set.reps} × {set.weight}
               </span>
               {set.completed ? (

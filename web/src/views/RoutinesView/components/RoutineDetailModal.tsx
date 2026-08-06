@@ -101,7 +101,8 @@ export default function RoutineDetailModal({
 
           <button
             type="button"
-            className="space-mono flex-1 rounded-lg border border-[var(--contrast-one)] px-5 py-3.5 text-xs font-bold uppercase tracking-wide text-[var(--text-strong)] transition-colors hover:border-[var(--accent-primary)] hover:text-[var(--accent-primary)]"
+            disabled
+            className="space-mono flex-1 rounded-lg border border-[var(--contrast-one)] px-5 py-3.5 text-xs font-bold uppercase tracking-wide text-[var(--text-strong)] transition-colors hover:border-[var(--accent-primary)] hover:text-[var(--accent-primary)] pointer-events-none opacity-40"
           >
             Schedule
           </button>

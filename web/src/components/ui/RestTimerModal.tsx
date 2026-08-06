@@ -42,6 +42,8 @@ export default function RestTimerModal({
     selectedPresetIndex,
     selectPreset,
     adjustPreset,
+    setDuration,
+    adjustDuration,
     start,
     pause,
     reset,
@@ -95,7 +97,9 @@ export default function RestTimerModal({
         </div>
 
         {/* Mode toggle */}
-        <div className="mt-6 grid grid-cols-2 gap-2 rounded-xl border border-[var(--contrast-one)] bg-[var(--dark-one)] p-1.5">
+        <div
+          className={`mt-6 grid grid-cols-2 gap-2 rounded-xl border border-[var(--contrast-one)] bg-[var(--dark-one)] p-1.5 ${isRunning ? 'pointer-events-none opacity-50' : ''}`}
+        >
           <ModeTab
             icon={<LuTimer />}
             label="Timer"
@@ -110,10 +114,19 @@ export default function RestTimerModal({
           />
         </div>
 
-        {/* Display */}
-        <div className="anotation my-8 text-center text-7xl! font-bold tracking-normal! text-[var(--text-strong)]! tabular-nums lg:text-8xl!">
-          {formatClock(displayMs, mode)}
-        </div>
+        {/* Display — editable when idle in timer mode (direct entry + ± steps),
+            static while running or in stopwatch mode. */}
+        {mode === 'timer' && !isRunning ? (
+          <DurationEditor
+            valueMs={displayMs}
+            onAdjust={adjustDuration}
+            onSet={setDuration}
+          />
+        ) : (
+          <div className="anotation my-8 text-center text-7xl! font-bold tracking-normal! text-[var(--text-strong)]! tabular-nums lg:text-8xl!">
+            {formatClock(displayMs, mode)}
+          </div>
+        )}
 
         {/* Timer-only: progress + quick presets */}
         {mode === 'timer' && (
@@ -140,9 +153,11 @@ export default function RestTimerModal({
               </button>
             </div>
 
-            <div className="mt-3 grid grid-cols-3 gap-3">
+            <div
+              className={`mt-3 grid grid-cols-2 gap-3 ${isRunning ? 'pointer-events-none opacity-50' : ''}`}
+            >
               {presets.map((seconds, index) =>
-                editing ? (
+                index > 1 ? null : editing ? (
                   <div
                     key={index}
                     className="flex items-center justify-between gap-1 rounded-xl border border-[var(--accent-primary)] bg-[var(--dark-one)] p-1.5"
@@ -180,6 +195,8 @@ export default function RestTimerModal({
                 ),
               )}
             </div>
+
+              <div className="mt-5 block h-px flex-1 bg-[var(--contrast-one)]" />
           </>
         )}
 
@@ -235,7 +252,7 @@ function ModeTab({
       aria-pressed={active}
       className={`anton flex items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-extrabold uppercase tracking-wide transition-colors ${
         active
-          ? 'bg-[var(--accent-primary)] ntext-[var(--text-contrast)]'
+          ? 'bg-[var(--accent-primary)] text-[var(--text-contrast)]'
           : 'text-[var(--contrast-three)] hover:text-[var(--text-strong)]'
       }`}
     >
@@ -249,19 +266,111 @@ function StepButton({
   label,
   onClick,
   children,
+  className = 'h-8 w-8',
 }: {
   label: string;
   onClick: () => void;
   children: ReactNode;
+  /** Sizing override — the hero editor uses larger steppers than the presets. */
+  className?: string;
 }) {
   return (
     <button
       type="button"
       aria-label={label}
       onClick={onClick}
-      className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[var(--contrast-one)] bg-[var(--dark-two)] text-[var(--contrast-three)] transition-colors hover:border-[var(--accent-primary)] hover:text-[var(--text-strong)]"
+      className={`flex shrink-0 items-center justify-center rounded-lg border border-[var(--contrast-one)] bg-[var(--dark-two)] text-[var(--contrast-three)] transition-colors hover:border-[var(--accent-primary)] hover:text-[var(--text-strong)] ${className}`}
     >
       {children}
     </button>
+  );
+}
+
+/**
+ * Editable countdown hero: type an exact MM:SS, or step it by 15s with ±.
+ * Fields hold free-form text while focused and commit (parse + clamp) on blur
+ * or Enter; the parent's clamp is the source of truth, so we resync when the
+ * committed value comes back down through `valueMs`.
+ */
+function DurationEditor({
+  valueMs,
+  onAdjust,
+  onSet,
+}: {
+  valueMs: number;
+  onAdjust: (deltaSteps: number) => void;
+  onSet: (seconds: number) => void;
+}) {
+  const totalSec = Math.round(valueMs / 1000);
+  const mm = Math.floor(totalSec / 60);
+  const ss = totalSec % 60;
+
+  const [mmStr, setMmStr] = useState(String(mm));
+  const [ssStr, setSsStr] = useState(String(ss).padStart(2, '0'));
+
+  // Resync when the value changes from outside (± steppers, presets, reset).
+  useEffect(() => {
+    setMmStr(String(mm));
+    setSsStr(String(ss).padStart(2, '0'));
+  }, [mm, ss]);
+
+  const commit = () => {
+    const minutes = Math.min(60, parseInt(mmStr || '0', 10) || 0);
+    const seconds = Math.min(59, parseInt(ssStr || '0', 10) || 0);
+    onSet(minutes * 60 + seconds);
+  };
+
+  const sanitize = (value: string) => value.replace(/\D/g, '').slice(0, 2);
+
+  const fieldClass =
+    'bg-transparent text-center outline-none transition-colors focus:text-[var(--accent-primary)]';
+
+  return (
+    <div className="my-8 flex items-center justify-center gap-4 lg:gap-6">
+      <StepButton
+        label="Decrease timer by 15 seconds"
+        onClick={() => onAdjust(-1)}
+        className="h-12 w-12 text-xl"
+      >
+        <FiMinus />
+      </StepButton>
+
+      <div className="anotation flex items-center text-7xl! font-bold tracking-normal! text-[var(--text-strong)]! tabular-nums lg:text-8xl!">
+        <input
+          aria-label="Minutes"
+          inputMode="numeric"
+          value={mmStr}
+          onChange={(e) => setMmStr(sanitize(e.target.value))}
+          onFocus={(e) => e.target.select()}
+          onBlur={commit}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') e.currentTarget.blur();
+          }}
+          style={{ width: `${Math.max(1, mmStr.length)}ch` }}
+          className={fieldClass}
+        />
+        <span className="px-1">:</span>
+        <input
+          aria-label="Seconds"
+          inputMode="numeric"
+          value={ssStr}
+          onChange={(e) => setSsStr(sanitize(e.target.value))}
+          onFocus={(e) => e.target.select()}
+          onBlur={commit}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') e.currentTarget.blur();
+          }}
+          className={`${fieldClass} w-[2ch]`}
+        />
+      </div>
+
+      <StepButton
+        label="Increase timer by 15 seconds"
+        onClick={() => onAdjust(1)}
+        className="h-12 w-12 text-xl"
+      >
+        <FiPlus />
+      </StepButton>
+    </div>
   );
 }

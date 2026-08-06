@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 export type RestTimerMode = 'timer' | 'stopwatch';
 
 const PRESETS_KEY = 'replo:rest-timer-presets';
-const DEFAULT_PRESETS = [60, 90, 120];
+const DEFAULT_PRESETS = [90, 120];
 const DEFAULT_DURATION_SEC = 90;
 const PRESET_STEP_SEC = 15;
 const PRESET_MIN_SEC = 15;
@@ -51,6 +51,10 @@ export interface RestTimerEngine {
   selectedPresetIndex: number;
   selectPreset: (seconds: number) => void;
   adjustPreset: (index: number, deltaSteps: number) => void;
+  /** Set the countdown duration directly (seconds), clamped to the allowed range. */
+  setDuration: (seconds: number) => void;
+  /** Nudge the countdown duration by whole preset steps (±15s), clamped. */
+  adjustDuration: (deltaSteps: number) => void;
   start: () => void;
   pause: () => void;
   reset: () => void;
@@ -77,6 +81,10 @@ export function useRestTimerEngine({
   const anchorRef = useRef<number | null>(null);
   const onCompleteRef = useRef(onComplete);
   onCompleteRef.current = onComplete;
+
+  // Latest displayed value, for adjustDuration to nudge off what the user sees.
+  const displayMsRef = useRef(displayMs);
+  displayMsRef.current = displayMs;
 
   // Persist preset edits.
   useEffect(() => {
@@ -161,6 +169,25 @@ export function useRestTimerEngine({
     setDisplayMs(seconds * 1000);
   }, []);
 
+  // Set/adjust the countdown duration directly (the editable hero). Both stop
+  // the timer and sync display to the new duration, so progress reads full.
+  const setDuration = useCallback((seconds: number) => {
+    const ms =
+      clamp(Math.round(seconds), PRESET_MIN_SEC, PRESET_MAX_SEC) * 1000;
+    anchorRef.current = null;
+    setIsRunning(false);
+    setTargetMs(ms);
+    setDisplayMs(ms);
+  }, []);
+
+  const adjustDuration = useCallback(
+    (deltaSteps: number) => {
+      const base = Math.round(displayMsRef.current / 1000);
+      setDuration(base + deltaSteps * PRESET_STEP_SEC);
+    },
+    [setDuration],
+  );
+
   const adjustPreset = useCallback((index: number, deltaSteps: number) => {
     setPresets((prev) =>
       prev.map((sec, i) =>
@@ -193,6 +220,8 @@ export function useRestTimerEngine({
     selectedPresetIndex,
     selectPreset,
     adjustPreset,
+    setDuration,
+    adjustDuration,
     start,
     pause,
     reset,

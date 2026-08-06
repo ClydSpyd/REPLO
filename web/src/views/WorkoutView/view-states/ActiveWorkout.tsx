@@ -5,6 +5,7 @@ import { useUpdateCurrentWorkout } from '../../../mutations/workouts';
 import { useMyCurrentWorkout } from '../../../queries/workouts';
 import WorkoutSummary from '../components/WorkoutSummary';
 import WorkoutProgress from '../components/WorkoutProgress';
+import WorkoutDetailsPanel from '../components/WorkoutDetailsPanel';
 import AddExerciseModal from '../components/AddExerciseModal';
 import ExerciseList from '../components/ExerciseList';
 import EndWorkoutModal from '../components/EndWorkoutModal';
@@ -40,6 +41,10 @@ export default function ActiveWorkout() {
   return (
     <div className="w-full px-6 lg:px-2">
       <WorkoutSummary session={workout} setConfirmingEnd={setConfirmingEnd} />
+
+      {/* Mobile-only collapsible details (elapsed, progress, coverage). */}
+      <WorkoutDetailsPanel session={workout} />
+
       <div className="h-full w-full grow grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_400px] gap-4">
         <div className="flex flex-col gap-4 min-w-0">
           <ExerciseList exercises={workout.exercises} />
@@ -54,7 +59,7 @@ export default function ActiveWorkout() {
             <p>add exercise</p>
           </button>
         </div>
-        <div className="flex flex-col gap-4 h-full">
+        <div className="hidden lg:flex flex-col gap-4 h-full">
           <WorkoutProgress session={workout} />
           {/* <WorkoutNotes
             key={workout._id}
