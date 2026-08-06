@@ -4,7 +4,7 @@ import WorkoutTitleBlock from './WorkoutTitleBlock';
 import Button from '../../../components/ui/Button';
 import ElapsedTimer from '../../../components/ui/ElapsedTimer';
 import { useWorkoutSessionData } from '../../../hooks/useWorkoutSessionData';
-import { useRestTimer } from '../../../hooks/useRestTimer';
+import { useRestTimer } from '../../../context/rest-timer';
 
 export default function WorkoutSummary({
   session,

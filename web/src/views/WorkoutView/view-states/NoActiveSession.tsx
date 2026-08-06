@@ -15,7 +15,7 @@ import RoutineBuilderModal from '../../RoutinesView/components/RoutineBuilderMod
 import { useMyRoutines } from '../../../queries/routines';
 import { useFavorites } from '../../../queries/favorites';
 import { useStartWorkoutFromRoutine } from '../../../mutations/workouts';
-import { useToast } from '../../../hooks/useToast';
+import { useToast } from '../../../context/toast';
 import { useMediaQuery } from '../../../hooks/useMediaQuery';
 import { getRoutineStats } from '../../RoutinesView/routine-utils';
 

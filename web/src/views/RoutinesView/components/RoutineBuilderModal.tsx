@@ -10,7 +10,7 @@ import { LuDumbbell } from 'react-icons/lu';
 import Modal from '../../../components/ui/Modal';
 import ExerciseDatasetList from '../../../components/exercise-dataset-list';
 import ExerciseFiltersBar from '../../../components/exercise-filters-bar';
-import { useToast } from '../../../hooks/useToast';
+import { useToast } from '../../../context/toast';
 import { estimateDurationSec } from '../../../hooks/useWorkoutSessionData';
 import {
   useCreateRoutine,

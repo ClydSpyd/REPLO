@@ -10,7 +10,7 @@ import {
 } from 'react-icons/fi';
 import RoutineDetailModal from './RoutineDetailModal';
 import RoutineBuilderModal from './RoutineBuilderModal';
-import { useToast } from '../../../hooks/useToast';
+import { useToast } from '../../../context/toast';
 import { useMediaQuery } from '../../../hooks/useMediaQuery';
 import { useCreateRoutine, useDeleteRoutine } from '../../../mutations/routines';
 import { useToggleFavorite } from '../../../mutations/favorites';
@@ -184,7 +184,7 @@ export default function RoutineCard({
             onClick={handleStart}
             disabled={isStarting}
             aria-label={`Start ${routine.name}`}
-            className="ml-1 flex h-12 w-12 items-center justify-center rounded-xl border border-[var(--accent-primary)] bg-[var(--hint-primary-dark)] text-[var(--accent-primary)] transition-colors hover:bg-[var(--accent-primary)] hover:ntext-[var(--text-contrast)] disabled:cursor-not-allowed disabled:opacity-60"
+            className="ml-1 flex h-12 w-12 items-center justify-center rounded-xl border border-[var(--accent-primary)] bg-[var(--hint-primary-dark)] text-[var(--accent-primary)] transition-colors hover:bg-[var(--accent-primary)] hover:text-[var(--text-contrast)] disabled:cursor-not-allowed disabled:opacity-60"
           >
             <FaPlay className="text-sm" />
           </button>
@@ -250,7 +250,7 @@ export default function RoutineCard({
           type="button"
           onClick={handleStart}
           disabled={isStarting}
-          className="anton flex flex-1 items-center justify-center gap-2 rounded-lg bg-[var(--accent-primary)] px-4 py-3 text-sm font-extrabold uppercase tracking-wide ntext-[var(--text-contrast)] transition-colors hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-60"
+          className="anton flex flex-1 items-center justify-center gap-2 rounded-lg bg-[var(--accent-primary)] px-4 py-3 text-sm font-extrabold uppercase tracking-wide text-[var(--text-contrast)] transition-colors hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-60"
         >
           <FaPlay className="text-xs" />
           {isStarting ? 'Starting…' : 'Start'}

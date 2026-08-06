@@ -3,9 +3,9 @@ import { LuChartNoAxesCombined } from 'react-icons/lu';
 import { HiBolt } from 'react-icons/hi2';
 import { IoCalendarClearOutline, IoListSharp } from 'react-icons/io5';
 import Homescreen from '../views/Homescreen';
-import PlaceholderView from '../views/PlaceholderView';
 import WorkoutView from '../views/WorkoutView';
 import RoutinesView from '../views/RoutinesView';
+import SessionsView from '../views/SessionsView';
 
 export interface NavItem {
   /** Absolute path; also the router path for this destination. */
@@ -40,7 +40,7 @@ export const navItems: NavItem[] = [
     path: '/sessions',
     label: 'Sessions',
     icon: <IoCalendarClearOutline fontSize={18} />,
-    element: <PlaceholderView title="Sessions" />,
+    element: <SessionsView />,
   },
   {
     path: '/routines',

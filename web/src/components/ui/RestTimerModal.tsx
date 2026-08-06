@@ -138,7 +138,9 @@ export default function RestTimerModal({
               />
             </div>
 
-            <div className="mt-6 flex items-center gap-3">
+            <div
+              className={`mt-6 flex items-center gap-3 ${isRunning ? 'pointer-events-none opacity-50' : ''}`}
+            >
               <span className="space-mono whitespace-nowrap text-xs uppercase tracking-wide text-[var(--contrast-three)]">
                 Quick Presets
               </span>
@@ -196,7 +198,7 @@ export default function RestTimerModal({
               )}
             </div>
 
-              <div className="mt-5 block h-px flex-1 bg-[var(--contrast-one)]" />
+            <div className="mt-5 block h-px flex-1 bg-[var(--contrast-one)]" />
           </>
         )}
 

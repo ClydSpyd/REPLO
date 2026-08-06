@@ -1,15 +1,17 @@
 import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { FiLogOut, FiMoon, FiSun, FiUser, FiX } from 'react-icons/fi';
+import { FiLogOut, FiMoon, FiSettings, FiSun, FiUser, FiX } from 'react-icons/fi';
 import { NavLink } from 'react-router-dom';
 import { navItems } from '../../config/nav';
-import { useTheme } from '../../hooks/useTheme';
+import { useTheme } from '../../context/theme';
 
 interface MobileNavSheetProps {
   /** Dismiss the sheet (backdrop, close button, Escape, or after navigating). */
   onClose: () => void;
   /** Sign the user out. */
   onLogout: () => void;
+  /** Open the app options modal (owned by the header). */
+  onOpenOptions: () => void;
 }
 
 /**
@@ -21,6 +23,7 @@ interface MobileNavSheetProps {
 export default function MobileNavSheet({
   onClose,
   onLogout,
+  onOpenOptions,
 }: MobileNavSheetProps) {
   const { theme, toggleTheme } = useTheme();
 
@@ -108,6 +111,14 @@ export default function MobileNavSheet({
               <FiMoon className="text-xl text-[var(--contrast-three)]" />
             )}
             {theme === 'dark' ? 'Light mode' : 'Dark mode'}
+          </button>
+          <button
+            type="button"
+            onClick={onOpenOptions}
+            className="mt-1 flex w-full items-center gap-4 rounded-xl px-5 py-4 text-left text-base text-[var(--text-strong)] transition-colors hover:bg-[var(--hint-primary-dark)]"
+          >
+            <FiSettings className="text-xl text-[var(--contrast-three)]" />
+            Options
           </button>
           <button
             type="button"

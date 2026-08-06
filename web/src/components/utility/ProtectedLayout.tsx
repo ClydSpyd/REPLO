@@ -1,7 +1,7 @@
 import { Outlet } from 'react-router-dom';
 import ViewHeader from '../ui/ViewHeader';
 import ErrorBoundaryModal from './ErrorBoundaryModal';
-import RestTimerProvider from '../ui/RestTimerProvider';
+import RestTimerProvider from '../../context/rest-timer';
 
 /**
  * Layout route for all authenticated pages. The auth guard lives on the route

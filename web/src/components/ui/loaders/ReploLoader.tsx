@@ -1,4 +1,4 @@
-import { useTheme } from '../../../hooks/useTheme';
+import { useTheme } from '../../../context/theme';
 
 interface ReploLoaderProps {
   size?: number;

@@ -1,17 +1,26 @@
 import { useEffect, useRef, useState } from 'react';
-import { FiUser, FiLogOut, FiMenu, FiSun, FiMoon } from 'react-icons/fi';
+import {
+  FiUser,
+  FiLogOut,
+  FiMenu,
+  FiSun,
+  FiMoon,
+  FiSettings,
+} from 'react-icons/fi';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import BarsLogo from './BarsLogo';
 import MobileNavSheet from './MobileNavSheet';
+import OptionsModal from './OptionsModal';
 import HeaderRestTimerButton from './HeaderRestTimerButton';
 import { navItems } from '../../config/nav';
-import { useTheme } from '../../hooks/useTheme';
+import { useTheme } from '../../context/theme';
 import { useQueryClient } from '@tanstack/react-query';
 
 export default function ViewHeader() {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [optionsOpen, setOptionsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
   const { theme, toggleTheme } = useTheme();
@@ -131,6 +140,18 @@ export default function ViewHeader() {
               <button
                 type="button"
                 role="menuitem"
+                onClick={() => {
+                  setMenuOpen(false);
+                  setOptionsOpen(true);
+                }}
+                className="flex w-full items-center gap-2 border-t border-[var(--contrast-one)] px-4 py-2.5 text-left text-sm text-[var(--text-strong)] transition-colors hover:bg-[var(--hint-primary-dark)]"
+              >
+                <FiSettings className="text-base text-[var(--contrast-three)]" />
+                Options
+              </button>
+              <button
+                type="button"
+                role="menuitem"
                 onClick={() => setMenuOpen(false)}
                 className="flex w-full items-center gap-2 border-t border-[var(--contrast-one)] px-4 py-2.5 text-left text-sm text-[var(--text-strong)] transition-colors hover:bg-[var(--hint-primary-dark)]"
               >
@@ -155,8 +176,14 @@ export default function ViewHeader() {
         <MobileNavSheet
           onClose={() => setSheetOpen(false)}
           onLogout={handleLogout}
+          onOpenOptions={() => {
+            setSheetOpen(false);
+            setOptionsOpen(true);
+          }}
         />
       )}
+
+      {optionsOpen && <OptionsModal onClose={() => setOptionsOpen(false)} />}
     </div>
   );
 }

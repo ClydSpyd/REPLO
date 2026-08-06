@@ -4,6 +4,7 @@ import exerciseMethods from './exercises';
 import { routineMethods } from './routine';
 import { favoriteMethods } from './favorite';
 import { userMethods } from './user';
+import { userMetricsMethods } from './userMetrics';
 
 export const baseClient = axios.create({
   /**
@@ -44,5 +45,6 @@ export const API = {
   exercise: exerciseMethods,
   routine: routineMethods,
   favorite: favoriteMethods,
-  user: userMethods
+  user: userMethods,
+  userMetrics: userMetricsMethods,
 };

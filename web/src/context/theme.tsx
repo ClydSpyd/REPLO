@@ -1,15 +1,25 @@
 import {
+  createContext,
   useCallback,
+  useContext,
   useEffect,
   useMemo,
   useState,
   type ReactNode,
 } from 'react';
-import {
-  ThemeContext,
-  THEME_STORAGE_KEY,
-  type Theme,
-} from '../../context/theme-context';
+
+export type Theme = 'light' | 'dark';
+
+interface ThemeContextValue {
+  theme: Theme;
+  setTheme: (theme: Theme) => void;
+  toggleTheme: () => void;
+}
+
+const ThemeContext = createContext<ThemeContextValue | null>(null);
+
+/** Shared with the pre-paint script in index.html — keep in sync. */
+export const THEME_STORAGE_KEY = 'replo:theme';
 
 /**
  * Read the initial theme from the <html data-theme> the pre-paint script
@@ -54,4 +64,13 @@ export default function ThemeProvider({ children }: { children: ReactNode }) {
   return (
     <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
   );
+}
+
+/** Read and change the active colour theme. Must be used within a ThemeProvider. */
+export function useTheme() {
+  const context = useContext(ThemeContext);
+  if (!context) {
+    throw new Error('useTheme must be used within a ThemeProvider');
+  }
+  return context;
 }

@@ -108,7 +108,7 @@ export default function RoutineDetailModal({
           </button>
           <button
             type="button"
-            className="anton flex flex-[1.6] items-center justify-center gap-2 rounded-lg bg-[var(--accent-primary)] px-6 py-3.5 text-sm font-extrabold uppercase tracking-wide ntext-[var(--text-contrast)] transition-colors hover:brightness-95"
+            className="anton flex flex-[1.6] items-center justify-center gap-2 rounded-lg bg-[var(--accent-primary)] px-6 py-3.5 text-sm font-extrabold uppercase tracking-wide text-[var(--text-contrast)] transition-colors hover:brightness-95"
           >
             <FaPlay className="text-xs" />
             Start

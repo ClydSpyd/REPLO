@@ -1,33 +1,30 @@
 import { Router } from "express";
-import { createMetrics, getLatestMetrics, getMetricsHistory, updateMetrics } from "./userMetrics.controller";
+import {
+  getPersonalBests,
+  getVolume,
+  getMuscleBalance,
+} from "./userMetrics.controller";
 import { authMiddleware } from "../../middleware/auth.middleware";
 
 const router = Router();
 
 /**
- * POST /api/userMetrics/
- * Auth required. Create a metrics record for the authenticated user.
- * Payload: { weight, bmi, bodyFat, personalBests }
+ * GET /api/userMetrics/personal-bests
+ * Auth required. Personal bests (heaviest weight + estimated 1RM) per exercise,
+ * computed from the user's whole workout history.
  */
-router.post("/", authMiddleware, createMetrics);
+router.get("/personal-bests", authMiddleware, getPersonalBests);
 
 /**
- * GET /api/userMetrics/latest
- * Auth required. Get latest metrics for the authenticated user.
+ * GET /api/userMetrics/volume?period=week|month
+ * Auth required. Completed-volume series + total + trend over the window.
  */
-router.get("/latest", authMiddleware, getLatestMetrics);
+router.get("/volume", authMiddleware, getVolume);
 
 /**
- * GET /api/userMetrics/history
- * Auth required. Get metrics history for the authenticated user.
+ * GET /api/userMetrics/muscle-balance?period=week|month
+ * Auth required. Volume attributed to each coverage group over the window.
  */
-router.get("/history", authMiddleware, getMetricsHistory);
-
-/**
- * PATCH /api/userMetrics/:id
- * Auth required. Update metrics record by ID.
- * Payload: Partial metrics object
- */
-router.patch("/:id", authMiddleware, updateMetrics);
+router.get("/muscle-balance", authMiddleware, getMuscleBalance);
 
 export default router;

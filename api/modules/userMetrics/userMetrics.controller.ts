@@ -1,65 +1,56 @@
 import { Request, Response, NextFunction } from "express";
+import { MetricsPeriod } from "@replo/shared";
 import { UserMetricsService } from "./userMetrics.service";
 import { AuthenticatedRequest } from '../../types/auth';
 
 const service = new UserMetricsService();
 
-export async function createMetrics(
+/** Read `?period=` from the query, defaulting to `week` for anything else. */
+function parsePeriod(value: unknown): MetricsPeriod {
+  return value === "month" ? "month" : "week";
+}
+
+export async function getPersonalBests(
   req: Request,
   res: Response,
   next: NextFunction,
 ) {
   try {
     const authReq = req as AuthenticatedRequest;
-    const metrics = await service.createMetrics({
-      ...req.body,
-      userId: authReq.user.id,
-    });
-    res.status(201).json(metrics);
+    res.json(await service.getPersonalBests(authReq.user.id));
   } catch (err) {
     next(err);
   }
 }
 
-export async function getLatestMetrics(
+export async function getVolume(
   req: Request,
   res: Response,
   next: NextFunction,
 ) {
   try {
     const authReq = req as AuthenticatedRequest;
-    const metrics = await service.getLatestMetrics(authReq.user.id);
-    res.json(metrics);
-  } catch (err) {
-    next(err);
-  }
-}
-
-export async function getMetricsHistory(
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) {
-  try {
-    const authReq = req as AuthenticatedRequest;
-    const history = await service.getMetricsHistory(authReq.user.id);
-    res.json(history);
-  } catch (err) {
-    next(err);
-  }
-}
-
-export async function updateMetrics(
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) {
-  try {
-    const metrics = await service.updateMetrics(
-      req.params.id as string,
-      req.body,
+    res.json(
+      await service.getVolume(authReq.user.id, parsePeriod(req.query.period)),
     );
-    res.json(metrics);
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function getMuscleBalance(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    const authReq = req as AuthenticatedRequest;
+    res.json(
+      await service.getMuscleBalance(
+        authReq.user.id,
+        parsePeriod(req.query.period),
+      ),
+    );
   } catch (err) {
     next(err);
   }

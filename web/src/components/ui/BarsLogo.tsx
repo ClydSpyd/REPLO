@@ -1,4 +1,4 @@
-import { useTheme } from "../../hooks/useTheme";
+import { useTheme } from "../../context/theme";
 
 interface BarsLogoProps {
   /** Width and height of the (square) logo, in pixels. */

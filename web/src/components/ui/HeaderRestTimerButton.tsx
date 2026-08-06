@@ -2,7 +2,7 @@ import { Suspense } from 'react';
 import { useLocation } from 'react-router-dom';
 import { FaStopwatch } from 'react-icons/fa';
 import { useMyCurrentWorkout } from '../../queries/workouts';
-import { useRestTimer } from '../../hooks/useRestTimer';
+import { useRestTimer } from '../../context/rest-timer';
 
 /**
  * Rest-timer trigger for the global header. Shown only on the /workout route

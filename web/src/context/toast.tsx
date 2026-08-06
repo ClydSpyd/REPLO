@@ -1,12 +1,38 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { createPortal } from 'react-dom';
 import { FiAlertCircle, FiCheckCircle, FiInfo, FiX } from 'react-icons/fi';
-import {
-  ToastContext,
-  type Toast,
-  type ToastOptions,
-  type ToastVariant,
-} from '../../context/toast-context';
+
+export type ToastVariant = 'success' | 'error' | 'info';
+
+export interface ToastOptions {
+  /** Short headline, e.g. "Routine duplicated". */
+  title: string;
+  /** Optional supporting detail, e.g. an API error message. */
+  description?: string;
+  variant?: ToastVariant;
+  /** Milliseconds before auto-dismiss. Pass 0 to require manual dismissal. */
+  duration?: number;
+}
+
+interface Toast extends ToastOptions {
+  id: string;
+}
+
+interface ToastContextValue {
+  /** Show a toast; returns its id so it can be dismissed programmatically. */
+  toast: (options: ToastOptions) => string;
+  dismiss: (id: string) => void;
+}
+
+const ToastContext = createContext<ToastContextValue | null>(null);
 
 const DEFAULT_DURATION = 5000;
 /** Failures get longer on screen — they usually carry something to read. */
@@ -134,4 +160,38 @@ export default function ToastProvider({
       )}
     </ToastContext.Provider>
   );
+}
+
+type Shorthand = (title: string, description?: string) => string;
+
+/**
+ * Raise a toast from anywhere under <ToastProvider />.
+ *
+ *   const { success, error } = useToast();
+ *   success('Routine duplicated');
+ *   error("Couldn't duplicate", err.message);
+ */
+export function useToast() {
+  const context = useContext(ToastContext);
+
+  if (!context) {
+    throw new Error('useToast must be used within a ToastProvider');
+  }
+
+  const { toast, dismiss } = context;
+
+  return useMemo(() => {
+    const withVariant =
+      (variant: ToastOptions['variant']): Shorthand =>
+      (title, description) =>
+        toast({ title, description, variant });
+
+    return {
+      toast,
+      dismiss,
+      success: withVariant('success'),
+      error: withVariant('error'),
+      info: withVariant('info'),
+    };
+  }, [toast, dismiss]);
 }
