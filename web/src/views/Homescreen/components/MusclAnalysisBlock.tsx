@@ -12,7 +12,8 @@ export default function MuscleAnalysisBlock() {
     <section className="rounded-lg border border-[var(--contrast-one)] bg-[var(--dark-one)] px-8 py-6 text-[var(--text-strong)]">
       <div className="flex items-start justify-between">
         <p className="space-mono text-xs text-[var(--contrast-three)]">
-          MUSCLE BALANCE
+          MUSCLE BALANCE{' '}
+          <span className="text-[var(--contrast-two)]">· LAST 4 WEEKS</span>
         </p>
       </div>
 
