@@ -23,6 +23,7 @@ export interface CreateWorkoutPayload {
   notes?: string;
   location?: string;
   baseRoutine?: string; // ID of the routine this workout is based on, if any
+  started?: Date; // stamped server-side when the session begins (create time)
   date?: Date; // defaults to now
 }
 

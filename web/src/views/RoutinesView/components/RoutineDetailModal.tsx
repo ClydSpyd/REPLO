@@ -82,6 +82,7 @@ export default function RoutineDetailModal({
                 routineName={routine.name}
                 isDuplicating={isDuplicating}
                 direction="up"
+                align="left"
                 onEdit={onEdit}
                 onDuplicate={onDuplicate}
                 onDelete={() => setConfirmingDelete(true)}

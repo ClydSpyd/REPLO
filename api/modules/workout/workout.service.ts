@@ -52,7 +52,7 @@ export class WorkoutService {
       throw error;
     }
 
-    return this.repository.create({ ...data, userId });
+    return this.repository.create({ ...data, started: new Date(), userId });
   }
 
   async updateWorkout(

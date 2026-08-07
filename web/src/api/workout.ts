@@ -30,15 +30,6 @@ export const workoutMethods = {
     );
     return data;
   },
-  startWorkout: async (workoutId: string) => {
-    const { data } = await baseClient.patch<WorkoutSession>(
-      `/workout/${workoutId}`,
-      {
-        started: new Date().toISOString(),
-      },
-    );
-    return data;
-  },
   endWorkout: async (workoutId: string) => {
     const { data } = await baseClient.patch<WorkoutSession>(
       `/workout/${workoutId}`,

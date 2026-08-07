@@ -27,21 +27,21 @@ export default function RecordsBlock() {
         <p className="space-mono text-xs text-[var(--contrast-three)]">
           RECENT PRS
         </p>
-        <button
-          type="button"
-          onClick={() => setModalOpen(true)}
-          className="space-mono flex items-center gap-1 rounded-lg border border-[var(--contrast-one)] px-3 py-1.5 text-xs uppercase tracking-wide text-[var(--accent-primary)] transition-colors hover:border-[var(--accent-primary)]"
-        >
-          View all <FiChevronRight />
-        </button>
+        {recent.length > 0 && (
+          <button
+            type="button"
+            onClick={() => setModalOpen(true)}
+            className="space-mono flex items-center gap-1 rounded-lg border border-[var(--contrast-one)] px-3 py-1.5 text-xs uppercase tracking-wide text-[var(--accent-primary)] transition-colors hover:border-[var(--accent-primary)]"
+          >
+            View all <FiChevronRight />
+          </button>
+        )}
       </div>
 
       <div className="mt-5 flex flex-col divide-y divide-[var(--contrast-one)]">
         {isLoading && <RowPlaceholder text="Loading records…" />}
         {error && <RowPlaceholder text="Couldn't load records" />}
-        {!isLoading && !error && recent.length === 0 && (
-          <RowPlaceholder text="No PRs yet — log some sets" />
-        )}
+        {!isLoading && !error && recent.length === 0 && <EmptyRecords />}
         {recent.map((record) => (
           <div key={record.exerciseId} className="flex items-center gap-3 py-3">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[var(--contrast-one)] text-[var(--accent-primary)]">
@@ -67,6 +67,29 @@ export default function RecordsBlock() {
         <PersonalRecordsModal onClose={() => setModalOpen(false)} />
       )}
     </section>
+  );
+}
+
+/** Ghost PR rows hinting the layout, with a nudge to log some sets. */
+function EmptyRecords() {
+  return (
+    <div className="pt-3">
+      <div className="flex flex-col gap-4">
+        {[0, 1, 2].map((i) => (
+          <div key={i} className="flex items-center gap-3">
+            <div className="h-9 w-9 shrink-0 rounded-full border border-[var(--contrast-one)] bg-[var(--dark-two)]" />
+            <div className="flex-1">
+              <div className="h-3 w-28 rounded bg-[var(--dark-three)]" />
+              <div className="mt-1.5 h-2 w-14 rounded bg-[var(--dark-three)]" />
+            </div>
+            <div className="h-4 w-10 rounded bg-[var(--dark-three)]" />
+          </div>
+        ))}
+      </div>
+      <p className="space-mono mt-4 text-center text-[11px] uppercase tracking-wide text-[var(--contrast-two)]!">
+        Log sets to set your first PR
+      </p>
+    </div>
   );
 }
 

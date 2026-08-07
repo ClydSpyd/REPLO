@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   getPersonalBests,
   getVolume,
+  getVolumeTrend,
   getMuscleBalance,
 } from "./userMetrics.controller";
 import { authMiddleware } from "../../middleware/auth.middleware";
@@ -20,6 +21,12 @@ router.get("/personal-bests", authMiddleware, getPersonalBests);
  * Auth required. Completed-volume series + total + trend over the window.
  */
 router.get("/volume", authMiddleware, getVolume);
+
+/**
+ * GET /api/userMetrics/volume-trend
+ * Auth required. Last 8 weeks (bars) + last 28 days (strip) of completed volume.
+ */
+router.get("/volume-trend", authMiddleware, getVolumeTrend);
 
 /**
  * GET /api/userMetrics/muscle-balance?period=week|month

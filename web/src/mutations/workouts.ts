@@ -174,6 +174,55 @@ export const useEndWorkout = () => {
   });
 };
 
+/**
+ * Start a fresh session from a past one — copies its exercises (every set reset
+ * to incomplete) into a new workout. Mirrors useStartWorkoutFromRoutine's cache
+ * handling: refetch the active session so the workout view can render it, and
+ * refresh history. Rejected with 409 if a session is already in progress.
+ */
+export const useRepeatWorkout = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (session: WorkoutSession) =>
+      API.workout.createWorkout({
+        name: session.name,
+        tags: session.tags ?? [],
+        exercises: session.exercises.map((exercise) => ({
+          exerciseId: exercise.exerciseId,
+          name: exercise.name,
+          sets: exercise.sets.map((set) => ({
+            reps: set.reps,
+            weight: set.weight,
+            completed: false,
+          })),
+        })) as WorkoutSession['exercises'],
+      }),
+    onSuccess: async () => {
+      await queryClient.refetchQueries({ queryKey: CURRENT_WORKOUT_KEY });
+      queryClient.invalidateQueries({ queryKey: ['myWorkouts'] });
+    },
+  });
+};
+
+/**
+ * Delete a past session by id. Clears its own cache entry and refreshes the
+ * history list plus the computed metrics (personal bests / volume / balance all
+ * derive from sessions, so a deletion can change them).
+ */
+export const useDeleteWorkout = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (workoutId: string) => API.workout.deleteWorkout(workoutId),
+    onSuccess: (_result, workoutId) => {
+      queryClient.removeQueries({ queryKey: ['workout', workoutId] });
+      queryClient.invalidateQueries({ queryKey: ['myWorkouts'] });
+      queryClient.invalidateQueries({ queryKey: ['userMetrics'] });
+    },
+  });
+};
+
 export const useAddExerciseToCurrentWorkout = () =>
   useCurrentWorkoutMutation<{ exerciseId: string }>({
     request: (workoutId, { exerciseId }) =>

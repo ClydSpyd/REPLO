@@ -3,6 +3,7 @@ import type {
   MuscleBalance,
   PersonalBest,
   VolumeAnalysis,
+  VolumeTrend,
 } from '@replo/shared';
 import { baseClient } from '.';
 
@@ -17,6 +18,12 @@ export const userMetricsMethods = {
     const { data } = await baseClient.get<VolumeAnalysis>(
       '/userMetrics/volume',
       { params: { period } },
+    );
+    return data;
+  },
+  getVolumeTrend: async () => {
+    const { data } = await baseClient.get<VolumeTrend>(
+      '/userMetrics/volume-trend',
     );
     return data;
   },

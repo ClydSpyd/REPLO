@@ -5,11 +5,18 @@ import {
   PersonalBest,
   VolumeAnalysis,
   VolumePoint,
+  VolumeTrend,
 } from "@replo/shared";
 import { WorkoutRepository } from "../workout/workout.repository";
 import { enrichExercises } from "../exercise/exercise.utils";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
+const WEEKS = 8;
+const DAYS_IN_STRIP = 28;
+const TREND_DAYS = WEEKS * 7; // 56
+
+/** UTC midnight at or before `ms`. */
+const startOfUtcDay = (ms: number) => Math.floor(ms / DAY_MS) * DAY_MS;
 
 /** Round to one decimal place. */
 const round1 = (n: number) => Math.round(n * 10) / 10;
@@ -18,9 +25,9 @@ const round1 = (n: number) => Math.round(n * 10) / 10;
 const estimateOneRepMax = (weight: number, reps: number) =>
   weight * (1 + reps / 30);
 
-/** Best available timestamp to bucket a session by, as epoch ms. */
+/** Best available timestamp to bucket a session by (its start), as epoch ms. */
 function sessionTime(workout: any): number {
-  const raw = workout.ended ?? workout.started ?? workout.createdAt;
+  const raw = workout.started ?? workout.createdAt ?? workout.ended;
   return new Date(raw).getTime();
 }
 
@@ -151,6 +158,62 @@ export class UserMetricsService {
       deltaPct:
         prevTotal > 0 ? round1(((total - prevTotal) / prevTotal) * 100) : null,
       series,
+    };
+  }
+
+  /**
+   * Volume trend for the dashboard: the last 8 rolling weeks (bars) and the last
+   * 28 days (activity strip). Weeks are 7-day buckets aligned to UTC calendar
+   * days, with the current (partial) week last. `deltaPct` compares the most
+   * recent 4 weeks against the preceding 4.
+   */
+  async getVolumeTrend(userId: string): Promise<VolumeTrend> {
+    const workouts = (await this.workouts.findByUser(userId)) as any[];
+
+    const todayStart = startOfUtcDay(Date.now());
+    // 56-day window: day 0 is the oldest, day 55 is today.
+    const windowStart = todayStart - (TREND_DAYS - 1) * DAY_MS;
+
+    const weekVolumes = new Array<number>(WEEKS).fill(0);
+    const dayVolumes = new Array<number>(TREND_DAYS).fill(0);
+
+    for (const workout of workouts) {
+      const volume = sessionVolume(workout);
+      if (volume <= 0) continue;
+
+      const dayStart = startOfUtcDay(sessionTime(workout));
+      const dayIndex = Math.round((dayStart - windowStart) / DAY_MS);
+      if (dayIndex < 0 || dayIndex >= TREND_DAYS) continue;
+
+      dayVolumes[dayIndex] += volume;
+      weekVolumes[Math.floor(dayIndex / 7)] += volume;
+    }
+
+    const weeks = weekVolumes.map((volume, i) => {
+      const start = windowStart + i * 7 * DAY_MS;
+      return {
+        label: `W${i + 1}`,
+        volume: round1(volume),
+        start: new Date(start).toISOString(),
+        end: new Date(start + 6 * DAY_MS).toISOString(),
+      };
+    });
+
+    // Activity strip: the most recent 28 days of the window.
+    const stripStart = TREND_DAYS - DAYS_IN_STRIP;
+    const days = dayVolumes.slice(stripStart).map((volume, i) => ({
+      date: new Date(windowStart + (stripStart + i) * DAY_MS).toISOString(),
+      volume: round1(volume),
+    }));
+
+    const recent = weekVolumes.slice(4).reduce((a, b) => a + b, 0);
+    const older = weekVolumes.slice(0, 4).reduce((a, b) => a + b, 0);
+
+    return {
+      totalVolume: round1(weekVolumes.reduce((a, b) => a + b, 0)),
+      deltaPct: older > 0 ? round1(((recent - older) / older) * 100) : null,
+      weeks,
+      days,
     };
   }
 

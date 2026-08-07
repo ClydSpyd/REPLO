@@ -38,6 +38,19 @@ export async function getVolume(
   }
 }
 
+export async function getVolumeTrend(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    const authReq = req as AuthenticatedRequest;
+    res.json(await service.getVolumeTrend(authReq.user.id));
+  } catch (err) {
+    next(err);
+  }
+}
+
 export async function getMuscleBalance(
   req: Request,
   res: Response,

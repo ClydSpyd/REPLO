@@ -19,9 +19,7 @@ export default function MuscleAnalysisBlock() {
       <div className="mt-5 flex flex-col gap-4">
         {isLoading && <Placeholder text="Loading…" />}
         {error && <Placeholder text="Couldn't load muscle balance" />}
-        {!isLoading && !error && groups.length === 0 && (
-          <Placeholder text="No data yet — complete a workout to see your balance." />
-        )}
+        {!isLoading && !error && groups.length === 0 && <EmptyBalance />}
         {groups.map((group) => (
           <div key={group.label}>
             <div className="flex items-center justify-between text-sm">
@@ -40,6 +38,31 @@ export default function MuscleAnalysisBlock() {
         ))}
       </div>
     </section>
+  );
+}
+
+/** Ghost bars hinting the eventual chart, with a nudge to train. */
+function EmptyBalance() {
+  const ghostWidths = [62, 48, 38, 28, 20];
+  return (
+    <div>
+      <div className="flex flex-col gap-4">
+        {ghostWidths.map((width, i) => (
+          <div key={i}>
+            <div className="h-2.5 w-16 rounded bg-[var(--dark-three)]" />
+            <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-[var(--dark-three)]">
+              <div
+                className="h-full rounded-full bg-[var(--contrast-one)]"
+                style={{ width: `${width}%` }}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+      <p className="space-mono mt-5 text-center text-[11px] uppercase tracking-wide text-[var(--contrast-two)]!">
+        Complete a workout to map your balance
+      </p>
+    </div>
   );
 }
 

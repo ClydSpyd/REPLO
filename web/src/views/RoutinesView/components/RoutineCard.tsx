@@ -234,7 +234,7 @@ export default function RoutineCard({
       )}
 
       {/* Size + recency */}
-      <div className="mt-4 flex flex-col gap-1.5">
+      <div className="mt-4 flex flex-col gap-1.5 grow">
         <p className="space-mono text-xs text-[var(--contrast-three)]">
           {exerciseCount} exercise{exerciseCount === 1 ? '' : 's'}
           <span className="px-2">·</span>~{minutes} min
@@ -316,6 +316,7 @@ export function RoutineActionMenu({
   onDuplicate,
   onDelete,
   direction = 'down',
+  align = 'right',
   triggerClassName = 'h-8 w-8 rounded-md text-[var(--contrast-two)] hover:bg-[var(--dark-two)] hover:text-[var(--text-strong)]',
 }: {
   routineName: string;
@@ -324,6 +325,9 @@ export function RoutineActionMenu({
   onDuplicate: () => void;
   onDelete: () => void;
   direction?: 'down' | 'up';
+  /** Which edge the dropdown aligns to. Right-anchored expands left (top-right
+   *  triggers); left-anchored expands right (left-edge triggers like a footer). */
+  align?: 'left' | 'right';
   /** Overrides trigger sizing/skin — e.g. a larger bordered button in a footer. */
   triggerClassName?: string;
 }) {
@@ -366,9 +370,9 @@ export function RoutineActionMenu({
       {open && (
         <div
           role="menu"
-          className={`absolute right-0 z-20 w-44 overflow-hidden rounded-lg border border-[var(--contrast-one)] bg-[var(--dark-two)] shadow-lg ${
-            direction === 'up' ? 'bottom-full mb-2' : 'top-full mt-2'
-          }`}
+          className={`absolute z-20 w-44 overflow-hidden rounded-lg border border-[var(--contrast-one)] bg-[var(--dark-two)] shadow-lg ${
+            align === 'left' ? 'left-0' : 'right-0'
+          } ${direction === 'up' ? 'bottom-full mb-2' : 'top-full mt-2'}`}
         >
           <button
             type="button"

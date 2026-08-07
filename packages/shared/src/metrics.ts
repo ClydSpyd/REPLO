@@ -44,6 +44,41 @@ export interface VolumeAnalysis {
   series: VolumePoint[];
 }
 
+/** One rolling 7-day bucket in the volume-trend widget. */
+export interface VolumeTrendWeek {
+  /** Short label, e.g. "W1"…"W8" (W8 = current week). */
+  label: string;
+  /** Σ reps × weight of completed sets in the week. */
+  volume: number;
+  /** ISO date of the bucket's first day (inclusive). */
+  start: string;
+  /** ISO date of the bucket's last day (inclusive). */
+  end: string;
+}
+
+/** One calendar day in the volume-trend activity strip. */
+export interface VolumeTrendDay {
+  /** ISO date of the day. */
+  date: string;
+  /** Σ reps × weight of completed sets that day. */
+  volume: number;
+}
+
+/**
+ * Volume trend for the dashboard: the last 8 rolling weeks (bars) and the last
+ * 28 days (activity strip), plus the headline total and momentum delta.
+ */
+export interface VolumeTrend {
+  /** Total completed volume over the 8-week window. */
+  totalVolume: number;
+  /** % change of the most recent 4 weeks vs the preceding 4 weeks; null when the older half had no volume. */
+  deltaPct: number | null;
+  /** Exactly 8 buckets, oldest first (last is the current week). */
+  weeks: VolumeTrendWeek[];
+  /** Exactly 28 days, oldest first (last is today). */
+  days: VolumeTrendDay[];
+}
+
 export interface MuscleBalanceGroup {
   label: string;
   /** Completed volume attributed to this coverage group over the window. */

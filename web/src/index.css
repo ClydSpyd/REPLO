@@ -82,6 +82,16 @@
   --grid-line: transparent; /* grid lines are dark-mode only */
 }
 
+/* Volume-chart bars grow up from the axis (scaled, so the base stays pinned). */
+@keyframes bar-grow {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
 /* Modal enter animations. */
 @keyframes modal-fade-in {
   from {
