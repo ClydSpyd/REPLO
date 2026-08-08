@@ -20,6 +20,7 @@ export default function RoutineDetailModal({
   onClose,
   onEdit,
   onDuplicate,
+  handleStart,
   isDuplicating = false,
 }: {
   routine: Routine;
@@ -27,6 +28,7 @@ export default function RoutineDetailModal({
   /** Edit/duplicate handlers back the mobile ⋯ menu (desktop keeps it on the card). */
   onEdit?: () => void;
   onDuplicate?: () => void;
+  handleStart: () => void;
   isDuplicating?: boolean;
 }) {
   const [confirmingDelete, setConfirmingDelete] = useState(false);
@@ -108,6 +110,7 @@ export default function RoutineDetailModal({
             Schedule
           </button>
           <button
+            onClick={handleStart}
             type="button"
             className="anton flex flex-[1.6] items-center justify-center gap-2 rounded-lg bg-[var(--accent-primary)] px-6 py-3.5 text-sm font-extrabold uppercase tracking-wide text-[var(--text-contrast)] transition-colors hover:brightness-95"
           >
@@ -129,7 +132,10 @@ export default function RoutineDetailModal({
       <div className="-mt-1 mb-6 border-b border-[var(--contrast-one)] pb-6">
         <div className="flex items-center justify-between gap-3">
           <p className="space-mono text-sm text-[var(--contrast-three)]">
-            <span className="font-bold text-[var(--text-strong)]">{exerciseCount}</span> exercises
+            <span className="font-bold text-[var(--text-strong)]">
+              {exerciseCount}
+            </span>{' '}
+            exercises
             {/* {' · '}
             <span className="font-bold text-[var(--text-strong)]">
               ~{estimatedMinutes}
@@ -186,19 +192,19 @@ export default function RoutineDetailModal({
               key={`${exercise.exerciseId}-${index}`}
               className="flex items-center justify-between gap-2 rounded-2xl border border-[var(--contrast-one)] bg-[var(--dark-one)] p-4 lg:p-5"
             >
-                <div className="flex min-w-0 items-start gap-3 lg:gap-4">
-                  <span className="anton flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[var(--dark-two)] text-sm text-[var(--contrast-two)]">
-                    {String(index + 1).padStart(2, '0')}
-                  </span>
-                  <div className="min-w-0">
-                    <h3 className="heading-four truncate text-[var(--text-strong)]">
-                      {exercise.name}
-                    </h3>
-                    <p className="mt-1 truncate text-xs lg:text-sm text-[var(--accent-primary)]">
-                      {muscleSubtitle(exercise)}
-                    </p>
-                  </div>
+              <div className="flex min-w-0 items-start gap-3 lg:gap-4">
+                <span className="anton flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[var(--dark-two)] text-sm text-[var(--contrast-two)]">
+                  {String(index + 1).padStart(2, '0')}
+                </span>
+                <div className="min-w-0">
+                  <h3 className="heading-four truncate text-[var(--text-strong)]">
+                    {exercise.name}
+                  </h3>
+                  <p className="mt-1 truncate text-xs lg:text-sm text-[var(--accent-primary)]">
+                    {muscleSubtitle(exercise)}
+                  </p>
                 </div>
+              </div>
 
               <h3 className="space-mono shrink-0 text-base font-bold uppercase tracking-wide text-[var(--accent-primary)]">
                 <span className="lowercase">x</span>

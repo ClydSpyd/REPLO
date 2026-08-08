@@ -140,6 +140,8 @@ export const useUpdateWorkout = (workoutId?: string) => {
     onSuccess: (updatedWorkout) => {
       queryClient.setQueryData(['workout', workoutId], updatedWorkout);
       queryClient.invalidateQueries({ queryKey: ['myWorkouts'] });
+      // Name/set edits can move volume and personal records.
+      queryClient.invalidateQueries({ queryKey: ['userMetrics'] });
     },
   });
 };

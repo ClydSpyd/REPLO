@@ -138,6 +138,7 @@ export default function RoutineCard({
             setEditOpen(true);
           }}
           onDuplicate={handleDuplicate}
+          handleStart={handleStart}
         />
       )}
     </>

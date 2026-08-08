@@ -9,8 +9,14 @@ import { completedReps, formatDurationShort } from '../review-utils';
  */
 export default function CompletedSummary({
   session,
+  editing = false,
+  nameValue,
+  onNameChange,
 }: {
   session: WorkoutSession;
+  editing?: boolean;
+  nameValue?: string;
+  onNameChange?: (value: string) => void;
 }) {
   const { completedSetCount, completedVolume, estimatedDurationSec } =
     useWorkoutSessionData(session);
@@ -57,9 +63,20 @@ export default function CompletedSummary({
           </span>
         </div>
 
-        <h1 className="anton text-4xl uppercase tracking-wide text-[var(--text-strong)] lg:text-6xl">
-          {session.name}
-        </h1>
+        {editing ? (
+          <input
+            type="text"
+            value={nameValue ?? ''}
+            onChange={(e) => onNameChange?.(e.target.value)}
+            placeholder="Untitled Workout"
+            aria-label="Session name"
+            className="anton w-full border-b border-[var(--accent-primary)] bg-transparent pb-1 text-4xl uppercase tracking-wide text-[var(--text-strong)] focus:border-[var(--accent-secondary)] focus:outline-none lg:text-6xl"
+          />
+        ) : (
+          <h1 className="anton text-4xl uppercase tracking-wide text-[var(--text-strong)] lg:text-6xl">
+            {session.name}
+          </h1>
+        )}
       </div>
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
