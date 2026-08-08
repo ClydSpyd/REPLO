@@ -11,6 +11,7 @@ import Modal from '../../../components/ui/Modal';
 import ExerciseDatasetList from '../../../components/exercise-dataset-list';
 import ExerciseFiltersBar from '../../../components/exercise-filters-bar';
 import { useToast } from '../../../context/toast';
+import { useLocalStorage } from '../../../hooks/useLocalStorage';
 import { estimateDurationSec } from '../../../hooks/useWorkoutSessionData';
 import {
   useCreateRoutine,
@@ -69,8 +70,16 @@ export default function RoutineBuilderModal({
   onClose: () => void;
 }) {
   const isEditing = Boolean(routine);
+  const shouldCache = !isEditing;
 
-  const [name, setName] = useState(routine?.name ?? '');
+  const nameStorageKey = routine
+    ? `routine-builder-name:${routine._id}`
+    : 'routine-builder-name:new';
+  const [name, setName, clearName] = useLocalStorage<string>(
+    nameStorageKey,
+    routine?.name ?? '',
+    { enabled: shouldCache },
+  );
   const [tag, setTag] = useState<RoutineTag | null>(
     (routine?.tags?.[0] as RoutineTag) ?? null,
   );
@@ -79,8 +88,17 @@ export default function RoutineBuilderModal({
    * routine's tag counts as deliberate, so editing never silently retags.
    */
   const [tagTouched, setTagTouched] = useState(Boolean(routine?.tags?.length));
-  const [draft, setDraft] = useState<DraftExercise[]>(
-    routine ? draftFromRoutine(routine) : [],
+  const draftStorageKey = routine
+    ? `routine-builder-draft:${routine._id}`
+    : 'routine-builder-draft:new';
+  const initialDraft = useMemo(
+    () => (routine ? draftFromRoutine(routine) : []),
+    [routine],
+  );
+  const [draft, setDraft, clearDraft] = useLocalStorage<DraftExercise[]>(
+    draftStorageKey,
+    initialDraft,
+    { enabled: shouldCache },
   );
 
   const [search, setSearch] = useState('');
@@ -237,6 +255,8 @@ export default function RoutineBuilderModal({
         {
           onSuccess: (updated) => {
             success('Routine updated', updated.name);
+            clearName();
+            clearDraft();
             onClose();
           },
           onError: (err) => toastError("Couldn't update routine", err.message),
@@ -248,10 +268,26 @@ export default function RoutineBuilderModal({
     createRoutine(payload, {
       onSuccess: (created) => {
         success('Routine saved', created.name);
+        clearName();
+        clearDraft();
         onClose();
       },
       onError: (err) => toastError("Couldn't save routine", err.message),
     });
+  };
+
+  const handleCancel = () => {
+    clearName();
+    clearDraft();
+    onClose();
+  };
+
+  const handleReset = () => {
+    clearName();
+    clearDraft();
+    setTagTouched(false);
+    setTag(null);
+    setMobileView('add');
   };
 
   return (
@@ -280,9 +316,19 @@ export default function RoutineBuilderModal({
           </div>
 
           <div className="flex items-center gap-3">
+            {!isEditing && draft.length > 0 && (
+              <button
+                type="button"
+                onClick={handleReset}
+                disabled={isPending}
+                className="manrope hidden rounded-lg border border-(--contrast-one) px-5 py-3 text-sm font-bold text-[var(--text-strong)] transition-colors hover:border-(--contrast-two) disabled:opacity-50 lg:block"
+              >
+                Reset
+              </button>
+            )}
             <button
               type="button"
-              onClick={onClose}
+              onClick={handleCancel}
               disabled={isPending}
               className="manrope hidden rounded-lg border border-(--contrast-one) px-5 py-3 text-sm font-bold text-[var(--text-strong)] transition-colors hover:border-(--contrast-two) disabled:opacity-50 lg:block"
             >
@@ -343,11 +389,6 @@ export default function RoutineBuilderModal({
               </button>
             ))}
           </div>
-          {!tagTouched && derivedTag && (
-            <span className="space-mono text-xs uppercase tracking-wide text-[var(--contrast-two)]">
-              · Auto
-            </span>
-          )}
         </div>
       </div>
 
