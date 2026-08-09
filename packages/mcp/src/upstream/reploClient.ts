@@ -3,6 +3,8 @@
  * tool calls go through here - auth, error handling, and URL building live in one place. 
  */
 
+import type { CreateRoutineInput } from "@replo/shared";
+
 // "week" | "month" — the period accepted by the metrics endpoints.
 export type MetricsPeriod = "week" | "month";
 
@@ -36,16 +38,11 @@ export interface WorkoutTrimmed {
   }>;
 }
 
-/** payload for creating a routine (mirrors API CreateRoutineSchema). */
-export interface CreateRoutinePayload {
-  name: string;
-  description?: string;
-  tags: string[]; // required by the API
-  exercises: Array<{
-    exerciseId: string;
-    sets: Array<{ reps: number; weight: number }>;
-  }>;
-}
+/**
+ * Payload for creating a routine. Sourced from the shared CreateRoutineSchema
+ * (@replo/shared) so it can't drift from what the API validates.
+ */
+export type CreateRoutinePayload = CreateRoutineInput;
 
 type RequestOptions = {
   auth?: boolean;
