@@ -9,6 +9,7 @@ import { registerGetSession } from "./tools/getSession.js";
 import { registerCreateRoutine } from "./tools/createRoutine.js";
 import { registerAnalyzeWeek } from "./tools/analyzeWeek.js";
 import { registerExerciseCatalog } from "./resources/exerciseCatalog.js";
+import { registerEditRoutine } from "./tools/editRoutine.js";
 
 const PORT = Number(process.env.PORT ?? 8080);
 
@@ -30,6 +31,7 @@ function createMcpServer(): McpServer {
   registerCreateRoutine(server, client);
   registerAnalyzeWeek(server, client);
   registerExerciseCatalog(server, client);
+  registerEditRoutine(server, client);
 
   return server;
 }
