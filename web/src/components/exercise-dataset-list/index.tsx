@@ -43,6 +43,9 @@ export default function ExerciseDatasetList(props: Props) {
   const applyFilters = useCallback(
     (filterInput?: Props['filterInput']) => {
       const normalizedName = filterInput?.name?.trim().toLowerCase();
+      const searchTerms = normalizedName
+        ? normalizedName.split(/\s+/).filter(Boolean)
+        : [];
       const normalizedMuscle = filterInput?.primaryMuscleGroup
         ?.trim()
         .toLowerCase();
@@ -67,12 +70,15 @@ export default function ExerciseDatasetList(props: Props) {
       }
 
       const nextFilteredExercises = exercises.filter((exercise) => {
+        const searchableText = [
+          exercise.name,
+          ...(exercise.muscleGroups ?? []),
+        ]
+          .join(' ')
+          .toLowerCase();
         const nameMatches =
-          !normalizedName ||
-          exercise.name.toLowerCase().includes(normalizedName) ||
-          (exercise.muscleGroups ?? []).some((muscle) =>
-            muscle.toLowerCase().includes(normalizedName),
-          );
+          searchTerms.length === 0 ||
+          searchTerms.every((term) => searchableText.includes(term));
         // Consolidated groups expand to the specific values the dataset uses,
         // so "back" also matches upper-back, lower-back, lats, traps, …
         const muscleMatches =
