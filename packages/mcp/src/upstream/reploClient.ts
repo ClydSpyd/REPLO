@@ -144,6 +144,13 @@ export class ReploClient {
 
     if (!res.ok) {
       const text = await res.text().catch(() => "");
+      // TEMP DIAGNOSTIC: exactly what we sent upstream and what came back.
+      const authPrefix = headers.Authorization
+        ? headers.Authorization.slice(0, 16)
+        : "(none)";
+      console.error(
+        `[replo-mcp] upstream ${method} ${url.href} -> ${res.status} | auth=${authPrefix}… | body=${text.slice(0, 200)}`,
+      );
       throw new ReploError(
         res.status,
         `${method} ${path} → ${res.status}: ${text.slice(0, 200)}`,
