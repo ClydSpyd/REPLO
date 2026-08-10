@@ -11,8 +11,10 @@
   "scripts": {
     "dev": "concurrently -n api,web -c cyan,magenta \"npm run dev -w @replo/api\" \"npm run dev -w @replo/web\"",
     "dev:host": "concurrently -n api,web -c cyan,magenta \"npm run dev -w @replo/api\" \"npm run dev -w @replo/web -- --host\"",
+    "dev:server": "concurrently -n api,mcp -c cyan,green \"npm run dev -w @replo/api\" \"npm run dev -w @replo/mcp\"",
     "dev:api": "npm run dev -w @replo/api",
     "dev:web": "npm run dev -w @replo/web",
+    "dev:mcp": "npm run dev -w @replo/mcp",
     "build": "npm run build -w @replo/shared && npm run build -w @replo/api && npm run build -w @replo/web",
     "lint": "npm run lint -w @replo/web",
     "typecheck": "npm run build -w @replo/shared && npm run build -w @replo/api && npm run build -w @replo/web"
