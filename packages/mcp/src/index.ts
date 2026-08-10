@@ -47,6 +47,8 @@ function createMcpServer(): McpServer {
 }
 
 const app = express();
+// Behind Render's proxy the real client IP arrives in X-Forwarded-For
+app.set("trust proxy", 1);
 app.use(express.json());
 
 app.get("/healthz", (_req, res) => {
