@@ -1,6 +1,6 @@
 import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import type { ReploClient } from "../upstream/reploClient.js";
+import { reploClientForRequest } from "../upstream/requestClient.js";
 import { jsonContent, toolError } from "./helpers.js";
 
 /**
@@ -8,7 +8,7 @@ import { jsonContent, toolError } from "./helpers.js";
  * four metrics endpoints in parallel and returns a single snapshot the model
  * can narrate — a purpose-built, task-shaped tool.
  */
-export function registerAnalyzeWeek(server: McpServer, client: ReploClient) {
+export function registerAnalyzeWeek(server: McpServer) {
   server.registerTool(
     "analyze_week",
     {
@@ -25,8 +25,9 @@ export function registerAnalyzeWeek(server: McpServer, client: ReploClient) {
           .describe("Analysis window (default 'week')"),
       },
     },
-    async ({ period }) => {
+    async ({ period }, extra) => {
       try {
+        const client = reploClientForRequest(extra);
         const p = period ?? "week";
         const [volume, muscleBalance, volumeTrend, personalBests] =
           await Promise.all([

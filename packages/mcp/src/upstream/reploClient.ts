@@ -10,8 +10,13 @@ export type MetricsPeriod = "week" | "month";
 
 export interface ReploClientOptions {
   baseUrl: string; // e.g. http://localhost:6969
-  email: string;
-  password: string;
+  email?: string;
+  password?: string;
+  /**
+   * If set, the client uses this REPLO JWT (Token B) directly and never logs
+   * in — this is how a per-request client acts as the authenticated OAuth user.
+   */
+  accessToken?: string;
 }
 
 /** thrown when an upstream REPLO call fails; carries the HTTP status. */
@@ -38,6 +43,18 @@ export interface WorkoutTrimmed {
   }>;
 }
 
+export interface Routine {
+  _id: string;
+  name: string;
+  description: string;
+  exercises: Record<string, any>[];
+  tags: string[];
+  lastPerformed?: Date;
+  user: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 /**
  * Payload for creating a routine. Sourced from the shared CreateRoutineSchema
  * (@replo/shared) so it can't drift from what the API validates.
@@ -54,10 +71,17 @@ type RequestOptions = {
 export class ReploClient {
   private accessToken: string | null = null;
 
-  constructor(private readonly opts: ReploClientOptions) {}
+  constructor(private readonly opts: ReploClientOptions) {
+    // A per-request client is handed the user's REPLO JWT directly — no login.
+    this.accessToken = opts.accessToken ?? null;
+  }
 
   /** Log in and cache the access token (Token B in the plan's two-token model). */
   async login(): Promise<string> {
+    if (this.opts.accessToken) return this.opts.accessToken;
+    if (!this.opts.email || !this.opts.password) {
+      throw new ReploError(401, "No credentials available to log in");
+    }
     const res = await fetch(`${this.opts.baseUrl}/api/user/login`, {
       method: "POST",
       headers: {
@@ -106,7 +130,14 @@ export class ReploClient {
       body: opts.body !== undefined ? JSON.stringify(opts.body) : undefined,
     });
 
-    if (res.status === 401 && opts.auth && !opts._retried) {
+    // Token-bound (per-request) clients can't re-login, so only retry the
+    // login-and-retry dance when we actually hold our own credentials.
+    if (
+      res.status === 401 &&
+      opts.auth &&
+      !opts._retried &&
+      !this.opts.accessToken
+    ) {
       this.accessToken = null; // force a fresh login, then retry once
       return this.request<T>(method, path, { ...opts, _retried: true });
     }
@@ -138,6 +169,10 @@ export class ReploClient {
 
   getMyWorkouts(): Promise<WorkoutTrimmed[]> {
     return this.request("GET", "/api/workout/mine", { auth: true });
+  }
+
+  getMyRoutines(): Promise<Routine[]> {
+    return this.request("GET", "/api/routine/mine", { auth: true });
   }
 
   getWorkout(id: string): Promise<unknown> {

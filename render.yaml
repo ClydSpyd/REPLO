@@ -1,0 +1,54 @@
+# Render Blueprint — REPLO MCP server (packages/mcp)
+#
+# This defines ONLY the new MCP service. Your existing API/web services are
+# dashboard-managed and are not described here; Render will not modify them.
+#
+# To use: commit this file, then in Render → "New +" → "Blueprint" and point it
+# at this repo. Review, then Apply.
+#
+# ── Before it works, you must (see comments inline) ──────────────────────────
+#   1. Add the custom domain `mcp.replo-app.com` to this service (Render shows a
+#      CNAME target) — or change MCP_PUBLIC_URL to the *.onrender.com URL Render
+#      assigns. MCP_PUBLIC_URL MUST exactly match the public URL clients hit.
+#   2. Keep it a SINGLE instance: the OAuth token/client/code stores are still
+#      in-memory (pre-M5). Multiple instances = tokens minted on one won't
+#      validate on another. Do not enable autoscaling until M5 (Mongo-backed).
+#   3. Do NOT set MCP_DEV_TOKEN / REPLO_EMAIL / REPLO_PASSWORD in prod — those
+#      only feed the local dev-token backdoor. Real users authenticate via OAuth.
+
+services:
+  - type: web
+    name: replo-mcp
+    runtime: node
+    # Match your API's region so REPLO_API_URL can use private networking later.
+    region: oregon
+    # Paid/always-on: the free tier spins down on idle and would drop all
+    # in-memory OAuth state (forcing re-login on every cold start).
+    plan: starter
+    # Root of the monorepo so npm workspaces resolve (@replo/shared, @replo/mcp).
+    rootDir: .
+    # Build @replo/shared first — @replo/mcp imports its compiled dist.
+    buildCommand: npm ci && npm run build -w @replo/shared && npm run build -w @replo/mcp
+    startCommand: node packages/mcp/dist/index.js
+    healthCheckPath: /healthz
+    autoDeploy: true
+    # Attach the custom domain here (Render provisions TLS automatically — this
+    # is what satisfies the OAuth "AS endpoints must be HTTPS" requirement).
+    domains:
+      - mcp.replo-app.com
+    envVars:
+      # Node 20 to match the repo's engines field.
+      - key: NODE_VERSION
+        value: "20"
+      # This server's public origin = OAuth issuer + resource + redirect base.
+      # MUST equal the URL clients connect to. Change if not using the custom domain.
+      - key: MCP_PUBLIC_URL
+        value: https://mcp.replo-app.com
+      # Where tools call /api/*. Public URL of your existing API service.
+      # (Optionally swap for a Render private URL once both share a region.)
+      - key: REPLO_API_URL
+        value: https://replo-app.com
+      # Access-token lifetime (seconds). Short-lived; refresh handles renewal.
+      - key: MCP_ACCESS_TOKEN_TTL
+        value: "900"
+      # Render injects PORT automatically; the server reads process.env.PORT.

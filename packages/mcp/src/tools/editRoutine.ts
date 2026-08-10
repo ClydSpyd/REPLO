@@ -5,10 +5,10 @@ import {
   routineSetFields,
 } from "@replo/shared";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import type { ReploClient } from "../upstream/reploClient.js";
+import { reploClientForRequest } from "../upstream/requestClient.js";
 import { jsonContent, toolError } from "./helpers.js";
 
-export function registerEditRoutine(server: McpServer, client: ReploClient) {
+export function registerEditRoutine(server: McpServer) {
     server.registerTool("edit_routine", {
       title: "Edit routine",
       description:
@@ -43,8 +43,9 @@ export function registerEditRoutine(server: McpServer, client: ReploClient) {
           .min(1)
           .describe("Exercises with their planned sets"),
       }).partial(),
-    }, async (input) => {
+    }, async (input, extra) => {
       try {
+        const client = reploClientForRequest(extra);
         const { id, ...body } = input;
         const routine = await client.editRoutine(id!, body);
         return jsonContent({ updated: true, routine });

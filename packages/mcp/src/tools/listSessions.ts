@@ -1,6 +1,7 @@
 import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import type { ReploClient, WorkoutTrimmed } from "../upstream/reploClient.js";
+import type { WorkoutTrimmed } from "../upstream/reploClient.js";
+import { reploClientForRequest } from "../upstream/requestClient.js";
 import { jsonContent, toolError } from "./helpers.js";
 
 /** Sum of reps × weight over *completed* sets — the same notion of "volume". */
@@ -14,7 +15,7 @@ function totalVolume(w: WorkoutTrimmed): number {
   return vol;
 }
 
-export function registerListSessions(server: McpServer, client: ReploClient) {
+export function registerListSessions(server: McpServer) {
   server.registerTool(
     "list_sessions",
     {
@@ -41,8 +42,9 @@ export function registerListSessions(server: McpServer, client: ReploClient) {
           .describe("Max sessions to return (default 20)"),
       },
     },
-    async ({ from, to, limit }) => {
+    async ({ from, to, limit }, extra) => {
       try {
+        const client = reploClientForRequest(extra);
         const all = await client.getMyWorkouts();
         const fromT = from ? Date.parse(from) : undefined;
         const toT = to ? Date.parse(to) : undefined;

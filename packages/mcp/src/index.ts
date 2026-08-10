@@ -16,6 +16,7 @@ import { registerCreateRoutine } from "./tools/createRoutine.js";
 import { registerAnalyzeWeek } from "./tools/analyzeWeek.js";
 import { registerExerciseCatalog } from "./resources/exerciseCatalog.js";
 import { registerEditRoutine } from "./tools/editRoutine.js";
+import { registerListRoutines } from "./tools/listRoutines.js";
 
 const PORT = Number(process.env.PORT ?? 8080);
 const REPLO_API_URL = process.env.REPLO_API_URL ?? "http://localhost:6969";
@@ -25,25 +26,22 @@ const MCP_PUBLIC_URL = (
 ).replace(/\/$/, "");
 const RESOURCE_METADATA_URL = `${MCP_PUBLIC_URL}/.well-known/oauth-protected-resource`;
 
-// M1: one shared client logged in as a single dev user. In M3.5 the tools will
-// instead act as the authenticated OAuth user (Token B from req.auth).
-const client = new ReploClient({
-  baseUrl: REPLO_API_URL,
-  email: process.env.REPLO_EMAIL ?? "",
-  password: process.env.REPLO_PASSWORD ?? "",
-});
-
-/** Build a fresh MCP server with our tools + resource registered. */
+/**
+ * Build a fresh MCP server with our tools + resource registered. Each tool
+ * builds its own per-request ReploClient (from the request's auth context), so
+ * calls act as the authenticated OAuth user — there is no shared dev client.
+ */
 function createMcpServer(): McpServer {
   const server = new McpServer({ name: "replo-mcp", version: "0.0.0" });
 
-  registerSearchExercises(server, client);
-  registerListSessions(server, client);
-  registerGetSession(server, client);
-  registerCreateRoutine(server, client);
-  registerAnalyzeWeek(server, client);
-  registerExerciseCatalog(server, client);
-  registerEditRoutine(server, client);
+  registerSearchExercises(server);
+  registerListSessions(server);
+  registerGetSession(server);
+  registerCreateRoutine(server);
+  registerAnalyzeWeek(server);
+  registerExerciseCatalog(server);
+  registerListRoutines(server);
+  registerEditRoutine(server);
 
   return server;
 }
@@ -104,15 +102,32 @@ app.get("/mcp", methodNotAllowed);
 app.delete("/mcp", methodNotAllowed);
 
 // Dev-only: seed a static bearer token so curl can hit /mcp without the full
-// OAuth dance. Real tokens come from the login flow above.
+// OAuth dance. To make tools work with it, we log in the dev creds once and
+// attach that REPLO JWT (Token B) as `extra.reploToken` — exactly what a real
+// OAuth token carries. Without dev creds it still passes the RS gate, but tools
+// will report "No REPLO token" (nothing to act as).
 const DEV_TOKEN = process.env.MCP_DEV_TOKEN;
-if (DEV_TOKEN) {
+async function seedDevToken(): Promise<void> {
+  if (!DEV_TOKEN) return;
+  let reploToken: string | undefined;
+  if (process.env.REPLO_EMAIL && process.env.REPLO_PASSWORD) {
+    try {
+      reploToken = await new ReploClient({
+        baseUrl: REPLO_API_URL,
+        email: process.env.REPLO_EMAIL,
+        password: process.env.REPLO_PASSWORD,
+      }).login();
+    } catch (err) {
+      console.error("[replo-mcp] dev token: REPLO login failed —", err);
+    }
+  }
   tokenStore.set(DEV_TOKEN, {
     token: DEV_TOKEN,
     clientId: "dev-cli",
     scopes: [],
     expiresAt: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 365, // 1y (dev)
     resource: new URL(MCP_PUBLIC_URL),
+    extra: reploToken ? { reploToken } : undefined,
   });
 }
 
@@ -120,5 +135,7 @@ app.listen(PORT, () => {
   console.log(`[replo-mcp] listening on http://localhost:${PORT}  (POST /mcp)`);
   console.log(`[replo-mcp] issuer / resource: ${MCP_PUBLIC_URL}`);
   console.log(`[replo-mcp] AS metadata: ${MCP_PUBLIC_URL}/.well-known/oauth-authorization-server`);
-  if (DEV_TOKEN) console.log("[replo-mcp] seeded MCP_DEV_TOKEN for local testing");
+  void seedDevToken().then(() => {
+    if (DEV_TOKEN) console.log("[replo-mcp] seeded MCP_DEV_TOKEN for local testing");
+  });
 });

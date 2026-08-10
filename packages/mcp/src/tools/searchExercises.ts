@@ -1,6 +1,6 @@
 import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import type { ReploClient } from "../upstream/reploClient.js";
+import { reploClientForRequest } from "../upstream/requestClient.js";
 import { jsonContent, toolError } from "./helpers.js";
 
 // We only surface a few fields — catalog entries are large and we don't want to
@@ -12,7 +12,7 @@ interface CatalogEntry {
   equipment?: string[];
 }
 
-export function registerSearchExercises(server: McpServer, client: ReploClient) {
+export function registerSearchExercises(server: McpServer) {
   server.registerTool(
     "search_exercises",
     {
@@ -29,8 +29,9 @@ export function registerSearchExercises(server: McpServer, client: ReploClient) 
           .describe("Free text, e.g. 'bench', 'squat', 'biceps'"),
       },
     },
-    async ({ query }) => {
+    async ({ query }, extra) => {
       try {
+        const client = reploClientForRequest(extra);
         const results = (await client.searchExercises(query)) as CatalogEntry[];
         const compact = results.slice(0, 25).map((e) => ({
           id: e.id,

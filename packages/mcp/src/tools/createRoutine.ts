@@ -5,7 +5,7 @@ import {
   routineSetFields,
 } from "@replo/shared";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import type { ReploClient } from "../upstream/reploClient.js";
+import { reploClientForRequest } from "../upstream/requestClient.js";
 import { jsonContent, toolError } from "./helpers.js";
 
 // Built from the shared CreateRoutineSchema field shapes (@replo/shared) so the
@@ -19,7 +19,7 @@ const setSchema = z.object({
   ),
 });
 
-export function registerCreateRoutine(server: McpServer, client: ReploClient) {
+export function registerCreateRoutine(server: McpServer) {
   server.registerTool(
     "create_routine",
     {
@@ -49,8 +49,9 @@ export function registerCreateRoutine(server: McpServer, client: ReploClient) {
           .describe("Exercises with their planned sets"),
       },
     },
-    async (input) => {
+    async (input, extra) => {
       try {
+        const client = reploClientForRequest(extra);
         const routine = await client.createRoutine(input);
         return jsonContent({ created: true, routine });
       } catch (err) {
