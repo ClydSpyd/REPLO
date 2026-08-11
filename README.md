@@ -3,9 +3,12 @@
 A workout tracker for logging resistance training: build reusable routines, run
 live sessions set by set, and review what you've done.
 
-The repo is a single npm workspace holding the Express API and the React client.
-In production one Express process serves both, so there is no cross-origin
-traffic and no API base URL to configure.
+The repo is an npm-workspaces monorepo holding the Express API, the React
+client, a shared types/validation package, and a remote **MCP server** that lets
+MCP-capable AI clients (Claude, etc.) reach your training data. In production one
+Express process serves the API and client together, so there is no cross-origin
+traffic and no API base URL to configure. The MCP server is a separate service —
+see [`packages/mcp/README.md`](packages/mcp/README.md).
 
 ---
 
@@ -50,6 +53,8 @@ single-origin behaviour, so CORS never applies in either mode.
 |---|---|
 | **API** | TypeScript, Express 4, Mongoose 7, Zod 4, JWT (`jsonwebtoken`), bcrypt |
 | **Client** | TypeScript, React 19, Vite 7, TanStack Query 5, Tailwind 4, React Router 7 |
+| **MCP** | TypeScript, `@modelcontextprotocol/sdk`, Express 5, OAuth 2.1 — remote MCP server (`packages/mcp`) |
+| **Shared** | TypeScript, Zod 4 — schemas + types shared across API, client, and MCP (`packages/shared`) |
 | **Tooling** | npm workspaces, `concurrently`, Node 20 |
 
 ### Layout
@@ -62,13 +67,16 @@ REPLO/
 │   ├── assets/data/     static exercise catalog (JSON)
 │   ├── scripts/         one-off migrations
 │   └── public/          API landing + docs page
-└── web/                 @replo/web — React client
-    └── src/
-        ├── views/       page-level components
-        ├── components/  shared UI
-        ├── queries/     TanStack Query read hooks
-        ├── mutations/   TanStack Query write hooks
-        └── api/         axios client + endpoint methods
+├── web/                 @replo/web — React client
+│   └── src/
+│       ├── views/       page-level components
+│       ├── components/  shared UI
+│       ├── queries/     TanStack Query read hooks
+│       ├── mutations/   TanStack Query write hooks
+│       └── api/         axios client + endpoint methods
+└── packages/
+    ├── shared/          @replo/shared — Zod schemas + types shared across api, web, and mcp
+    └── mcp/             @replo/mcp — remote, OAuth-secured MCP server (see packages/mcp/README.md)
 ```
 
 ---
@@ -107,7 +115,9 @@ npm run dev:web    # client only → :5173
 
 | Command | Does |
 |---|---|
-| `npm run dev` | Both apps, colour-prefixed output |
+| `npm run dev` | API + client, colour-prefixed output |
+| `npm run dev:full` | API + client + MCP server together |
+| `npm run dev:mcp` | MCP server only |
 | `npm run build` | Compiles the API, then builds the client into `api/dist/public` |
 | `npm run lint` | Lints the client |
 | `npm start -w @replo/api` | Runs the compiled server (production) |
@@ -230,5 +240,23 @@ the catalog.
 
 So corrections to the catalog propagate to all historical workouts, nothing can
 drift, and enrichment costs an O(1) lookup rather than a database join.
+
+---
+
+## MCP server
+
+REPLO ships a remote **Model Context Protocol** server (`packages/mcp`,
+`@replo/mcp`) — a separate Node service that lets MCP-capable AI clients (Claude
+Code / Desktop, etc.) query your training data **as you**, secured with OAuth 2.1.
+It doesn't touch the database directly; it calls the existing `/api/*` endpoints,
+and each user signs in with their REPLO credentials through the server's own
+OAuth login page.
+
+- **Connect:** `claude mcp add --transport http replo https://<mcp-host>/mcp`
+- **Tools:** search exercises, list / inspect past sessions, list routines,
+  analyze the week's training, and create / edit routines.
+
+Full capabilities, local + hosted setup, environment variables, and the OAuth
+flow are documented in [`packages/mcp/README.md`](packages/mcp/README.md).
 
 ---
