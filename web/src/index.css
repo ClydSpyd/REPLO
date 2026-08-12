@@ -151,6 +151,36 @@
   animation: toast-in 0.22s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+/*
+ * Coach launcher: a sweeping accent trail around a dark tile.
+ * `.coach-fab-trail` is an oversized conic-gradient that ramps from transparent
+ * to the theme accent (a comet trail) and spins; `.coach-fab` clips it to a
+ * rounded square, and the inner tile masks the center to leave a thin ring.
+ */
+@keyframes coach-sweep-spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+.coach-fab-trail {
+  position: absolute;
+  inset: -60%;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0turn,
+    transparent 0.6turn,
+    var(--accent-primary) 1turn
+  );
+  animation: coach-sweep-spin 3s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .coach-fab-trail {
+    animation: none;
+  }
+}
+
 /* replace browser default focus ring on inputs with a simple orange border. */
 input:focus,
 input:focus-visible,

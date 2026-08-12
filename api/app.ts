@@ -7,6 +7,7 @@ import favoriteRoutes from "./modules/favorite/favorite.routes";
 import userRoutes from "./modules/user/user.routes";
 import exerciseRoutes from "./modules/exercise/exercise.routes";
 import userMetricsRoutes from "./modules/userMetrics/userMetrics.routes";
+import assistantRoutes from "./modules/assistant/assistant.routes";
 import { errorHandler } from "./middleware/error.middleware";
 
 /**
@@ -41,6 +42,7 @@ export function createServer() {
   app.use("/api/user", userRoutes);
   app.use("/api/exercise", exerciseRoutes);
   app.use("/api/userMetrics", userMetricsRoutes);
+  app.use("/api/assistant", assistantRoutes);
 
   // API documentation route
   app.get("/api/docs", (req, res) => {
