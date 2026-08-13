@@ -5,8 +5,7 @@
  */
 import Anthropic from "@anthropic-ai/sdk";
 
-// Reads ANTHROPIC_API_KEY from the environment (loaded via `dotenv/config` in
-// server.ts). Server-only — this key is never sent to the client.
+// Reads ANTHROPIC_API_KEY from .env
 const client = new Anthropic();
 
 const SYSTEM_PROMPT = `You are Coach, a friendly fitness assistant built into the REPLO workout-tracking app.
@@ -30,7 +29,7 @@ export class AssistantService {
     onToken: (text: string) => void,
   ): Promise<void> {
     const stream = client.messages.stream({
-      model: "claude-opus-4-8",
+      model: "claude-sonnet-5",
       max_tokens: 64000, // streaming: give the model room; timeouts aren't a concern
       thinking: { type: "adaptive" },
       system: SYSTEM_PROMPT,
