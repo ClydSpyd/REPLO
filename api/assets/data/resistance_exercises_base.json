@@ -3223,5 +3223,55 @@
     "estimatedCaloriesMET": 6,
     "aliases": [],
     "tags": ["full-body"]
+  },
+  {
+    "id": "cable-abduction",
+    "name": "Cable Abduction",
+    "category": "cable",
+    "exerciseType": "isolation",
+    "equipment": ["cable-machine", "ankle-strap"],
+    "primaryMuscleGroups": ["abductors", "glute-medius"],
+    "secondaryMuscleGroups": ["glutes"],
+    "muscleGroups": ["abductors", "glute-medius", "glutes"],
+    "movementPattern": "hip-abduction",
+    "bodyRegion": "lower-body",
+    "mechanics": "pull",
+    "unilateral": false,
+    "bilateral": true,
+    "requiresSpotter": false,
+    "trackableMetrics": ["weight", "reps", "sets", "rpe", "tempo"],
+    "defaultRepRange": {
+      "strength": "1-6",
+      "hypertrophy": "6-12",
+      "endurance": "12-25"
+    },
+    "estimatedCaloriesMET": 6,
+    "aliases": ["cable hip abduction", "standing cable abduction", "cable glute abduction"],
+    "tags": ["legs"]
+  },
+  {
+    "id": "bayesian-curl",
+    "name": "Bayesian Curl",
+    "category": "cable",
+    "exerciseType": "isolation",
+    "equipment": ["cable-machine"],
+    "primaryMuscleGroups": ["biceps"],
+    "secondaryMuscleGroups": ["forearms"],
+    "muscleGroups": ["biceps", "forearms"],
+    "movementPattern": "elbow-flexion",
+    "bodyRegion": "upper-body",
+    "mechanics": "pull",
+    "unilateral": false,
+    "bilateral": true,
+    "requiresSpotter": false,
+    "trackableMetrics": ["weight", "reps", "sets", "rpe", "tempo"],
+    "defaultRepRange": {
+      "strength": "1-6",
+      "hypertrophy": "6-12",
+      "endurance": "12-25"
+    },
+    "estimatedCaloriesMET": 6,
+    "aliases": ["behind-the-back cable curl", "behind-body cable curl", "single-arm cable curl"],
+    "tags": ["upper-body"]
   }
 ]
