@@ -23,7 +23,9 @@ export const useExerciseDataset = () => {
       }
     },
     retry: 3,
-    staleTime: Infinity, // indefinite
+    // 24h: still available offline from the persisted cache, but revalidates
+    // when online so a changed exercise library eventually shows up.
+    staleTime: 1000 * 60 * 60 * 24,
     refetchOnWindowFocus: false,
     enabled: true,
   });
