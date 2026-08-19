@@ -9,20 +9,17 @@
  */
 import { Request, Response, NextFunction } from "express";
 import { AssistantService, ChatMessage } from "./assistant.service";
+import { AuthenticatedRequest } from "../../types/auth";
 
 const service = new AssistantService();
 
 export async function chat(req: Request, res: Response) {
   const { messages } = req.body as {
     messages?: ChatMessage[];
-    user?: { id: string };
   };
+  
+  const { user } = req as AuthenticatedRequest;
 
-  const { user } = req as unknown as {
-    user: Record<string, any>;
-  };
-
-  console.log({ user: user });
   // Basic validation before we commit to an SSE response — once headers are
   // flushed we can no longer send a normal JSON error.
   if (!Array.isArray(messages) || messages.length === 0) {
@@ -47,7 +44,7 @@ export async function chat(req: Request, res: Response) {
     await service.streamChat(
       messages,
       (text) => send("token", { text }),
-      user?.id ?? "unknown",
+      user.id,
     );
     send("done", {});
   } catch (err) {

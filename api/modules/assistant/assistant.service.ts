@@ -13,11 +13,6 @@ export interface ChatMessage {
   content: string;
 }
 
-// Read-only tools available to the coach. Module-level for now — none of these
-// need per-user context yet. When we add tools scoped to req.user.id we'll move
-// this behind a buildTools(userId) factory.
-// const tools = [searchExercisesTool];
-
 const buildTools = (userId: string) => {
   const analyzePeriodTool = createAnalyzeTrainingPeriodTool(userId);
   const listSessionsTool = createListSessionsTool(userId);

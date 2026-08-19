@@ -30,7 +30,7 @@ export const createListSessionsTool = (userId: string) =>
     }),
     run: async ({ from, to, limit }) => {
       const service = new WorkoutService();
-      const finalSessions = service.getUserWorkouts(userId).then((all) => {
+      const finalSessions = await service.getUserWorkouts(userId).then((all) => {
         const fromT = from ? Date.parse(from) : undefined;
         const toT = to ? Date.parse(to) : undefined;
 
