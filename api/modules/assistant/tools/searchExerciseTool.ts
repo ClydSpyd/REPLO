@@ -1,6 +1,6 @@
 import { betaZodTool } from "@anthropic-ai/sdk/helpers/beta/zod";
 import { z } from "zod";
-import { ExerciseService } from "../exercise/exercise.service";
+import { ExerciseService } from "../../exercise/exercise.service";
 
 const exerciseService = new ExerciseService();
 

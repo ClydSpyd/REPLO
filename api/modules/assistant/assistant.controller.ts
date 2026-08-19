@@ -12,13 +12,23 @@ import { AssistantService, ChatMessage } from "./assistant.service";
 
 const service = new AssistantService();
 
-export async function chat(req: Request, res: Response, next: NextFunction) {
-  const { messages } = req.body as { messages?: ChatMessage[] };
+export async function chat(req: Request, res: Response) {
+  const { messages } = req.body as {
+    messages?: ChatMessage[];
+    user?: { id: string };
+  };
 
+  const { user } = req as unknown as {
+    user: Record<string, any>;
+  };
+
+  console.log({ user: user });
   // Basic validation before we commit to an SSE response — once headers are
   // flushed we can no longer send a normal JSON error.
   if (!Array.isArray(messages) || messages.length === 0) {
-    return res.status(400).json({ error: "messages must be a non-empty array" });
+    return res
+      .status(400)
+      .json({ error: "messages must be a non-empty array" });
   }
 
   // SSE headers. `X-Accel-Buffering: no` + no compression on this route keeps
@@ -34,7 +44,11 @@ export async function chat(req: Request, res: Response, next: NextFunction) {
   };
 
   try {
-    await service.streamChat(messages, (text) => send("token", { text }));
+    await service.streamChat(
+      messages,
+      (text) => send("token", { text }),
+      user?.id ?? "unknown",
+    );
     send("done", {});
   } catch (err) {
     // Headers are already sent, so report the error inside the stream rather

@@ -1,5 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { searchExercisesTool } from "./tools";
+import { searchExercisesTool, createAnalyzeTrainingPeriodTool, createListSessionsTool } from "./tools";
 
 const client = new Anthropic();
 
@@ -16,7 +16,13 @@ export interface ChatMessage {
 // Read-only tools available to the coach. Module-level for now — none of these
 // need per-user context yet. When we add tools scoped to req.user.id we'll move
 // this behind a buildTools(userId) factory.
-const tools = [searchExercisesTool];
+// const tools = [searchExercisesTool];
+
+const buildTools = (userId: string) => {
+  const analyzePeriodTool = createAnalyzeTrainingPeriodTool(userId);
+  const listSessionsTool = createListSessionsTool(userId);
+  return [listSessionsTool, searchExercisesTool, analyzePeriodTool];
+}
 
 export class AssistantService {
   /**
@@ -27,7 +33,12 @@ export class AssistantService {
   async streamChat(
     messages: ChatMessage[],
     onToken: (text: string) => void,
+    userId: string
   ): Promise<void> {
+    console.log(`[assistant] streamChat: req userID ${userId}`);
+
+    const tools = buildTools(userId);
+
     const runner = client.beta.messages.toolRunner({
       model: "claude-sonnet-5",
       max_tokens: 64000, // streaming: give the model room; timeouts aren't a concern

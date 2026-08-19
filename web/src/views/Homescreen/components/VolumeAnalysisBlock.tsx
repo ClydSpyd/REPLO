@@ -171,6 +171,10 @@ function VolumeBars({ bars, mode }: { bars: Bar[]; mode: Mode }) {
     // Keyed by mode so switching views remounts the bars and replays the grow-in.
     <div key={mode} className="mt-3 flex h-48 items-end gap-3">
       {bars.map((bar, i) => {
+
+        console.log(
+          `bar ${i} volume: ${bar.volume}, max: ${max}, pct: ${(bar.volume / max) * 100}`,
+        );
         // Non-zero periods keep a visible stub even when tiny.
         const heightPct =
           bar.volume > 0 ? Math.max(4, (bar.volume / max) * 100) : 2;
@@ -201,7 +205,7 @@ function VolumeBars({ bars, mode }: { bars: Bar[]; mode: Mode }) {
               <p className="anton mt-1 text-sm text-[var(--text-strong)]">
                 {(bar.volume / 1000).toFixed(1)}t
                 <span className="space-mono ml-1.5 text-[10px] text-[var(--contrast-three)]!">
-                  {bar.volume.toLocaleString()} kg
+                  {bar.volume?.toLocaleString()} kg
                 </span>
               </p>
             </Popover>
