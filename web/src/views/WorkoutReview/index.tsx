@@ -343,7 +343,9 @@ export default function WorkoutReview() {
                     aria-label="Repeat workout"
                     className="space-mono flex h-12 w-12 shrink-0 items-center justify-center gap-2 rounded-lg border border-[var(--contrast-one)] text-xs font-bold uppercase tracking-wide text-[var(--text-strong)] transition-colors hover:border-[var(--accent-primary)] hover:text-[var(--accent-primary)] disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto sm:px-5"
                   >
-                    <FiRefreshCw className={isRepeating ? 'animate-spin' : ''} />
+                    <FiRefreshCw
+                      className={isRepeating ? 'animate-spin' : ''}
+                    />
                     <span className="hidden sm:inline">
                       {isRepeating ? 'Starting…' : 'Repeat workout'}
                     </span>

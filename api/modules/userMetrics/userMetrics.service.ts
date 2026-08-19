@@ -87,7 +87,11 @@ export class UserMetricsService {
           }
 
           if (set.weight > current.heaviestWeight.weight) {
-            current.heaviestWeight = { weight: set.weight, reps: set.reps, date };
+            current.heaviestWeight = {
+              weight: set.weight,
+              reps: set.reps,
+              date,
+            };
           }
           if (oneRm > current.estimatedOneRepMax.value) {
             current.estimatedOneRepMax = {
@@ -125,10 +129,13 @@ export class UserMetricsService {
     const start = now - windowMs;
     const prevStart = now - 2 * windowMs;
 
-    const series: VolumePoint[] = Array.from({ length: bucketCount }, (_, i) => ({
-      bucket: new Date(start + i * bucketDays * DAY_MS).toISOString(),
-      volume: 0,
-    }));
+    const series: VolumePoint[] = Array.from(
+      { length: bucketCount },
+      (_, i) => ({
+        bucket: new Date(start + i * bucketDays * DAY_MS).toISOString(),
+        volume: 0,
+      }),
+    );
 
     let total = 0;
     let prevTotal = 0;
@@ -257,7 +264,11 @@ export class UserMetricsService {
 
         for (const group of MUSCLE_COVERAGE_GROUPS) {
           if (group.match.some((muscle) => hit.has(muscle))) {
-            totals.set(group.label, (totals.get(group.label) ?? 0) + volume);
+            totals.set(
+              group.label,
+              (totals.get(group.label) ?? 0) +
+                (Number.isFinite(volume) ? volume : 0),
+            );
           }
         }
       }

@@ -8,6 +8,7 @@ export default function MuscleAnalysisBlock() {
     .filter((group) => group.volume > 0)
     .sort((a, b) => b.percent - a.percent);
 
+    console.log('MuscleAnalysisBlock data:', data);
   return (
     <section className="rounded-lg border border-[var(--contrast-one)] bg-[var(--dark-one)] px-8 py-6 text-[var(--text-strong)]">
       <div className="flex items-start justify-between">

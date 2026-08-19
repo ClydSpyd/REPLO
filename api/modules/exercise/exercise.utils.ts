@@ -22,6 +22,18 @@ export interface EnrichedExercise {
   exerciseDetails?: Exercise; // muscle groups, equipment, etc. — undefined if unresolved
 }
 
+/** 
+ * 
+ * if set stored without reps or weight, default to 0 for volume calculations
+*/
+const ensureSetVolume = (set: { reps?: number; weight?: number }) => {
+  return {
+    ...set,
+    reps: set.reps ?? 0,
+    weight: set.weight ?? 0,
+  };
+};
+
 /**
  * Enrich a stored workout/routine exercise entry with catalog metadata
  * (muscleGroups, primary/secondary muscle groups, equipment, ...) resolved
@@ -39,7 +51,7 @@ export function enrichExerciseEntry(ex: ExerciseInput): EnrichedExercise {
   return {
     exerciseId: exerciseId ?? details?.id ?? "",
     name: details?.name ?? "",
-    sets: ex.sets,
+    sets: ex.sets.map(ensureSetVolume),
     exerciseDetails: details,
   };
 }

@@ -1,5 +1,7 @@
 import { Outlet } from 'react-router-dom';
 import ViewHeader from '../ui/ViewHeader';
+import CoachDrawer from '../ui/CoachDrawer';
+import CoachFab from '../ui/CoachFab';
 import ErrorBoundaryModal from './ErrorBoundaryModal';
 import RestTimerProvider from '../../context/rest-timer';
 
@@ -21,6 +23,8 @@ const ProtectedLayout = () => {
             <Outlet />
           </ErrorBoundaryModal>
         </main>
+        <CoachFab />
+        <CoachDrawer />
       </div>
     </RestTimerProvider>
   );
