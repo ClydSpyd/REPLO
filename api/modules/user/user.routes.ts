@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { register, login, getUserData } from "./user.controller";
+import { register, login, refresh, getUserData } from "./user.controller";
 import { authMiddleware } from "../../middleware/auth.middleware";
 
 const router = Router();
@@ -17,6 +17,13 @@ router.post("/register", register);
  * Payload: { email, password }
  */
 router.post("/login", login);
+
+/**
+ * POST /api/user/refresh
+ * Exchange a valid refresh token for a new access token.
+ * Payload: { refreshToken }
+ */
+router.post("/refresh", refresh);
 
 /**
 * GET /api/user/me

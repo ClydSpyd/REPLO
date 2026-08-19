@@ -36,7 +36,9 @@ function sessionVolume(workout: any): number {
   let total = 0;
   for (const exercise of workout.exercises ?? []) {
     for (const set of exercise.sets ?? []) {
-      if (set.completed) total += set.reps * set.weight;
+      const weight = set.weight ?? 0;
+      const reps = set.reps ?? 0;
+      if (set.completed) total += weight * reps;
     }
   }
   return total;

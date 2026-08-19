@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { UserService } from "./user.service";
-import { createTokenPair } from "./user.utils";
+import { createTokenPair, createAccessToken, verifyRefreshToken } from "./user.utils";
 import { AuthenticatedRequest } from "../../types/auth";
 import { loginUserSchema, RegisterUserSchema } from "./user.schema";
 import { notifyOwner } from "../../lib/notify";
@@ -74,6 +74,32 @@ export async function login(req: Request, res: Response, next: NextFunction) {
     const tokenPair = createTokenPair(user, JWT_SECRET, REFRESH_SECRET);
 
     res.status(201).json(tokenPair);
+  } catch (err) {
+    next(err);
+  }
+}
+
+/**
+ * @function refresh
+ * @description Exchanges a valid refresh token for a new access token.
+ * Responds with 200 and { accessToken } on success, or 401 if the refresh token is missing/invalid/expired.
+ */
+export async function refresh(req: Request, res: Response, next: NextFunction) {
+  try {
+    const { refreshToken } = req.body ?? {};
+    if (!refreshToken || typeof refreshToken !== "string") {
+      return res.status(401).json({ error: "Missing refresh token" });
+    }
+
+    let payload;
+    try {
+      payload = verifyRefreshToken(refreshToken, REFRESH_SECRET);
+    } catch {
+      return res.status(401).json({ error: "Invalid or expired refresh token" });
+    }
+
+    const accessToken = createAccessToken(payload, JWT_SECRET);
+    res.status(200).json({ accessToken });
   } catch (err) {
     next(err);
   }
