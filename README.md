@@ -28,6 +28,12 @@ and movement patterns. Filter by muscle group or search by name; selecting a
 consolidated group like *Back* matches everything under it (`lats`,
 `upper-back`, `traps`, …).
 
+**AI coach** — an in-app assistant ("Coach", branded **REPLO AI**) in a global
+chat drawer on every page. It streams its reply token by token and can read your
+data through tools — searching the exercise catalog, listing past sessions, and
+analysing a training period — to ground advice in what you've actually done.
+Powered by Anthropic Claude; **read-only** for now (it advises, it doesn't write).
+
 
 ## Architecture
 
@@ -53,6 +59,7 @@ single-origin behaviour, so CORS never applies in either mode.
 |---|---|
 | **API** | TypeScript, Express 4, Mongoose 7, Zod 4, JWT (`jsonwebtoken`), bcrypt |
 | **Client** | TypeScript, React 19, Vite 7, TanStack Query 5, Tailwind 4, React Router 7 |
+| **AI** | `@anthropic-ai/sdk`, Anthropic Claude (`claude-sonnet-5`) — powers the in-app coach (`api/modules/assistant`) |
 | **MCP** | TypeScript, `@modelcontextprotocol/sdk`, Express 5, OAuth 2.1 — remote MCP server (`packages/mcp`) |
 | **Shared** | TypeScript, Zod 4 — schemas + types shared across API, client, and MCP (`packages/shared`) |
 | **Tooling** | npm workspaces, `concurrently`, Node 20 |
@@ -96,6 +103,8 @@ MONGO_URI=mongodb+srv://…
 JWT_SECRET=…
 REFRESH_SECRET=…
 PORT=6969          # optional, defaults to 6969
+
+ANTHROPIC_API_KEY=sk-ant-…   # required for the in-app AI coach (server-only)
 
 # Owner signup notifications (optional — omit both to disable)
 RESEND_API_KEY=re_…
@@ -241,6 +250,17 @@ the catalog.
 So corrections to the catalog propagate to all historical workouts, nothing can
 drift, and enrichment costs an O(1) lookup rather than a database join.
 
+### Assistant — AI coach
+
+`POST /api/assistant/chat` (auth required) streams a coach reply as
+**Server-Sent Events**. The body is `{ messages: { role, content }[] }` — the full
+conversation so far. Events: `token { text }` per delta, `done {}` at the end,
+`error { message }` on failure. Requires `ANTHROPIC_API_KEY`.
+
+Server-side it runs an Anthropic Claude tool-runner loop
+(`api/modules/assistant`) with read-only tools scoped to the caller —
+`search_exercises`, `list_sessions`, `analyze_training_period`.
+
 ---
 
 ## MCP server
@@ -258,5 +278,38 @@ OAuth login page.
 
 Full capabilities, local + hosted setup, environment variables, and the OAuth
 flow are documented in [`packages/mcp/README.md`](packages/mcp/README.md).
+
+---
+
+## AI assistant (Coach)
+
+REPLO also has an **in-app** AI assistant — the "Coach" (branded **REPLO AI**) —
+rendered directly in the client as a global chat drawer. It's a different surface
+from the MCP server, and the two are complementary:
+
+| | Coach (in-app) | MCP server |
+|---|---|---|
+| Audience | REPLO's own UI | External MCP clients (Claude Desktop/Code) |
+| Auth | The user's existing app session (JWT) | OAuth 2.1 sign-in per client |
+| How it reaches data | Claude **tool-runner in the API**, calling the domain services directly, scoped to `req.user.id` | Tools that call the public `/api/*` endpoints as the user |
+| Delivery | Token streaming over SSE | MCP transport |
+| Model | Anthropic Claude (`claude-sonnet-5`, adaptive thinking) | (client's own model) |
+
+Because the user is already authenticated in the app, the Coach needs no extra
+OAuth hop — it uses **direct tool use** in the backend rather than the MCP
+connector.
+
+**Backend** (`api/modules/assistant`) — a streaming SSE endpoint plus a Claude
+tool-runner loop with read-only, user-scoped tools. See
+[`api/README.md`](api/README.md#assistant-module-ai-coach).
+
+**Frontend** (`web/src/…/Coach*`) — a floating launcher and slide-in chat drawer
+with live token streaming and markdown rendering. See
+[`web/README.md`](web/README.md#ai-coach-replo-ai).
+
+Scope today is **read-only**: the Coach can search exercises, review your past
+sessions, and analyse a training period, but it does not create or modify
+workouts or routines. Requires `ANTHROPIC_API_KEY` (server-only; never sent to
+the client).
 
 ---

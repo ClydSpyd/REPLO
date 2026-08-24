@@ -9,6 +9,7 @@ This is a web application designed to help you track your workouts, create custo
 - **Progress Monitoring:** Visualize your progress with stats and history.
 - **User Authentication:** Secure login to keep your data private.
 - **Responsive UI:** Works seamlessly on desktop and mobile devices.
+- **AI Coach:** An in-app assistant ("REPLO AI") in a global chat drawer that streams answers about your training and renders them as markdown.
 
 ## Getting Started
 
@@ -56,6 +57,28 @@ The app will be available at [http://localhost:5173](http://localhost:5173) (def
 - React + TypeScript
 - Vite
 - Tailwind CSS
+- Zustand (client state, incl. the AI coach store)
+- react-markdown + remark-gfm (assistant message rendering)
+
+## AI Coach (REPLO AI)
+
+A global chat assistant available on every authenticated page via a floating launcher
+(bottom-right). It streams replies token by token and renders them as markdown.
+
+- **Launcher + drawer:** `components/ui/CoachFab.tsx` (a floating button with an animated
+  accent sweep) opens `components/ui/CoachDrawer.tsx`, a slide-in panel that mirrors the mobile
+  nav sheet (portal, backdrop, Escape to close, scroll-lock).
+- **State:** `stores/coach-store.tsx` (Zustand) holds the conversation and streaming status
+  globally, so the chat survives navigation between pages.
+- **Streaming client:** `api/assistant.ts` calls `POST /api/assistant/chat` with a raw `fetch`
+  (not the axios client — axios can't read a response stream), attaches the bearer token
+  manually, and parses the Server-Sent Events (`token` / `done` / `error`).
+- **Rendering:** `components/ui/CoachMarkdown.tsx` renders assistant messages with
+  `react-markdown` + `remark-gfm`, styling elements through a `components` map (links open in a
+  new tab; wide tables scroll within the drawer).
+
+The backend streaming endpoint and its tools are documented in
+[`../api/README.md`](../api/README.md#assistant-module-ai-coach).
 
 ## License
 

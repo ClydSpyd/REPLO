@@ -30,6 +30,9 @@ in `routine`, `user` and `exercise`, and helpers in `user` (JWT token pair) and 
 Routers are mounted in `app.ts` under `/api/workout`, `/api/routine`, `/api/user` and
 `/api/exercise`. `GET /api/docs` serves `public/docs.html`.
 
+The AI coach adds an `/api/assistant` router — see the [Assistant Module](#assistant-module-ai-coach)
+below. It's the one module that doesn't own a database collection.
+
 ## Exercise Reference Architecture
 
 The exercise catalog is a **static JSON dataset** (`assets/data/resistance_exercises_base.json`),
@@ -127,6 +130,29 @@ Serves the static exercise catalog. All routes are public and read-only.
   [Exercise Reference Architecture](#exercise-reference-architecture)).
 - **No database dependency:** All data is served from a static JSON file for fast, read-only
   access — `exercise.model.ts` and `exercise.repository.ts` are intentionally empty placeholders.
+
+### Assistant Module (AI Coach)
+Powers the in-app AI coach. Unlike the other modules it owns no data — no model, no
+repository. Instead it orchestrates Anthropic Claude and reuses the other modules' services
+as the model's tools. It departs from the standard layering on purpose: just `routes →
+controller → service`, plus a `tools/` folder.
+
+- **Streaming chat endpoint:** `POST /api/assistant/chat` (auth required) streams the
+  assistant's reply as Server-Sent Events. The controller does only SSE plumbing — it emits
+  `token { text }` per delta, `done {}` on completion, and `error { message }` on failure —
+  while the service owns all Claude interaction. The request body is the running conversation:
+  `{ messages: { role: "user" | "assistant", content: string }[] }`.
+- **Tool-runner loop:** `assistant.service.ts` runs Claude (`claude-sonnet-5`, adaptive
+  thinking) through the SDK's tool-runner, which drives the agentic loop — call the model, run
+  any tool it requests, feed the result back, repeat — until the reply is complete. Only text
+  deltas are forwarded to the client; thinking and tool-call plumbing stay server-side.
+- **Read-only tools (`tools/`):** one file per tool, re-exported from `tools/index.ts`.
+  `search_exercises` is global; `list_sessions` and `analyze_training_period` are built
+  per-request by `create*Tool(userId)` factories so every data-reading tool is **scoped to the
+  authenticated user** (`req.user.id`). Handlers call the existing `ExerciseService`,
+  `WorkoutService` and `UserMetricsService` directly.
+- **Config & scope:** requires `ANTHROPIC_API_KEY` (server-only). Read-only for now — the coach
+  advises and analyses but cannot create or modify workouts or routines.
 
 ## Middlewares
 
