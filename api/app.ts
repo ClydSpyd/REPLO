@@ -8,6 +8,7 @@ import userRoutes from "./modules/user/user.routes";
 import exerciseRoutes from "./modules/exercise/exercise.routes";
 import userMetricsRoutes from "./modules/userMetrics/userMetrics.routes";
 import assistantRoutes from "./modules/assistant/assistant.routes";
+import conversationRoutes from "./modules/conversation/conversation.routes";
 import { errorHandler } from "./middleware/error.middleware";
 
 /**
@@ -43,6 +44,7 @@ export function createServer() {
   app.use("/api/exercise", exerciseRoutes);
   app.use("/api/userMetrics", userMetricsRoutes);
   app.use("/api/assistant", assistantRoutes);
+  app.use("/api/conversation", conversationRoutes);
 
   // API documentation route
   app.get("/api/docs", (req, res) => {

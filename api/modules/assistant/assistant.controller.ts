@@ -9,9 +9,11 @@
  */
 import { Request, Response, NextFunction } from "express";
 import { AssistantService, ChatMessage } from "./assistant.service";
+import { ConversationService } from "../conversation/conversation.service";
 import { AuthenticatedRequest } from "../../types/auth";
 
 const service = new AssistantService();
+const conversations = new ConversationService();
 
 export async function chat(req: Request, res: Response) {
   const { messages } = req.body as {
@@ -41,11 +43,30 @@ export async function chat(req: Request, res: Response) {
   };
 
   try {
+    // Persist the user turn up front so it survives a mid-stream disconnect.
+    const lastUser = messages[messages.length - 1];
+    const conversationId = await conversations.appendUserMessage(
+      user.id,
+      lastUser.content,
+    );
+
+    console.log(`[assistant] streamChat: req userID ${user.id} conversationID ${conversationId}`);
+    console.log(`[assistant] streamChat: messages ${JSON.stringify(messages)}`);
+
+    // Accumulate the streamed reply so we can persist the full assistant turn.
+    let assistantText = "";
     await service.streamChat(
       messages,
-      (text) => send("token", { text }),
+      (text) => {
+        assistantText += text;
+        send("token", { text });
+      },
       user.id,
     );
+
+    console.log(`[assistant] streamChat: ÖÖÖÖ userID ${user.id} conversationID ${conversationId}`);
+
+    await conversations.appendAssistantMessage(conversationId, assistantText);
     send("done", {});
   } catch (err) {
     // Headers are already sent, so report the error inside the stream rather

@@ -13,6 +13,10 @@ export interface ChatMessage {
   content: string;
 }
 
+function toModelMessages(messages: ChatMessage[]): ChatMessage[] {
+  return messages.map(({ role, content }) => ({ role, content }));
+}
+
 const buildTools = (userId: string) => {
   const analyzePeriodTool = createAnalyzeTrainingPeriodTool(userId);
   const listSessionsTool = createListSessionsTool(userId);
@@ -39,6 +43,7 @@ export class AssistantService {
     console.log(`[assistant] streamChat: req userID ${userId}`);
 
     const tools = buildTools(userId);
+    const modelMessages = toModelMessages(messages);
 
     const runner = client.beta.messages.toolRunner({
       model: "claude-sonnet-5",
@@ -46,7 +51,7 @@ export class AssistantService {
       thinking: { type: "adaptive" },
       system: SYSTEM_PROMPT,
       tools,
-      messages,
+      messages: modelMessages,
       stream: true,
     });
 

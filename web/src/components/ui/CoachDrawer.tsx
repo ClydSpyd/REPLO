@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { FiArrowUp, FiX } from 'react-icons/fi';
 import { HiSparkles } from 'react-icons/hi2';
@@ -23,18 +23,51 @@ export default function CoachDrawer() {
   const isOpen = useCoachStore((s) => s.isOpen);
   const messages = useCoachStore((s) => s.messages);
   const isStreaming = useCoachStore((s) => s.isStreaming);
+  const isLoadingHistory = useCoachStore((s) => s.isLoadingHistory);
+  const hasMore = useCoachStore((s) => s.hasMore);
   const close = useCoachStore((s) => s.close);
   const sendMessage = useCoachStore((s) => s.sendMessage);
+  const hydrate = useCoachStore((s) => s.hydrate);
+  const loadMore = useCoachStore((s) => s.loadMore);
 
   const { error } = useToast();
   const [draft, setDraft] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
+  // When prepending older history, anchor the viewport instead of jumping to
+  // the bottom. Holds the scrollHeight captured just before the prepend.
+  const prependAnchorRef = useRef<number | null>(null);
 
-  // Keep the latest message in view as tokens stream in.
+  // Load the most recent history the first time the drawer opens.
   useEffect(() => {
+    if (isOpen) {
+      void hydrate();
+      scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight });
+    }
+  }, [isOpen, hydrate]);
+
+  // Keep the latest message in view as tokens stream in — but when an older
+  // page was just prepended, restore the prior scroll position so the view
+  // stays anchored on the same message.
+  useLayoutEffect(() => {
     const el = scrollRef.current;
-    if (el) el.scrollTop = el.scrollHeight;
+    if (!el) return;
+    if (prependAnchorRef.current !== null) {
+      el.scrollTop = el.scrollHeight - prependAnchorRef.current;
+      prependAnchorRef.current = null;
+    } else {
+      el.scrollTop = el.scrollHeight;
+    }
   }, [messages]);
+
+  // Fetch the next older page when the user scrolls to the top.
+  const handleScroll = () => {
+    const el = scrollRef.current;
+    if (!el || !hasMore || isLoadingHistory) return;
+    if (el.scrollTop < 80) {
+      prependAnchorRef.current = el.scrollHeight;
+      void loadMore();
+    }
+  };
 
   // Lock body scroll and close on Escape while mounted.
   useEffect(() => {
@@ -99,7 +132,16 @@ export default function CoachDrawer() {
         </div>
 
         {/* Messages */}
-        <div ref={scrollRef} className="flex flex-1 flex-col gap-4 overflow-y-auto px-5 py-5">
+        <div
+          ref={scrollRef}
+          onScroll={handleScroll}
+          className="flex flex-1 flex-col gap-4 overflow-y-auto px-5 py-5"
+        >
+          {isLoadingHistory && (
+            <div className="flex justify-center py-1">
+              <ReploLoader size={18} />
+            </div>
+          )}
           {/* Persistent intro — not part of the conversation sent to the API. */}
           <div className="max-w-[85%] self-start rounded-2xl border border-[var(--contrast-one)] bg-[var(--dark-one)] px-4 py-3 text-sm text-[var(--text-strong)]">
             Hey! I'm your REPLO coach. Ask me anything about training, technique,
@@ -132,7 +174,7 @@ export default function CoachDrawer() {
 
         {/* Suggestions + composer */}
         <div className="space-y-3 border-t border-[var(--contrast-one)] px-4 py-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
-          {messages.length === 0 && (
+          {/* {messages.length === 0 && (
             <div className="flex gap-2 overflow-x-auto">
               {SUGGESTIONS.map((suggestion) => (
                 <button
@@ -145,7 +187,7 @@ export default function CoachDrawer() {
                 </button>
               ))}
             </div>
-          )}
+          )} */}
 
           <div className="flex items-end gap-2">
             <textarea
