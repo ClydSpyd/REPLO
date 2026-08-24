@@ -1,5 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { searchExercisesTool, createAnalyzeTrainingPeriodTool, createListSessionsTool } from "./tools";
+import { searchExercisesTool, createAnalyzeTrainingPeriodTool, createListSessionsTool, createCreateRoutineTool } from "./tools";
 
 const client = new Anthropic();
 
@@ -16,7 +16,13 @@ export interface ChatMessage {
 const buildTools = (userId: string) => {
   const analyzePeriodTool = createAnalyzeTrainingPeriodTool(userId);
   const listSessionsTool = createListSessionsTool(userId);
-  return [listSessionsTool, searchExercisesTool, analyzePeriodTool];
+  const createRoutineTool = createCreateRoutineTool(userId);
+  return [
+    listSessionsTool,
+    searchExercisesTool,
+    analyzePeriodTool,
+    createRoutineTool,
+  ];
 }
 
 export class AssistantService {
