@@ -7,7 +7,7 @@
  *   done   {}         reply complete
  *   error  { message} something went wrong
  */
-import { Request, Response, NextFunction } from "express";
+import { Request, Response } from "express";
 import { AssistantService, ChatMessage } from "./assistant.service";
 import { ConversationService } from "../conversation/conversation.service";
 import { AuthenticatedRequest } from "../../types/auth";
@@ -50,9 +50,6 @@ export async function chat(req: Request, res: Response) {
       lastUser.content,
     );
 
-    console.log(`[assistant] streamChat: req userID ${user.id} conversationID ${conversationId}`);
-    console.log(`[assistant] streamChat: messages ${JSON.stringify(messages)}`);
-
     // Accumulate the streamed reply so we can persist the full assistant turn.
     let assistantText = "";
     await service.streamChat(
@@ -63,8 +60,6 @@ export async function chat(req: Request, res: Response) {
       },
       user.id,
     );
-
-    console.log(`[assistant] streamChat: ÖÖÖÖ userID ${user.id} conversationID ${conversationId}`);
 
     await conversations.appendAssistantMessage(conversationId, assistantText);
     send("done", {});

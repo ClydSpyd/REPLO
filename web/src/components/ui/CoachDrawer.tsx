@@ -8,11 +8,11 @@ import CoachMarkdown from './CoachMarkdown';
 import ReploLoader from './loaders/ReploLoader';
 
 /** Starter prompts */
-const SUGGESTIONS = [
-  'Why has my bench stalled?',
-  'What should I train next?',
-  'How should I warm up?',
-];
+// const SUGGESTIONS = [
+//   'Why has my bench stalled?',
+//   'What should I train next?',
+//   'How should I warm up?',
+// ];
 
 /**
  * Global coach chat drawer ("REPLO AI"). Slides in from the right on any page,
