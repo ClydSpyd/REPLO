@@ -212,6 +212,7 @@ export default function ExerciseCard({
               icon={<FiTrash2 />}
               label="Remove"
               onClick={() => setConfirmingRemove(true)}
+              hideOnMobile
             />
           </div>
           <div className="mt-2 flex flex-wrap gap-2">
@@ -313,16 +314,20 @@ function HeaderButton({
   icon,
   label,
   onClick,
+  hideOnMobile,
 }: {
   icon: React.ReactNode;
   label: string;
   onClick?: () => void;
+  hideOnMobile?: boolean;
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className="space-mono hidden lg:flex items-center gap-2 rounded-full border border-[var(--contrast-one)] px-3 py-1.5 text-xs font-bold uppercase tracking-wide text-[var(--accent-primary)] transition-colors hover:border-[var(--accent-primary)]"
+      className={`whitespace-nowrap space-mono items-center gap-2 rounded-full border border-[var(--contrast-one)] px-3 py-1.5 text-xs font-bold uppercase tracking-wide text-[var(--accent-primary)] transition-colors hover:border-[var(--accent-primary)] ${
+        hideOnMobile ? 'hidden lg:flex' : 'flex'
+      }`}
     >
       {icon}
       {label}
