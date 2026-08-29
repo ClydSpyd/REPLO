@@ -1,11 +1,12 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { searchExercisesTool, createAnalyzeTrainingPeriodTool, createListSessionsTool, createCreateRoutineTool } from "./tools";
+import { searchExercisesTool, createAnalyzeTrainingPeriodTool, createListSessionsTool, createProposeRoutineTool, RoutineProposal } from "./tools";
 
 const client = new Anthropic();
 
 const SYSTEM_PROMPT = `You are Coach, a friendly fitness assistant built into the REPLO workout-tracking app.
 Give practical, general fitness and training guidance. Keep answers concise.
-You are not a medical professional — do not give medical advice; suggest seeing a professional for injuries or health concerns.`;
+You are not a medical professional — do not give medical advice; suggest seeing a professional for injuries or health concerns.
+When the user wants to build, create, or save a routine, call propose_routine to present it as a confirmation card — never create a routine silently. Resolve exercise slugs via search_exercises first. After proposing, briefly tell the user to tap "Add routine" to save it.`;
 
 /** One turn in the conversation. Mirrors the Anthropic message shape. */
 export interface ChatMessage {
@@ -17,15 +18,18 @@ function toModelMessages(messages: ChatMessage[]): ChatMessage[] {
   return messages.map(({ role, content }) => ({ role, content }));
 }
 
-const buildTools = (userId: string) => {
+const buildTools = (
+  userId: string,
+  emitProposal: (proposal: RoutineProposal) => void | Promise<void>,
+) => {
   const analyzePeriodTool = createAnalyzeTrainingPeriodTool(userId);
   const listSessionsTool = createListSessionsTool(userId);
-  const createRoutineTool = createCreateRoutineTool(userId);
+  const proposeRoutineTool = createProposeRoutineTool(emitProposal);
   return [
     listSessionsTool,
     searchExercisesTool,
     analyzePeriodTool,
-    createRoutineTool,
+    proposeRoutineTool,
   ];
 }
 
@@ -38,11 +42,12 @@ export class AssistantService {
   async streamChat(
     messages: ChatMessage[],
     onToken: (text: string) => void,
+    emitProposal: (proposal: RoutineProposal) => void | Promise<void>,
     userId: string
   ): Promise<void> {
     console.log(`[assistant] streamChat: req userID ${userId}`);
 
-    const tools = buildTools(userId);
+    const tools = buildTools(userId, emitProposal);
     const modelMessages = toModelMessages(messages);
 
     const runner = client.beta.messages.toolRunner({

@@ -1,6 +1,37 @@
 import { create } from 'zustand';
-import { streamChat, type CoachMessage } from '../api/assistant';
+import {
+  streamChat,
+  type CoachMessage,
+  type ProposalEvent,
+  type ProposalStatus,
+} from '../api/assistant';
 import { conversationMethods } from '../api/conversation';
+
+/**
+ * Flatten the conversation into plain text turns for the LLM. Proposal turns
+ * carry no text (`content: ''`), so replace them with a short synthetic line —
+ * this keeps the model aware of what it proposed AND avoids sending
+ * empty-content messages, which the API rejects.
+ */
+function toHistory(messages: CoachMessage[]): CoachMessage[] {
+  return messages
+    .map((m) => {
+      if (m.proposal) {
+        const note =
+          m.status === 'accepted'
+            ? 'accepted'
+            : m.status === 'dismissed'
+              ? 'dismissed'
+              : 'awaiting the user';
+        return {
+          role: 'assistant' as const,
+          content: `(proposed routine "${m.proposal.name}" — ${note})`,
+        };
+      }
+      return { role: m.role, content: m.content };
+    })
+    .filter((m) => m.content.trim() !== '');
+}
 
 interface CoachStore {
   /** Whether the drawer is showing. Global so it survives navigation. */
@@ -25,6 +56,12 @@ interface CoachStore {
   hydrate: () => Promise<void>;
   /** Prepend the next older page of history. */
   loadMore: () => Promise<void>;
+  /** Update a proposal message's status in place (after accept/dismiss). */
+  setProposalStatus: (
+    proposalId: string,
+    status: ProposalStatus,
+    routineId?: string,
+  ) => void;
 
   /**
    * Send a user message and stream the reply.
@@ -72,40 +109,76 @@ export const useCoachStore = create<CoachStore>((set, get) => ({
     }
   },
 
+  setProposalStatus: (proposalId, status, routineId) =>
+    set((state) => ({
+      messages: state.messages.map((m) =>
+        m.proposalId === proposalId ? { ...m, status, routineId } : m,
+      ),
+    })),
+
   sendMessage: async (text, onError) => {
     const trimmed = text.trim();
     if (!trimmed || get().isStreaming) return;
 
     const userMessage: CoachMessage = { role: 'user', content: trimmed };
 
-    // The payload is the history plus this turn — but NOT the empty assistant
-    // placeholder we add to the UI below.
-    const history = [...get().messages, userMessage];
+    // The payload is the history plus this turn (flattened to text turns), but
+    // NOT the empty assistant placeholder we add to the UI below.
+    const history = toHistory([...get().messages, userMessage]);
 
     set((state) => ({
       messages: [...state.messages, userMessage, { role: 'assistant', content: '' }],
       isStreaming: true,
     }));
 
-    // Append each delta to the last (assistant) message.
+    // Append each delta to the trailing assistant text bubble. If the last
+    // message is a proposal card, start a fresh text bubble after it.
     const appendToLast = (delta: string) =>
       set((state) => {
         const messages = state.messages.slice();
         const last = messages[messages.length - 1];
-        messages[messages.length - 1] = { ...last, content: last.content + delta };
+        if (!last || last.role !== 'assistant' || last.proposal) {
+          messages.push({ role: 'assistant', content: delta });
+        } else {
+          messages[messages.length - 1] = { ...last, content: last.content + delta };
+        }
+        return { messages };
+      });
+
+    // Render a proposal as a card. Reuse the empty streaming placeholder when
+    // no text preceded it; otherwise append the card as its own message.
+    const addProposal = ({ proposalId, ...proposal }: ProposalEvent) =>
+      set((state) => {
+        const messages = state.messages.slice();
+        const card: CoachMessage = {
+          role: 'assistant',
+          content: '',
+          proposal,
+          proposalId,
+          status: 'pending',
+        };
+        const last = messages[messages.length - 1];
+        if (last?.role === 'assistant' && last.content === '' && !last.proposal) {
+          messages[messages.length - 1] = card;
+        } else {
+          messages.push(card);
+        }
         return { messages };
       });
 
     await streamChat(history, {
       onToken: appendToLast,
+      onProposal: addProposal,
       onDone: () => set({ isStreaming: false }),
       onError: (message) => {
         console.error('Coach stream failed', message);
         set((state) => {
-          // Drop the placeholder if nothing streamed before the failure.
+          // Drop the placeholder if nothing (text or card) streamed before the failure.
           const messages = state.messages.slice();
           const last = messages[messages.length - 1];
-          if (last?.role === 'assistant' && last.content === '') messages.pop();
+          if (last?.role === 'assistant' && last.content === '' && !last.proposal) {
+            messages.pop();
+          }
           return { messages, isStreaming: false };
         });
         onError(message);

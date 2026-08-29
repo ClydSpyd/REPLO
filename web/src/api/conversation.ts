@@ -16,4 +16,17 @@ export const conversationMethods = {
     });
     return data;
   },
+
+  /** Record a proposal's outcome (accepted/dismissed). */
+  updateProposalStatus: async (
+    proposalId: string,
+    status: 'accepted' | 'dismissed',
+    routineId?: string,
+  ) => {
+    const { data } = await baseClient.patch<{ updated: boolean }>(
+      `/conversation/proposals/${proposalId}`,
+      { status, routineId },
+    );
+    return data;
+  },
 };
