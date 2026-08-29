@@ -1,5 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { searchExercisesTool, createAnalyzeTrainingPeriodTool, createListSessionsTool, createProposeRoutineTool, RoutineProposal } from "./tools";
+import { searchExercisesTool, createAnalyzeTrainingPeriodTool, createListSessionsTool, createProposeRoutineTool, RoutineProposal, createReadRoutinesTool } from "./tools";
 
 const client = new Anthropic();
 
@@ -25,11 +25,13 @@ const buildTools = (
   const analyzePeriodTool = createAnalyzeTrainingPeriodTool(userId);
   const listSessionsTool = createListSessionsTool(userId);
   const proposeRoutineTool = createProposeRoutineTool(emitProposal);
+  const readRoutinesTool = createReadRoutinesTool(userId);
   return [
     listSessionsTool,
     searchExercisesTool,
     analyzePeriodTool,
     proposeRoutineTool,
+    readRoutinesTool,
   ];
 }
 
