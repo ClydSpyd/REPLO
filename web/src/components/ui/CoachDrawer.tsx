@@ -5,6 +5,7 @@ import { HiSparkles } from 'react-icons/hi2';
 import { useCoachStore } from '../../stores/coach-store';
 import { useToast } from '../../context/toast';
 import CoachMarkdown from './CoachMarkdown';
+import RoutineProposalCard from './RoutineProposalCard';
 import ReploLoader from './loaders/ReploLoader';
 
 /** Starter prompts */
@@ -151,6 +152,24 @@ export default function CoachDrawer() {
           {messages.map((message, index) => {
             const isUser = message.role === 'user';
             const isLast = index === messages.length - 1;
+
+            // Proposal messages render as a card, not a text bubble.
+            if (message.proposal) {
+              return (
+                <RoutineProposalCard
+                  key={index}
+                  proposal={message.proposal}
+                  proposalId={message.proposalId}
+                  status={message.status}
+                />
+              );
+            }
+
+            // Skip empty assistant messages that aren't the active loader.
+            if (!isUser && !message.content && !(isStreaming && isLast)) {
+              return null;
+            }
+
             return (
               <div
                 key={index}

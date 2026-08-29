@@ -10,14 +10,45 @@
  * split it into events on the blank-line delimiter, and dispatch each one.
  */
 
+/** One exercise on a proposed routine card. */
+export interface ProposedExercise {
+  exerciseId: string;
+  name: string;
+  primaryMuscleGroups: string[];
+  sets: { reps: number; weight: number }[];
+}
+
+/** A routine the coach proposes; rendered as a confirm card in the drawer. */
+export interface RoutineProposal {
+  name: string;
+  description?: string;
+  tags: string[];
+  exercises: ProposedExercise[];
+}
+
+export type ProposalStatus = 'pending' | 'accepted' | 'dismissed';
+
+/** The `proposal` SSE payload: the routine plus its persisted id. */
+export interface ProposalEvent extends RoutineProposal {
+  proposalId: string;
+}
+
 export interface CoachMessage {
   role: 'user' | 'assistant';
   content: string;
+  /** When set, this message renders as a proposal card instead of text. */
+  proposal?: RoutineProposal;
+  proposalId?: string;
+  status?: ProposalStatus;
+  /** Set when a proposal is accepted → the created routine. */
+  routineId?: string;
 }
 
 interface StreamHandlers {
   /** A text delta arrived. */
   onToken: (text: string) => void;
+  /** A routine proposal arrived — render a confirm card. */
+  onProposal: (proposal: ProposalEvent) => void;
   /** The reply finished normally. */
   onDone: () => void;
   /** Something failed (network, auth, or an error event from the server). */
@@ -93,6 +124,8 @@ function dispatch(raw: string, handlers: StreamHandlers): void {
   try {
     if (event === 'token') {
       handlers.onToken((JSON.parse(data) as { text: string }).text);
+    } else if (event === 'proposal') {
+      handlers.onProposal(JSON.parse(data) as ProposalEvent);
     } else if (event === 'done') {
       handlers.onDone();
     } else if (event === 'error') {

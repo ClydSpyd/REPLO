@@ -3,9 +3,10 @@
  * HTTP + SSE plumbing for coach chat
  *
  * SSE event protocol (server -> client):
- *   token  { text }   one text delta
- *   done   {}         reply complete
- *   error  { message} something went wrong
+ *   token    { text }      one text delta
+ *   proposal { routine }   a routine proposed for the user to confirm
+ *   done     {}            reply complete
+ *   error    { message}    something went wrong
  */
 import { Request, Response } from "express";
 import { AssistantService, ChatMessage } from "./assistant.service";
@@ -57,6 +58,15 @@ export async function chat(req: Request, res: Response) {
       (text) => {
         assistantText += text;
         send("token", { text });
+      },
+      async (proposal) => {
+        // Persist as pending up front, then hand the client its id so it can
+        // record accept/dismiss later.
+        const proposalId = await conversations.appendProposal(
+          conversationId,
+          proposal,
+        );
+        send("proposal", { proposalId, ...proposal });
       },
       user.id,
     );

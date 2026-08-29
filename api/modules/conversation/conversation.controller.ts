@@ -29,3 +29,37 @@ export async function getActive(
     next(err);
   }
 }
+
+/**
+ * PATCH /api/conversation/proposals/:proposalId
+ * Record a proposal's outcome. Body: { status: "accepted"|"dismissed", routineId? }
+ */
+export async function updateProposalStatus(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    const authReq = req as AuthenticatedRequest;
+    const proposalId = String(req.params.proposalId);
+    const { status, routineId } = req.body as {
+      status?: string;
+      routineId?: string;
+    };
+    if (status !== "accepted" && status !== "dismissed") {
+      return res
+        .status(400)
+        .json({ error: "status must be 'accepted' or 'dismissed'" });
+    }
+    const ok = await service.setProposalStatus(
+      authReq.user.id,
+      proposalId,
+      status,
+      routineId,
+    );
+    if (!ok) return res.status(404).json({ error: "proposal not found" });
+    res.json({ updated: true });
+  } catch (err) {
+    next(err);
+  }
+}

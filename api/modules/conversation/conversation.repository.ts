@@ -24,6 +24,28 @@ export class ConversationRepository {
   }
 
   /**
+   * Update a proposal turn's status in place, scoped by owner. Positional
+   * `$` targets the matched proposalId. Returns null if not found/not owned.
+   */
+  async setProposalStatus(
+    userId: string,
+    proposalId: string,
+    status: string,
+    routineId?: string,
+  ) {
+    return ConversationModel.findOneAndUpdate(
+      { userId, "messages.proposalId": proposalId },
+      {
+        $set: {
+          "messages.$.status": status,
+          ...(routineId ? { "messages.$.routineId": routineId } : {}),
+        },
+      },
+      { new: true },
+    );
+  }
+
+  /**
    * A page of `limit` messages ending `offset` messages back from the newest.
    * `start` is derived from the array size inside the pipeline so it's one round
    * trip. Messages come back oldest→newest within the page.

@@ -1,5 +1,6 @@
+import { randomUUID } from "crypto";
 import { ConversationRepository } from "./conversation.repository";
-import { MessagePage } from "./conversation.types";
+import { MessagePage, ProposalPayload, ProposalStatus } from "./conversation.types";
 
 export class ConversationService {
   private repository = new ConversationRepository();
@@ -23,6 +24,38 @@ export class ConversationService {
       role: "assistant",
       content,
     });
+  }
+
+  /** Persist a proposed routine as a pending proposal turn; returns its id. */
+  async appendProposal(
+    conversationId: string,
+    proposal: ProposalPayload,
+  ): Promise<string> {
+    const proposalId = randomUUID();
+    await this.repository.appendMessage(conversationId, {
+      role: "assistant",
+      content: "",
+      proposalId,
+      proposal,
+      status: "pending",
+    });
+    return proposalId;
+  }
+
+  /** Record a proposal's outcome (accepted/dismissed), scoped by owner. */
+  async setProposalStatus(
+    userId: string,
+    proposalId: string,
+    status: ProposalStatus,
+    routineId?: string,
+  ): Promise<boolean> {
+    const updated = await this.repository.setProposalStatus(
+      userId,
+      proposalId,
+      status,
+      routineId,
+    );
+    return updated !== null;
   }
 
   /**
