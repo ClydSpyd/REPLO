@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { FiArrowUp, FiX } from 'react-icons/fi';
+import { FiArrowUp, FiMaximize2, FiMinimize2, FiX } from 'react-icons/fi';
 import { HiSparkles } from 'react-icons/hi2';
 import { useCoachStore } from '../../stores/coach-store';
 import { useToast } from '../../context/toast';
@@ -33,6 +33,8 @@ export default function CoachDrawer() {
 
   const { error } = useToast();
   const [draft, setDraft] = useState('');
+  // Desktop only: expand the side panel to fill the screen width.
+  const [expanded, setExpanded] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   // When prepending older history, anchor the viewport instead of jumping to
   // the bottom. Holds the scrollHeight captured just before the prepend.
@@ -106,7 +108,9 @@ export default function CoachDrawer() {
         aria-modal="true"
         aria-label="REPLO AI"
         onClick={(e) => e.stopPropagation()}
-        className="animate-sheet-panel app-bg absolute inset-y-0 right-0 flex h-full w-full max-w-md flex-col border-l border-[var(--contrast-one)]"
+        className={`animate-sheet-panel app-bg absolute inset-y-0 right-0 flex h-full w-full flex-col border-l border-[var(--contrast-one)] transition-[max-width] duration-300 ease-in-out ${
+          expanded ? 'max-w-[100vw]' : 'max-w-md'
+        }`}
       >
         {/* Header */}
         <div className="flex items-center gap-3 border-b border-[var(--contrast-one)] px-5 py-4">
@@ -124,6 +128,18 @@ export default function CoachDrawer() {
           </div>
           <button
             type="button"
+            aria-label={expanded ? 'Collapse panel' : 'Expand panel'}
+            onClick={() => setExpanded((v) => !v)}
+            className="hidden h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[var(--contrast-one)] text-[var(--contrast-three)] transition-colors hover:border-[var(--accent-primary)] hover:text-[var(--text-strong)] md:flex"
+          >
+            {expanded ? (
+              <FiMinimize2 className="text-lg" />
+            ) : (
+              <FiMaximize2 className="text-lg" />
+            )}
+          </button>
+          <button
+            type="button"
             aria-label="Close"
             onClick={close}
             className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[var(--contrast-one)] text-[var(--contrast-three)] transition-colors hover:border-[var(--accent-primary)] hover:text-[var(--text-strong)]"
@@ -136,7 +152,9 @@ export default function CoachDrawer() {
         <div
           ref={scrollRef}
           onScroll={handleScroll}
-          className="flex flex-1 flex-col gap-4 overflow-y-auto px-5 py-5"
+          className={`flex flex-1 flex-col gap-4 overflow-y-auto px-5 py-5 ${
+            expanded ? 'mx-auto w-full max-w-3xl' : ''
+          }`}
         >
           {isLoadingHistory && (
             <div className="flex justify-center py-1">
@@ -192,7 +210,11 @@ export default function CoachDrawer() {
         </div>
 
         {/* Suggestions + composer */}
-        <div className="space-y-3 border-t border-[var(--contrast-one)] px-4 py-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+        <div
+          className={`w-full space-y-3 border-t border-[var(--contrast-one)] px-4 py-4 pb-[max(1rem,env(safe-area-inset-bottom))] ${
+            expanded ? 'mx-auto max-w-3xl' : ''
+          }`}
+        >
           {/* {messages.length === 0 && (
             <div className="flex gap-2 overflow-x-auto">
               {SUGGESTIONS.map((suggestion) => (

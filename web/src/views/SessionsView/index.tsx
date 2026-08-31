@@ -271,17 +271,19 @@ function SessionRow({
           {session.name}
         </h3>
 
+        <div className="w-[110px] flex justify-center">
+          {tag && (
+            <span className="hidden shrink-0 rounded-full border border-[var(--accent-primary)] px-3 py-1 text-[10px] font-bold uppercase tracking-wide text-[var(--accent-primary)] sm:inline-block space-mono">
+              {tag}
+            </span>
+          )}
+        </div>
+
         <div className="hidden shrink-0 items-center gap-5 md:flex">
           <Stat value={minutes} label="min" />
           <Stat value={`${volumeTonnes}t`} label="vol" />
           <Stat value={sets} label="sets" />
         </div>
-
-        {tag && (
-          <span className="hidden shrink-0 rounded-full border border-[var(--accent-primary)] px-3 py-1 text-[10px] font-bold uppercase tracking-wide text-[var(--accent-primary)] sm:inline-block space-mono">
-            {tag}
-          </span>
-        )}
 
         <FiChevronRight className="shrink-0 text-[var(--contrast-two)]" />
       </button>

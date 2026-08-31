@@ -36,7 +36,7 @@ export default function Homescreen() {
           <TodayBlock />
         </Suspense>
 
-        <div className="mt-6 flex flex-col-reverse lg:grid gap-4 lg:grid-cols-3">
+        <div className="mt-6 flex flex-col lg:grid gap-4 lg:grid-cols-3">
           <div className="lg:col-span-2">
             <VolumeAnalysisBlock />
           </div>
