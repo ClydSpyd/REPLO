@@ -271,9 +271,9 @@ function SessionRow({
           {session.name}
         </h3>
 
-        <div className="w-[110px] flex justify-center">
+        <div className="w-[110px] justify-center sm:flex hidden space-mono">
           {tag && (
-            <span className="hidden shrink-0 rounded-full border border-[var(--accent-primary)] px-3 py-1 text-[10px] font-bold uppercase tracking-wide text-[var(--accent-primary)] sm:inline-block space-mono">
+            <span className="shrink-0 rounded-full border border-[var(--accent-primary)] px-3 py-1 text-[10px] font-bold uppercase tracking-wide text-[var(--accent-primary)] ">
               {tag}
             </span>
           )}

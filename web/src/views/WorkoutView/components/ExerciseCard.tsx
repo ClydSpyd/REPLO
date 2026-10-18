@@ -146,8 +146,12 @@ export default function ExerciseCard({
             <span className="space-mono text-xs uppercase tracking-wide text-[var(--contrast-three)] hidden lg:inline-block">
               {loggedCount}/{sets.length} Logged
             </span>
-            <span className="space-mono rounded-full border border-[var(--accent-primary)] bg-[var(--hint-primary-dark)] px-4 py-1 text-[10px] lg:text-xs font-bold uppercase tracking-wide text-[var(--accent-primary)]">
+            {/* <span className="space-mono rounded-full border border-[var(--accent-primary)] bg-[var(--hint-primary-dark)] px-4 py-1 text-[10px] lg:text-xs font-bold uppercase tracking-wide text-[var(--accent-primary)]">
               Open
+            </span> */}
+
+            <span className="anton text-4xl text-[var(--contrast-two)]">
+              {number}
             </span>
           </div>
         </div>
@@ -202,7 +206,7 @@ export default function ExerciseCard({
             </span>
           </div>
           <div className="mt-1 flex flex-wrap items-center gap-3">
-            <h3 className="heading-three text-[var(--text-strong)]">{exercise.name}</h3>
+            <h3 className="w-full sm:w-fit heading-three text-[var(--text-strong)]">{exercise.name}</h3>
             <HeaderButton
               icon={<FiRepeat />}
               label="Switch"
@@ -212,7 +216,7 @@ export default function ExerciseCard({
               icon={<FiTrash2 />}
               label="Remove"
               onClick={() => setConfirmingRemove(true)}
-              hideOnMobile
+              // hideOnMobile
             />
           </div>
           <div className="mt-2 flex flex-wrap gap-2">

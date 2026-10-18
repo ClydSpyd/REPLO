@@ -11,8 +11,10 @@
  */
 import { ExerciseInput } from "../exercise/exercise.types";
 import { RoutineModel } from "../routine/routine.model";
+import { UserMetricsService } from "../userMetrics/userMetrics.service";
 import { WorkoutModel } from "./workout.model";
 import { CreateWorkoutPayload } from "./workout.types";
+import { PersonalBest } from "@replo/shared";
 
 export class WorkoutRepository {
   /**
@@ -28,11 +30,25 @@ export class WorkoutRepository {
         throw new Error("Base routine not found");
       }
 
-      // map exercise.set.comlpeted value to false for all sets in the base routine
-      data.exercises = baseRoutine.exercises.map((ex) => ({
-        ...ex,
-        sets: ex.sets.map((set) => ({ ...set, completed: false })),
-      })) as ExerciseInput[];
+      const metrics = new UserMetricsService();
+      const personalBests: PersonalBest[] = await metrics.getPersonalBests(
+        data.userId,
+      );
+
+      // map exercise.set.comlpeted value to false and use any existing PB values for sets
+      data.exercises = baseRoutine.exercises.map((ex) => {
+        const pbForEx = personalBests.find(
+          (pb) => pb.exerciseId === ex.exerciseId,
+        );
+        return {
+          ...ex,
+          sets: ex.sets.map((set) => ({
+            completed: false,
+            reps: pbForEx ? pbForEx.heaviestWeight.reps : set.reps,
+            weight: pbForEx ? pbForEx.heaviestWeight.weight : set.weight,
+          })),
+        };
+      }) as ExerciseInput[];
 
       // Starting a workout from a routine counts as performing it.
       baseRoutine.set("lastPerformed", new Date());

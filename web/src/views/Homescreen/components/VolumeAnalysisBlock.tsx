@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { format } from 'date-fns';
+import { addDays, eachDayOfInterval, format, startOfWeek, subWeeks } from 'date-fns';
 import type { VolumeTrend } from '@replo/shared';
 import { useUserVolumeTrend } from '../../../queries/userMetrics';
 
@@ -78,16 +78,26 @@ function headlineFor(
 }
 
 /** Build the bar list for the active mode from the trend payload. */
-function buildBars(data: VolumeTrend, mode: Mode): Bar[] {
+function buildBars(data: VolumeTrend, mode: Mode, weekIdx: number): Bar[] {
   if (mode === 'daily') {
-    const last7 = data.days.slice(-7);
-    return last7.map((day, i) => ({
-      key: day.date,
-      label: format(new Date(day.date), 'EEE'),
-      volume: day.volume,
-      topLabel: format(new Date(day.date), 'EEE MMM d'),
-      isCurrent: i === last7.length - 1,
-    }));
+    
+    const start = startOfWeek(subWeeks(new Date(), weekIdx), {
+      weekStartsOn: 1,
+    });
+    const startIdx = data.days.findIndex(
+      (day) => day.date.slice(0, 10) === format(start, 'yyyy-MM-dd'),
+    );
+    const last7 = data.days.slice(startIdx, startIdx + 7);
+
+    return eachDayOfInterval({ start, end: addDays(start, 6) }).map(
+      (day, i) => ({
+        key: last7[i]?.date ?? day.toISOString(),
+        label: format(day, 'EEE'),
+        volume: last7[i]?.volume ?? 0,
+        topLabel: format(day, 'EEE MMM d'),
+        isCurrent: i === last7.length - 1,
+      }),
+    );
   }
 
   return data.weeks.map((week, i) => ({
@@ -106,6 +116,7 @@ function buildBars(data: VolumeTrend, mode: Mode): Bar[] {
 export default function VolumeAnalysisBlock() {
   const { data, isLoading, error } = useUserVolumeTrend();
   const [mode, setMode] = useState<Mode>('weekly');
+  const [weekIdx, setWeekIdx] = useState(0);
 
   // Computed before the early returns so the count-up hook runs every render.
   const headline = data ? headlineFor(data, mode) : null;
@@ -121,7 +132,7 @@ export default function VolumeAnalysisBlock() {
 
   const { days } = data;
   const totalTonnes = animatedTonnes.toFixed(1);
-  const bars = buildBars(data, mode);
+  const bars = buildBars(data, mode, weekIdx);
 
   return (
     <div className="flex h-full flex-col gap-4">
@@ -147,9 +158,29 @@ export default function VolumeAnalysisBlock() {
 
         <div className="mt-6 w-full border-b border-[var(--contrast-one)]" />
 
-        <p className="mt-6 space-mono text-xs text-[var(--contrast-three)]">
-          {mode === 'weekly' ? 'WEEKLY VOLUME' : 'DAILY VOLUME'}
-        </p>
+        <div className="flex w-full justify-between">
+          <p className="mt-6 space-mono text-xs text-[var(--contrast-three)]">
+            {mode === 'weekly' ? 'WEEKLY VOLUME' : 'DAILY VOLUME'}
+          </p>
+          {mode === 'daily' && (
+            <div className="flex gap-4">
+              <button
+                disabled={weekIdx === 3}
+                className="space-mono text-xs text-[var(--contrast-three)]"
+                onClick={() => setWeekIdx((prev) => prev + 1)}
+              >
+                Previous
+              </button>
+              <button
+                disabled={weekIdx === 0}
+                className="space-mono text-xs text-[var(--contrast-three)]"
+                onClick={() => setWeekIdx((prev) => Math.max(prev - 1, 0))}
+              >
+                Next
+              </button>
+            </div>
+          )}
+        </div>
         <VolumeBars bars={bars} mode={mode} />
       </section>
 
@@ -171,10 +202,6 @@ function VolumeBars({ bars, mode }: { bars: Bar[]; mode: Mode }) {
     // Keyed by mode so switching views remounts the bars and replays the grow-in.
     <div key={mode} className="mt-3 flex h-48 items-end gap-3">
       {bars.map((bar, i) => {
-
-        console.log(
-          `bar ${i} volume: ${bar.volume}, max: ${max}, pct: ${(bar.volume / max) * 100}`,
-        );
         // Non-zero periods keep a visible stub even when tiny.
         const heightPct =
           bar.volume > 0 ? Math.max(4, (bar.volume / max) * 100) : 2;
