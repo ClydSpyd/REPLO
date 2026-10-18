@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaStop } from 'react-icons/fa';
 import Modal from '../../../components/ui/Modal';
@@ -22,7 +22,14 @@ export default function EndWorkoutModal({
   onClose: () => void;
 }) {
   const navigate = useNavigate();
-  const [saveAsRoutine, setSaveAsRoutine] = useState(true);
+  const [saveAsRoutine, setSaveAsRoutine] = useState(false);
+  const [routineName, setRoutineName] = useState(() => {
+    const date = new Date();
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    return session.name + `_${day}-${month}`;
+  });
+  const nameInputRef = useRef<HTMLInputElement>(null);
   // Guards against creating a duplicate routine if the save succeeds but
   // ending the workout fails and the user retries.
   const routineSaved = useRef(false);
@@ -59,6 +66,12 @@ export default function EndWorkoutModal({
       },
     });
   };
+
+  useEffect(() => {
+    if (saveAsRoutine && nameInputRef.current) {
+      nameInputRef.current.focus();
+    }
+  }, [saveAsRoutine]);
 
   return (
     <Modal
@@ -102,6 +115,21 @@ export default function EndWorkoutModal({
               Keep these exercises and sets as a reusable template you can start
               from next time.
             </span>
+            <div
+              className={`flex flex-col gap-1 transition-all duration-300 ease-in-out overflow-hidden ${saveAsRoutine ? 'max-h-16 mt-2' : 'max-h-0 mt-0'}`}
+            >
+              <span className="block text-xs text-[var(--contrast-three)]">
+                Routine name:
+              </span>
+              <input
+                ref={nameInputRef}
+                type="text"
+                value={routineName}
+                onChange={(e) => setRoutineName(e.target.value)}
+                placeholder={'Routine Name'}
+                className={`w-full rounded-lg border border-[var(--contrast-one)] bg-transparent py-2 px-2 text-[var(--text-strong)] placeholder:text-[var(--contrast-two)]`}
+              />
+            </div>
           </span>
         </label>
 
