@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { addDays, eachDayOfInterval, format, startOfWeek, subWeeks } from 'date-fns';
 import type { VolumeTrend } from '@replo/shared';
 import { useUserVolumeTrend } from '../../../queries/userMetrics';
-
+import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 /** Animate a number from its previous value to `value` (easeOutCubic). */
 function useCountUp(value: number, duration = 500): number {
   const [display, setDisplay] = useState(value);
@@ -115,7 +115,7 @@ function buildBars(data: VolumeTrend, mode: Mode, weekIdx: number): Bar[] {
 /** Weekly volume bars (last 8 weeks) + a daily activity strip (last 4 weeks). */
 export default function VolumeAnalysisBlock() {
   const { data, isLoading, error } = useUserVolumeTrend();
-  const [mode, setMode] = useState<Mode>('weekly');
+  const [mode, setMode] = useState<Mode>('daily');
   const [weekIdx, setWeekIdx] = useState(0);
 
   // Computed before the early returns so the count-up hook runs every render.
@@ -158,25 +158,33 @@ export default function VolumeAnalysisBlock() {
 
         <div className="mt-6 w-full border-b border-[var(--contrast-one)]" />
 
-        <div className="flex w-full justify-between">
-          <p className="mt-6 space-mono text-xs text-[var(--contrast-three)]">
+        <div className="flex w-full justify-between items-center mt-3 ">
+          <p className="space-mono text-xs text-[var(--contrast-three)]">
             {mode === 'weekly' ? 'WEEKLY VOLUME' : 'DAILY VOLUME'}
           </p>
           {mode === 'daily' && (
             <div className="flex gap-4">
               <button
                 disabled={weekIdx === 3}
-                className="space-mono text-xs text-[var(--contrast-three)]"
+                style={{
+                  cursor: weekIdx === 3 ? 'not-allowed' : 'pointer',
+                  opacity: weekIdx === 3 ? 0.5 : 1,
+                }}
+                className="space-mono text-xs text-[var(--contrast-three)] border border-[var(--contrast-two)] p-2 rounded-sm"
                 onClick={() => setWeekIdx((prev) => prev + 1)}
               >
-                Previous
+                <FaChevronLeft />
               </button>
               <button
                 disabled={weekIdx === 0}
-                className="space-mono text-xs text-[var(--contrast-three)]"
+                style={{
+                  cursor: weekIdx === 0 ? 'not-allowed' : 'pointer',
+                  opacity: weekIdx === 0 ? 0.5 : 1,
+                }}
+                className="space-mono text-xs text-[var(--contrast-three)] border border-[var(--contrast-two)] p-2 rounded-sm"
                 onClick={() => setWeekIdx((prev) => Math.max(prev - 1, 0))}
               >
-                Next
+                <FaChevronRight />
               </button>
             </div>
           )}

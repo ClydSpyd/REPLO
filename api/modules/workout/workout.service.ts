@@ -6,11 +6,17 @@ import {
   SetPayload,
   WorkoutSession,
 } from "./workout.types";
-import { exerciseExists, withEnrichedExercises } from "../exercise/exercise.utils";
+import {
+  exerciseExists,
+  withEnrichedExercises,
+} from "../exercise/exercise.utils";
 import { ExerciseInput } from "../exercise/exercise.types";
+import { UserMetricsService } from "../userMetrics/userMetrics.service";
+import { PersonalBest } from "@replo/shared";
 
 export class WorkoutService {
   private repository = new WorkoutRepository();
+  private userMetrics = new UserMetricsService();
 
   private assertValidWorkoutId(workoutId: string) {
     if (!Types.ObjectId.isValid(workoutId)) {
@@ -150,6 +156,22 @@ export class WorkoutService {
           "Exercise already exists in workout, cannot add duplicate",
         );
       }
+
+      const personalBests: PersonalBest[] =
+        await this.userMetrics.getPersonalBests(userId);
+      const pbForEx = personalBests.find(
+        (pb) => pb.exerciseId === exercisePayload.exerciseId,
+      );
+
+      // create 3 set obkects using the personal best for this exercise if available
+      for (let i = 0; i < 3; i++) {
+        exercisePayload.sets.push({
+          weight: pbForEx?.heaviestWeight.weight ?? 0,
+          reps: pbForEx?.heaviestWeight.reps ?? 10,
+          completed: false,
+        });
+      }
+      
       workout.exercises.push(exercisePayload);
     }
 
@@ -170,7 +192,9 @@ export class WorkoutService {
     userId: string,
   ) {
     const { fromExerciseId, toExerciseId } = payload;
-    console.log(`Replacing exercise ${fromExerciseId} with ${toExerciseId} in workout ${workoutId}`);
+    console.log(
+      `Replacing exercise ${fromExerciseId} with ${toExerciseId} in workout ${workoutId}`,
+    );
 
     if (!fromExerciseId || !toExerciseId) {
       const error = new Error(

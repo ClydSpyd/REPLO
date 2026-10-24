@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 -c ' *)",
+      "Bash(cp /private/tmp/claude-501/-Users-davecdavelydesdale-Documents-REPLO/97499f8c-3eac-4178-9ba8-121444025015/scratchpad/orig.json /private/tmp/claude-501/-Users-davecdavelydesdale-Documents-REPLO/97499f8c-3eac-4178-9ba8-121444025015/scratchpad/test.json)",
+      "Bash(python3 /private/tmp/claude-501/-Users-davecdavelydesdale-Documents-REPLO/97499f8c-3eac-4178-9ba8-121444025015/scratchpad/revise.py /private/tmp/claude-501/-Users-davecdavelydesdale-Documents-REPLO/97499f8c-3eac-4178-9ba8-121444025015/scratchpad/test.json)",
+      "Bash(python3 /private/tmp/claude-501/-Users-davecdavelydesdale-Documents-REPLO/97499f8c-3eac-4178-9ba8-121444025015/scratchpad/revise.py assets/data/resistance_exercises_base.json)",
+      "Bash(npx tsc *)",
+      "Bash(git checkout *)"
+    ]
+  }
+}

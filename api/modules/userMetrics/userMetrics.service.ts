@@ -171,17 +171,21 @@ export class UserMetricsService {
   }
 
   /**
-   * Volume trend for the dashboard: the last 8 rolling weeks (bars) and the last
-   * 28 days (activity strip). Weeks are 7-day buckets aligned to UTC calendar
-   * days, with the current (partial) week last. `deltaPct` compares the most
+   * Volume trend for the dashboard: the last 8 calendar weeks (bars) and the last
+   * 28 days (activity strip). Weeks run Monday–Sunday (UTC), with the current
+   * (partial) week last. `deltaPct` compares the most
    * recent 4 weeks against the preceding 4.
    */
   async getVolumeTrend(userId: string): Promise<VolumeTrend> {
     const workouts = (await this.workouts.findByUser(userId)) as any[];
 
     const todayStart = startOfUtcDay(Date.now());
-    // 56-day window: day 0 is the oldest, day 55 is today.
-    const windowStart = todayStart - (TREND_DAYS - 1) * DAY_MS;
+    // Monday (UTC) of the current week; the window is the 8 calendar weeks
+    // ending with this one, so the last week may extend past today.
+    const mondayOffset = (new Date(todayStart).getUTCDay() + 6) % 7;
+    const currentMonday = todayStart - mondayOffset * DAY_MS;
+    const windowStart = currentMonday - (WEEKS - 1) * 7 * DAY_MS;
+    const todayIndex = Math.round((todayStart - windowStart) / DAY_MS);
 
     const weekVolumes = new Array<number>(WEEKS).fill(0);
     const dayVolumes = new Array<number>(TREND_DAYS).fill(0);
@@ -208,9 +212,9 @@ export class UserMetricsService {
       };
     });
 
-    // Activity strip: the most recent 28 days of the window.
-    const stripStart = TREND_DAYS - DAYS_IN_STRIP;
-    const days = dayVolumes.slice(stripStart).map((volume, i) => ({
+    // Activity strip: the 28 days ending today.
+    const stripStart = todayIndex - DAYS_IN_STRIP + 1;
+    const days = dayVolumes.slice(stripStart, todayIndex + 1).map((volume, i) => ({
       date: new Date(windowStart + (stripStart + i) * DAY_MS).toISOString(),
       volume: round1(volume),
     }));
