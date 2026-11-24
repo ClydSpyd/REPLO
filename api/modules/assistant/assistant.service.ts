@@ -1,21 +1,13 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { searchExercisesTool, createAnalyzeTrainingPeriodTool, createListSessionsTool, createProposeRoutineTool, RoutineProposal, createReadRoutinesTool } from "./tools";
+import { ModelContext } from "./context/context.types";
 
 const client = new Anthropic();
-
-const SYSTEM_PROMPT = `You are Coach, a friendly fitness assistant built into the REPLO workout-tracking app.
-Give practical, general fitness and training guidance. Keep answers concise.
-You are not a medical professional — do not give medical advice; suggest seeing a professional for injuries or health concerns.
-When the user wants to build, create, or save a routine, call propose_routine to present it as a confirmation card — never create a routine silently. Resolve exercise slugs via search_exercises first. After proposing, briefly tell the user to tap "Add routine" to save it.`;
 
 /** One turn in the conversation. Mirrors the Anthropic message shape. */
 export interface ChatMessage {
   role: "user" | "assistant";
   content: string;
-}
-
-function toModelMessages(messages: ChatMessage[]): ChatMessage[] {
-  return messages.map(({ role, content }) => ({ role, content }));
 }
 
 const buildTools = (
@@ -35,6 +27,11 @@ const buildTools = (
   ];
 }
 
+function toModelMessages(messages: ChatMessage[]): ChatMessage[] {
+  // Mongo entries also carry createdAt, which is rejected by the toolRunner
+  return messages.map(({ role, content }) => ({ role, content }));
+}
+
 export class AssistantService {
   /**
    * Stream a reply for the given conversation. The tool-runner drives the whole
@@ -42,7 +39,7 @@ export class AssistantService {
    * text delta. Resolves when the reply is complete (rejects on API error).
    */
   async streamChat(
-    messages: ChatMessage[],
+    modelContext: ModelContext,
     onToken: (text: string) => void,
     emitProposal: (proposal: RoutineProposal) => void | Promise<void>,
     userId: string
@@ -50,15 +47,14 @@ export class AssistantService {
     console.log(`[assistant] streamChat: req userID ${userId}`);
 
     const tools = buildTools(userId, emitProposal);
-    const modelMessages = toModelMessages(messages);
 
     const runner = client.beta.messages.toolRunner({
       model: "claude-sonnet-5",
-      max_tokens: 64000, // streaming: give the model room; timeouts aren't a concern
+      max_tokens: 64000,
       thinking: { type: "adaptive" },
-      system: SYSTEM_PROMPT,
+      system: modelContext.system,
       tools,
-      messages: modelMessages,
+      messages: toModelMessages(modelContext.messages),
       stream: true,
     });
 

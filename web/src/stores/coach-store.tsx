@@ -122,10 +122,6 @@ export const useCoachStore = create<CoachStore>((set, get) => ({
 
     const userMessage: CoachMessage = { role: 'user', content: trimmed };
 
-    // The payload is the history plus this turn (flattened to text turns), but
-    // NOT the empty assistant placeholder we add to the UI below.
-    const history = toHistory([...get().messages, userMessage]);
-
     set((state) => ({
       messages: [...state.messages, userMessage, { role: 'assistant', content: '' }],
       isStreaming: true,
@@ -166,7 +162,7 @@ export const useCoachStore = create<CoachStore>((set, get) => ({
         return { messages };
       });
 
-    await streamChat(history, {
+    await streamChat(userMessage, {
       onToken: appendToLast,
       onProposal: addProposal,
       onDone: () => set({ isStreaming: false }),
@@ -176,7 +172,11 @@ export const useCoachStore = create<CoachStore>((set, get) => ({
           // Drop the placeholder if nothing (text or card) streamed before the failure.
           const messages = state.messages.slice();
           const last = messages[messages.length - 1];
-          if (last?.role === 'assistant' && last.content === '' && !last.proposal) {
+          if (
+            last?.role === 'assistant' &&
+            last.content === '' &&
+            !last.proposal
+          ) {
             messages.pop();
           }
           return { messages, isStreaming: false };

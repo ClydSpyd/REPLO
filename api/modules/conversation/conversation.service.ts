@@ -72,7 +72,7 @@ export class ConversationService {
       return { conversationId: null, messages: [], total: 0, hasMore: false };
     }
     const id = String(active._id);
-    const { total, messages } = await this.repository.getPage(
+    const { total, messages } = await this.repository.fetchPage(
       id,
       offset,
       limit,
@@ -83,5 +83,15 @@ export class ConversationService {
       total,
       hasMore: offset + messages.length < total,
     };
+  }
+
+  /** Retrieve the summary of the user's active conversation. */
+  async getSummary(userId: string) {
+    const active = await this.repository.findActiveByUser(userId);
+    if (!active) {
+      return { total: 0, summary: "" };
+    }
+    const id = String(active._id);
+    return this.repository.getSummary(id);
   }
 }

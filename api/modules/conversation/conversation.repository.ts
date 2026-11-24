@@ -50,7 +50,7 @@ export class ConversationRepository {
    * `start` is derived from the array size inside the pipeline so it's one round
    * trip. Messages come back oldest→newest within the page.
    */
-  async getPage(conversationId: string, offset: number, limit: number) {
+  async fetchPage(conversationId: string, offset: number, limit: number) {
     const [result] = await ConversationModel.aggregate<{
       total: number;
       messages: ConversationMessage[];
@@ -76,4 +76,20 @@ export class ConversationRepository {
     ]);
     return result ?? { total: 0, messages: [] };
   }
+  async getSummary(conversationId: string) {
+    const [result] = await ConversationModel.aggregate<{
+      total: number;
+      summary: string;
+    }>([
+      { $match: { _id: new mongoose.Types.ObjectId(conversationId) } },
+      {
+        $project: {
+          total: { $size: "$messages" },
+          summary: "$summary",
+        },
+      },
+    ]);
+    return result ?? { total: 0, summary: "" };
+  }
 }
+

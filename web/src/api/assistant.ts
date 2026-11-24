@@ -56,7 +56,7 @@ interface StreamHandlers {
 }
 
 export async function streamChat(
-  messages: CoachMessage[],
+  message: CoachMessage,
   handlers: StreamHandlers,
   signal?: AbortSignal,
 ): Promise<void> {
@@ -70,7 +70,7 @@ export async function streamChat(
         'Content-Type': 'application/json',
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
-      body: JSON.stringify({ messages }),
+      body: JSON.stringify({ message }),
       signal,
     });
   } catch (err) {

@@ -12,23 +12,23 @@ import { Request, Response } from "express";
 import { AssistantService, ChatMessage } from "./assistant.service";
 import { ConversationService } from "../conversation/conversation.service";
 import { AuthenticatedRequest } from "../../types/auth";
+import { AssistantOrchestrator } from "./assistant.orchestrator";
 
 const service = new AssistantService();
 const conversations = new ConversationService();
+const orchestrator = new AssistantOrchestrator(conversations, service);
 
 export async function chat(req: Request, res: Response) {
-  const { messages } = req.body as {
-    messages?: ChatMessage[];
+  const { message } = req.body as {
+    message?: ChatMessage;
   };
-  
+
   const { user } = req as AuthenticatedRequest;
 
   // Basic validation before we commit to an SSE response — once headers are
   // flushed we can no longer send a normal JSON error.
-  if (!Array.isArray(messages) || messages.length === 0) {
-    return res
-      .status(400)
-      .json({ error: "messages must be a non-empty array" });
+  if (!message) {
+    return res.status(400).json({ error: "message is required" });
   }
 
   // SSE headers. `X-Accel-Buffering: no` + no compression on this route keeps
@@ -45,33 +45,14 @@ export async function chat(req: Request, res: Response) {
 
   try {
     // Persist the user turn up front so it survives a mid-stream disconnect.
-    const lastUser = messages[messages.length - 1];
-    const conversationId = await conversations.appendUserMessage(
-      user.id,
-      lastUser.content,
-    );
-
-    // Accumulate the streamed reply so we can persist the full assistant turn.
-    let assistantText = "";
-    await service.streamChat(
-      messages,
-      (text) => {
-        assistantText += text;
+    await orchestrator.handleIncomingMessage(message.content, user.id, {
+      onToken: (text) => {
         send("token", { text });
       },
-      async (proposal) => {
-        // Persist as pending up front, then hand the client its id so it can
-        // record accept/dismiss later.
-        const proposalId = await conversations.appendProposal(
-          conversationId,
-          proposal,
-        );
-        send("proposal", { proposalId, ...proposal });
+      onProposal: (proposal) => {
+        send("proposal", proposal);
       },
-      user.id,
-    );
-
-    await conversations.appendAssistantMessage(conversationId, assistantText);
+    });
     send("done", {});
   } catch (err) {
     // Headers are already sent, so report the error inside the stream rather
