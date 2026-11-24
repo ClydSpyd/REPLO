@@ -87,6 +87,13 @@ describe("AssistantOrchestrator", () => {
         onProposal: vi.fn(),
       },
     );
+    
+    expect(conversationService.getPageById).toHaveBeenCalledWith(
+      "user-123",
+      "conversation-123",
+      0,
+      10,
+    );
 
     expect(conversationService.getSummary).toHaveBeenCalledWith(
       "user-123",
