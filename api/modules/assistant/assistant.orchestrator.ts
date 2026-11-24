@@ -34,9 +34,16 @@ export class AssistantOrchestrator {
     // check if summarisation + memory extraction is required, execute if so [[ implementation deferred to next step ]]
 
     // retreive last 10 messages, summary and memory data
-    const { messages } = await this.conversationService.getPage(userId, 0, 10);
-    const { summary } =
-      await this.conversationService.getSummary(conversationId);
+    const { messages } = await this.conversationService.getPageById(
+      userId,
+      conversationId,
+      0,
+      10,
+    );
+    const { summary } = await this.conversationService.getSummary(
+      userId,
+      conversationId,
+    );
 
     // build ModelContext payload
     const modelContext = buildContext({
@@ -56,6 +63,7 @@ export class AssistantOrchestrator {
       },
       async (proposal) => {
         const proposalId = await this.conversationService.appendProposal(
+          userId,
           conversationId,
           proposal,
         );
@@ -66,6 +74,7 @@ export class AssistantOrchestrator {
 
     // persist assistant response
     await this.conversationService.appendAssistantMessage(
+      userId,
       conversationId,
       assistantText,
     );

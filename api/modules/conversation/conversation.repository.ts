@@ -2,6 +2,12 @@ import mongoose from "mongoose";
 import { ConversationModel } from "./conversation.model";
 import { ConversationMessage } from "./conversation.types";
 
+// Aggregate doesn't auto-cast ids like find() does, so cast explicitly.
+const ownedBy = (userId: string, conversationId: string) => ({
+  _id: new mongoose.Types.ObjectId(conversationId),
+  userId: new mongoose.Types.ObjectId(userId),
+});
+
 export class ConversationRepository {
   /** The user's active (most-recently touched) conversation, or null. */
   async findActiveByUser(userId: string) {
@@ -14,10 +20,17 @@ export class ConversationRepository {
     return ConversationModel.create({ userId, messages: [] });
   }
 
-  /** Atomic append + touch — no read-modify-write, so concurrent turns can't clobber. */
-  async appendMessage(conversationId: string, message: ConversationMessage) {
-    return ConversationModel.findByIdAndUpdate(
-      conversationId,
+  /**
+   * Atomic append + touch — no read-modify-write, so concurrent turns can't
+   * clobber. Scoped by owner: returns null if the conversation isn't the user's.
+   */
+  async appendMessage(
+    userId: string,
+    conversationId: string,
+    message: ConversationMessage,
+  ) {
+    return ConversationModel.findOneAndUpdate(
+      { _id: conversationId, userId },
       { $push: { messages: message }, $set: { lastActiveAt: new Date() } },
       { new: true },
     );
@@ -48,14 +61,20 @@ export class ConversationRepository {
   /**
    * A page of `limit` messages ending `offset` messages back from the newest.
    * `start` is derived from the array size inside the pipeline so it's one round
-   * trip. Messages come back oldest→newest within the page.
+   * trip. Messages come back oldest→newest within the page. Scoped by owner:
+   * a conversation that isn't the user's returns null.
    */
-  async fetchPage(conversationId: string, offset: number, limit: number) {
+  async fetchPage(
+    userId: string,
+    conversationId: string,
+    offset: number,
+    limit: number,
+  ) {
     const [result] = await ConversationModel.aggregate<{
       total: number;
       messages: ConversationMessage[];
     }>([
-      { $match: { _id: new mongoose.Types.ObjectId(conversationId) } },
+      { $match: ownedBy(userId, conversationId) },
       {
         $project: {
           total: { $size: "$messages" },
@@ -74,14 +93,16 @@ export class ConversationRepository {
         },
       },
     ]);
-    return result ?? { total: 0, messages: [] };
+    return result ?? null;
   }
-  async getSummary(conversationId: string) {
+
+  /** Summary of one conversation, scoped by owner. */
+  async getSummary(userId: string, conversationId: string) {
     const [result] = await ConversationModel.aggregate<{
       total: number;
       summary: string;
     }>([
-      { $match: { _id: new mongoose.Types.ObjectId(conversationId) } },
+      { $match: ownedBy(userId, conversationId) },
       {
         $project: {
           total: { $size: "$messages" },

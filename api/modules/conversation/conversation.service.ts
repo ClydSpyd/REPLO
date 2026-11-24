@@ -1,6 +1,6 @@
 import { randomUUID } from "crypto";
 import { ConversationRepository } from "./conversation.repository";
-import { MessagePage, ProposalPayload, ProposalStatus } from "./conversation.types";
+import { ConversationMessage, MessagePage, ProposalPayload, ProposalStatus } from "./conversation.types";
 
 export class ConversationService {
   private repository = new ConversationRepository();
@@ -15,24 +15,26 @@ export class ConversationService {
   async appendUserMessage(userId: string, content: string): Promise<string> {
     const conversation = await this.getOrCreateActive(userId);
     const id = String(conversation._id);
-    await this.repository.appendMessage(id, { role: "user", content });
+    await this.append(userId, id, { role: "user", content });
     return id;
   }
 
-  async appendAssistantMessage(conversationId: string, content: string) {
-    await this.repository.appendMessage(conversationId, {
-      role: "assistant",
-      content,
-    });
+  async appendAssistantMessage(
+    userId: string,
+    conversationId: string,
+    content: string,
+  ) {
+    await this.append(userId, conversationId, { role: "assistant", content });
   }
 
   /** Persist a proposed routine as a pending proposal turn; returns its id. */
   async appendProposal(
+    userId: string,
     conversationId: string,
     proposal: ProposalPayload,
   ): Promise<string> {
     const proposalId = randomUUID();
-    await this.repository.appendMessage(conversationId, {
+    await this.append(userId, conversationId, {
       role: "assistant",
       content: "",
       proposalId,
@@ -40,6 +42,22 @@ export class ConversationService {
       status: "pending",
     });
     return proposalId;
+  }
+
+  /** Owner-scoped append; throws rather than silently dropping a turn. */
+  private async append(
+    userId: string,
+    conversationId: string,
+    message: ConversationMessage,
+  ) {
+    const updated = await this.repository.appendMessage(
+      userId,
+      conversationId,
+      message,
+    );
+    if (!updated) {
+      throw new Error("Conversation not found for user");
+    }
   }
 
   /** Record a proposal's outcome (accepted/dismissed), scoped by owner. */
@@ -71,27 +89,38 @@ export class ConversationService {
     if (!active) {
       return { conversationId: null, messages: [], total: 0, hasMore: false };
     }
-    const id = String(active._id);
-    const { total, messages } = await this.repository.fetchPage(
-      id,
+    return this.getPageById(userId, String(active._id), offset, limit);
+  }
+
+  /**
+   * A page of a specific conversation, counted from the newest end. Empty if
+   * the conversation doesn't exist or isn't owned by `userId`.
+   */
+  async getPageById(
+    userId: string,
+    conversationId: string,
+    offset: number,
+    limit: number,
+  ): Promise<MessagePage> {
+    const page = await this.repository.fetchPage(
+      userId,
+      conversationId,
       offset,
       limit,
     );
+    if (!page) {
+      return { conversationId: null, messages: [], total: 0, hasMore: false };
+    }
     return {
-      conversationId: id,
-      messages,
-      total,
-      hasMore: offset + messages.length < total,
+      conversationId,
+      messages: page.messages,
+      total: page.total,
+      hasMore: offset + page.messages.length < page.total,
     };
   }
 
-  /** Retrieve the summary of the user's active conversation. */
-  async getSummary(userId: string) {
-    const active = await this.repository.findActiveByUser(userId);
-    if (!active) {
-      return { total: 0, summary: "" };
-    }
-    const id = String(active._id);
-    return this.repository.getSummary(id);
+  /** Summary of a specific conversation; empty if missing or not owned. */
+  async getSummary(userId: string, conversationId: string) {
+    return this.repository.getSummary(userId, conversationId);
   }
 }

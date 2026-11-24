@@ -7,32 +7,6 @@ import {
 } from '../api/assistant';
 import { conversationMethods } from '../api/conversation';
 
-/**
- * Flatten the conversation into plain text turns for the LLM. Proposal turns
- * carry no text (`content: ''`), so replace them with a short synthetic line —
- * this keeps the model aware of what it proposed AND avoids sending
- * empty-content messages, which the API rejects.
- */
-function toHistory(messages: CoachMessage[]): CoachMessage[] {
-  return messages
-    .map((m) => {
-      if (m.proposal) {
-        const note =
-          m.status === 'accepted'
-            ? 'accepted'
-            : m.status === 'dismissed'
-              ? 'dismissed'
-              : 'awaiting the user';
-        return {
-          role: 'assistant' as const,
-          content: `(proposed routine "${m.proposal.name}" — ${note})`,
-        };
-      }
-      return { role: m.role, content: m.content };
-    })
-    .filter((m) => m.content.trim() !== '');
-}
-
 interface CoachStore {
   /** Whether the drawer is showing. Global so it survives navigation. */
   isOpen: boolean;
