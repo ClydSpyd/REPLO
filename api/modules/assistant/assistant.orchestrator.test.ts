@@ -12,7 +12,7 @@ describe("AssistantOrchestrator", () => {
   let assistantService!: AssistantService;
   let orchestrator!: AssistantOrchestrator;
 
-  beforeEach(async () => {
+  beforeEach(() => {
     vi.resetAllMocks();
 
     conversationService = new ConversationService();
@@ -41,13 +41,8 @@ describe("AssistantOrchestrator", () => {
           content: "Build me a workout routine",
         },
       ],
-      total: 0,
+      total: 1,
       hasMore: false,
-    });
-
-    vi.mocked(conversationService.getSummary).mockResolvedValue({
-      total: 0,
-      summary: "",
     });
 
     vi.mocked(conversationService.getSummary).mockResolvedValue({
@@ -93,11 +88,9 @@ describe("AssistantOrchestrator", () => {
       },
     );
 
-    expect(conversationService.getPageById).toHaveBeenCalledWith(
+    expect(conversationService.getSummary).toHaveBeenCalledWith(
       "user-123",
-      "conversation-123",
-      0,
-      10,
+      "conversation-123"
     );
   });
 
