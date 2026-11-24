@@ -79,16 +79,36 @@ export class ConversationRepository {
         $project: {
           total: { $size: "$messages" },
           messages: {
-            $slice: [
-              "$messages",
-              {
-                $max: [
-                  { $subtract: [{ $size: "$messages" }, offset + limit] },
-                  0,
-                ],
+            // Window is [end - limit, end) where end = size - offset, so the
+            // oldest partial page is shortened rather than overlapping the
+            // previous one. $slice rejects a count of 0, hence the $cond.
+            $let: {
+              vars: {
+                end: {
+                  $max: [{ $subtract: [{ $size: "$messages" }, offset] }, 0],
+                },
               },
-              limit,
-            ],
+              in: {
+                $let: {
+                  vars: {
+                    start: { $max: [{ $subtract: ["$$end", limit] }, 0] },
+                  },
+                  in: {
+                    $cond: [
+                      { $gt: ["$$end", "$$start"] },
+                      {
+                        $slice: [
+                          "$messages",
+                          "$$start",
+                          { $subtract: ["$$end", "$$start"] },
+                        ],
+                      },
+                      [],
+                    ],
+                  },
+                },
+              },
+            },
           },
         },
       },
@@ -97,7 +117,10 @@ export class ConversationRepository {
   }
 
   /** Summary of one conversation, scoped by owner. */
-  async getSummary(userId: string, conversationId: string) {
+  async getSummary(
+    userId: string,
+    conversationId: string,
+  ): Promise<{ total: number; summary: string }> {
     const [result] = await ConversationModel.aggregate<{
       total: number;
       summary: string;
@@ -113,4 +136,3 @@ export class ConversationRepository {
     return result ?? { total: 0, summary: "" };
   }
 }
-

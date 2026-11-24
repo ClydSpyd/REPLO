@@ -27,8 +27,10 @@ export async function chat(req: Request, res: Response) {
 
   // Basic validation before we commit to an SSE response — once headers are
   // flushed we can no longer send a normal JSON error.
-  if (!message) {
-    return res.status(400).json({ error: "message is required" });
+  if (typeof message?.content !== "string" || !message.content.trim()) {
+    return res
+      .status(400)
+      .json({ error: "message.content must be a non-empty string" });
   }
 
   // SSE headers. `X-Accel-Buffering: no` + no compression on this route keeps

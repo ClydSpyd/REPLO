@@ -9,5 +9,11 @@
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true
   },
-  "include": ["app.ts", "server.ts", "modules/**/*.ts", "middleware/**/*.ts", "config/**/*.ts"]
+  "include": ["app.ts", "server.ts", "modules/**/*.ts", "middleware/**/*.ts", "config/**/*.ts"],
+  "exclude": [
+  "node_modules",
+  "dist",
+  "**/*.test.ts",
+  "**/*.spec.ts"
+]
 }

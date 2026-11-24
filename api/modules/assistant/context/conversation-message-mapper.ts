@@ -1,6 +1,7 @@
 import {
   ConversationMessage,
   ProposalPayload,
+  ProposalStatus,
 } from "../../conversation/conversation.types";
 import { ChatMessage } from "../assistant.service";
 
@@ -13,7 +14,7 @@ export function mapConversationMessages(
       return [
         {
           role: "assistant",
-          content: formatProposal(message.proposal),
+          content: formatProposal(message.proposal, message.status),
         },
       ];
     }
@@ -33,9 +34,12 @@ export function mapConversationMessages(
   });
 }
 
-function formatProposal(proposal: ProposalPayload): string {
+function formatProposal(
+  proposal: ProposalPayload,
+  status: ProposalStatus = "pending",
+): string {
   const routineName = proposal.name ?? "Unnamed routine";
   const exercises =
     proposal.exercises?.map((e) => e.name).join(", ") ?? "no exercises";
-  return `Proposed routine: ${routineName} with exercises: ${exercises}`;
+  return `Proposed routine (${status}): ${routineName} with exercises: ${exercises}`;
 }
