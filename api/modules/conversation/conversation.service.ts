@@ -120,7 +120,42 @@ export class ConversationService {
   }
 
   /** Summary of a specific conversation; empty if missing or not owned. */
-  async getSummary(userId: string, conversationId: string) {
+  async getSummary(
+    userId: string,
+    conversationId: string,
+  ): Promise<{
+    total: number;
+    summary: string;
+    summarisedMessageCount: number;
+  }> {
     return this.repository.getSummary(userId, conversationId);
+  }
+
+  async getMessagesByIndexRange(
+  userId: string,
+  conversationId: string,
+  startIndex: number,
+  endIndex: number,
+): Promise<ConversationMessage[]> {
+    return this.repository.getMessagesByIndexRange(
+      userId,
+      conversationId,
+      startIndex,
+      endIndex,
+    );
+  } 
+
+  async updateSummary(
+    userId: string,
+    conversationId: string,
+    summary: string,
+    summarisedMessageCount: number,
+  ): Promise<void> {
+    await this.repository.updateSummary(
+      userId,
+      conversationId,
+      summary,
+      summarisedMessageCount,
+    );
   }
 }

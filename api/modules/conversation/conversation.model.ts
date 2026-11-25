@@ -58,6 +58,7 @@ const ConversationSchema = new mongoose.Schema(
     messages: { type: [MessageSchema], default: [] },
     lastActiveAt: { type: Date, default: Date.now },
     summary: { type: String, default: "" },
+    summarisedMessageCount: { type: Number, default: 0 },
   },
   { timestamps: true },
 );

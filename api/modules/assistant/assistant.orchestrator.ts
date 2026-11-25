@@ -2,7 +2,9 @@ import { ConversationService } from "../conversation/conversation.service";
 import { ProposalPayload } from "../conversation/conversation.types";
 import { AssistantService } from "./assistant.service";
 import { buildContext } from "./context/context-builder";
+import { CONTEXT_CONFIG } from "./context/context.config";
 import { mapConversationMessages } from "./context/conversation-message-mapper";
+import { SummarisationService } from "./context/summarisation.service";
 
 const SYSTEM_PROMPT = `You are Coach, a friendly fitness assistant built into the REPLO workout-tracking app.
 Give practical, general fitness and training guidance. Keep answers concise.
@@ -18,6 +20,7 @@ export class AssistantOrchestrator {
   constructor(
     private conversationService: ConversationService,
     private assistantService: AssistantService,
+    private summarisationService: SummarisationService,
   ) {}
 
   async handleIncomingMessage(
@@ -31,18 +34,18 @@ export class AssistantOrchestrator {
       message,
     );
 
-    // check if summarisation + memory extraction is required, execute if so [[ implementation deferred to next step ]]
+    // check if summarisation + memory extraction is required, execute if so
+    await this.summarisationService.maybeSummarise(userId, conversationId);
 
-    // retreive last 10 messages, summary and memory data
-    const { messages } = await this.conversationService.getPageById(
+    // retreive unsummarised messages, summary and memory data
+    const { summary, total, summarisedMessageCount } =
+      await this.conversationService.getSummary(userId, conversationId);
+
+    const messages = await this.conversationService.getMessagesByIndexRange(
       userId,
       conversationId,
-      0,
-      10,
-    );
-    const { summary } = await this.conversationService.getSummary(
-      userId,
-      conversationId,
+      summarisedMessageCount,
+      total,
     );
 
     // build ModelContext payload

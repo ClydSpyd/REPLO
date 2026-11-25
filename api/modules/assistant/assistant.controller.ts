@@ -13,10 +13,21 @@ import { AssistantService, ChatMessage } from "./assistant.service";
 import { ConversationService } from "../conversation/conversation.service";
 import { AuthenticatedRequest } from "../../types/auth";
 import { AssistantOrchestrator } from "./assistant.orchestrator";
+import { SummarisationService } from "./context/summarisation.service";
 
-const service = new AssistantService();
-const conversations = new ConversationService();
-const orchestrator = new AssistantOrchestrator(conversations, service);
+const assistantService = new AssistantService();
+const conversationService = new ConversationService();
+
+const summarisationService = new SummarisationService(
+  conversationService,
+  assistantService,
+);
+
+const orchestrator = new AssistantOrchestrator(
+  conversationService,
+  assistantService,
+  summarisationService,
+);
 
 export async function chat(req: Request, res: Response) {
   const { message } = req.body as {

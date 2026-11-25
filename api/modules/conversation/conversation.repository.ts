@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import { ConversationModel } from "./conversation.model";
-import { ConversationMessage } from "./conversation.types";
+import { Conversation, ConversationMessage } from "./conversation.types";
 
 // Aggregate doesn't auto-cast ids like find() does, so cast explicitly.
 const ownedBy = (userId: string, conversationId: string) => ({
@@ -120,19 +120,61 @@ export class ConversationRepository {
   async getSummary(
     userId: string,
     conversationId: string,
-  ): Promise<{ total: number; summary: string }> {
+  ): Promise<{
+    total: number;
+    summary: string;
+    summarisedMessageCount: number;
+  }> {
     const [result] = await ConversationModel.aggregate<{
       total: number;
       summary: string;
+      summarisedMessageCount: number;
     }>([
       { $match: ownedBy(userId, conversationId) },
       {
         $project: {
           total: { $size: "$messages" },
           summary: "$summary",
+          summarisedMessageCount: "$summarisedMessageCount",
         },
       },
     ]);
-    return result ?? { total: 0, summary: "" };
+    return result ?? { total: 0, summary: "", summarisedMessageCount: 0 };
+  }
+
+  /** Retrieve messages within a specific index range, scoped by owner. */
+  async getMessagesByIndexRange(
+    userId: string,
+    conversationId: string,
+    startIndex: number,
+    endIndex: number,
+  ): Promise<ConversationMessage[]> {
+    const conversation = await ConversationModel.findOne(
+      ownedBy(userId, conversationId),
+      { messages: { $slice: [startIndex, endIndex - startIndex] } },
+    );
+    return conversation?.messages ?? [];
+  }
+
+  /** update summary + summarised message count for a conversation, scoped by owner. */
+  async updateSummary(
+    userId: string,
+    conversationId: string,
+    summary: string,
+    summarisedMessageCount: number,
+  ): Promise<void> {
+    const result = await ConversationModel.updateOne(
+      ownedBy(userId, conversationId),
+      {
+        $set: {
+          summary,
+          summarisedMessageCount,
+        },
+      },
+    );
+
+    if (result.matchedCount === 0) {
+      throw new Error("Conversation not found");
+    }
   }
 }

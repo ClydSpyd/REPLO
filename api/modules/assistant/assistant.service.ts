@@ -1,5 +1,12 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { searchExercisesTool, createAnalyzeTrainingPeriodTool, createListSessionsTool, createProposeRoutineTool, RoutineProposal, createReadRoutinesTool } from "./tools";
+import {
+  searchExercisesTool,
+  createAnalyzeTrainingPeriodTool,
+  createListSessionsTool,
+  createProposeRoutineTool,
+  RoutineProposal,
+  createReadRoutinesTool,
+} from "./tools";
 import { ModelContext } from "./context/context.types";
 
 const client = new Anthropic();
@@ -25,7 +32,7 @@ const buildTools = (
     proposeRoutineTool,
     readRoutinesTool,
   ];
-}
+};
 
 function toModelMessages(messages: ChatMessage[]): ChatMessage[] {
   // Mongo entries also carry createdAt, which is rejected by the toolRunner
@@ -42,7 +49,7 @@ export class AssistantService {
     modelContext: ModelContext,
     onToken: (text: string) => void,
     emitProposal: (proposal: RoutineProposal) => void | Promise<void>,
-    userId: string
+    userId: string,
   ): Promise<void> {
     console.log(`[assistant] streamChat: req userID ${userId}`);
 
@@ -70,5 +77,28 @@ export class AssistantService {
         }
       }
     }
+  }
+
+  async summariseConversation(
+    previousSummary: string,
+    messages: ChatMessage[],
+  ): Promise<string> {
+    // Construct summarisation prompt
+    const prompt = `Summarise this conversation.\n\nPrevious summary: ${previousSummary}\n\nMessages:\n${messages
+      .map((m) => `${m.role}: ${m.content}`)
+      .join("\n")}\n\nUpdated summary:`;
+
+    // Execute LLM request
+    const response = await client.beta.messages.create({
+      model: "claude-sonnet-5",
+      max_tokens: 2048,
+      messages: [{ role: "user", content: prompt }],
+    });
+
+    // Return updated summary
+    return response.content
+      .filter((block) => block.type === "text")
+      .map((block) => block.text)
+      .join("\n");
   }
 }

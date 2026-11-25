@@ -1,5 +1,17 @@
 export type ProposalStatus = "pending" | "accepted" | "dismissed";
 
+/** A conversation between a user and the assistant. */
+export interface Conversation {
+  _id: string;
+  userId: string;
+  messages: ConversationMessage[];
+  lastActiveAt: Date;
+  summary: string;
+  summarisedMessageCount: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 /** A proposed exercise as stored on a proposal message. */
 export interface ProposedExercise {
   exerciseId: string;
