@@ -2,7 +2,6 @@ import { ConversationService } from "../conversation/conversation.service";
 import { ProposalPayload } from "../conversation/conversation.types";
 import { AssistantService } from "./assistant.service";
 import { buildContext } from "./context/context-builder";
-import { CONTEXT_CONFIG } from "./context/context.config";
 import { mapConversationMessages } from "./context/conversation-message-mapper";
 import { SummarisationService } from "./context/summarisation.service";
 

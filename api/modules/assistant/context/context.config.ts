@@ -1,4 +1,5 @@
 export const CONTEXT_CONFIG = {
   RECENT_WINDOW_SIZE: 10,
   SUMMARY_BATCH_SIZE: 10,
+  MAXIMUM_BATCH_SIZE: 50,
 } as const;

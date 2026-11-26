@@ -8,6 +8,7 @@ import {
   createReadRoutinesTool,
 } from "./tools";
 import { ModelContext } from "./context/context.types";
+import { buildSummarisationPrompt } from "./prompts/summarisation.prompt";
 
 const client = new Anthropic();
 
@@ -84,16 +85,26 @@ export class AssistantService {
     messages: ChatMessage[],
   ): Promise<string> {
     // Construct summarisation prompt
-    const prompt = `Summarise this conversation.\n\nPrevious summary: ${previousSummary}\n\nMessages:\n${messages
-      .map((m) => `${m.role}: ${m.content}`)
-      .join("\n")}\n\nUpdated summary:`;
+    const prompt = buildSummarisationPrompt(previousSummary, messages);
 
     // Execute LLM request
     const response = await client.beta.messages.create({
       model: "claude-sonnet-5",
       max_tokens: 2048,
-      messages: [{ role: "user", content: prompt }],
+      ...prompt,
     });
+
+    if (response.stop_reason === "max_tokens") {
+      console.log({
+        stopReason: response.stop_reason,
+        inputTokens: response.usage.input_tokens,
+        outputTokens: response.usage.output_tokens,
+        blockTypes: response.content.map((b) => b.type),
+        raw: response,
+      });
+
+      throw new Error("Summarisation response truncated");
+    }
 
     // Return updated summary
     return response.content

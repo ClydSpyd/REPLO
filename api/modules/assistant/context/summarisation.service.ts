@@ -1,6 +1,7 @@
 import { ConversationService } from "../../conversation/conversation.service";
 import { AssistantService } from "../assistant.service";
 import { CONTEXT_CONFIG } from "./context.config";
+import { mapConversationMessages } from "./conversation-message-mapper";
 
 export class SummarisationService {
   constructor(
@@ -19,25 +20,34 @@ export class SummarisationService {
         return;
       }
 
+      // determine messages eligible for summarisation
       const totalMessages = conversation.total;
       const summarisedMessageCount = conversation.summarisedMessageCount;
-
+      
       const eligibleMessageCount =
         totalMessages -
         summarisedMessageCount -
         CONTEXT_CONFIG.RECENT_WINDOW_SIZE;
 
+      const batchSize = Math.min(
+        eligibleMessageCount,
+        CONTEXT_CONFIG.MAXIMUM_BATCH_SIZE,
+      );
+
+      // skip summarisation if not enough eligible messages
       if (eligibleMessageCount < CONTEXT_CONFIG.SUMMARY_BATCH_SIZE) {
         return;
       }
 
+      // extract messages to summarise by index range
       const messagesToSummarise =
         await this.conversationService.getMessagesByIndexRange(
           userId,
           conversationId,
           summarisedMessageCount,
-          totalMessages - CONTEXT_CONFIG.RECENT_WINDOW_SIZE,
+          summarisedMessageCount + batchSize,
         );
+
       if (messagesToSummarise.length === 0) {
         return;
       }
@@ -46,16 +56,23 @@ export class SummarisationService {
         `[summarisation] messages to summarise: ${messagesToSummarise.length}`,
       );
 
+      // generate updated summary using assistant service
       const updatedSummary = await this.assistantService.summariseConversation(
         conversation.summary,
-        messagesToSummarise,
+        mapConversationMessages(messagesToSummarise),
       );
 
       if (!updatedSummary.trim()) {
         throw new Error("LLM returned an empty summary");
       }
 
-      console.log(`[summarisation] updated summary: ${updatedSummary}`);
+      // update conversation summary in DB, increment summarisedMessageCount
+      await this.conversationService.updateSummary(
+        userId,
+        conversationId,
+        updatedSummary,
+        summarisedMessageCount + messagesToSummarise.length,
+      );
 
       console.log("[summarisation] Completed", {
         conversationId,
@@ -63,15 +80,6 @@ export class SummarisationService {
         previousCheckpoint: summarisedMessageCount,
         newCheckpoint: summarisedMessageCount + messagesToSummarise.length,
       });
-
-      // update the conversation summary in your database
-      // increment the summarisedMessageCount accordingly.
-      await this.conversationService.updateSummary(
-        userId,
-        conversationId,
-        updatedSummary,
-        summarisedMessageCount + messagesToSummarise.length,
-      );
     } catch (error) {
       console.error("[summarisation] failed to summarise conversation:", error);
     }
